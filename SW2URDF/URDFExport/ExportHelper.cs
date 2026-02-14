@@ -684,7 +684,7 @@ namespace SW2URDF.URDFExport
         //If the user selected something specific for a particular link, that is handled here.
         private void SetLinkSpecificSTLPreferences(string CoordinateSystemName, ModelDoc2 doc)
         {
-            doc.Extension.SetUserPreferenceString((int)swUserPreferenceStringValue_e.swFileSaveAsCoordinateSystem,
+            doc.Extension.SetUserPreferenceString((int)swUserPreferenceStringValue_e.swExportOutputCoordinateSystem,
                 (int)swUserPreferenceOption_e.swDetailingNoOptionSpecified, CoordinateSystemName);
         }
 
