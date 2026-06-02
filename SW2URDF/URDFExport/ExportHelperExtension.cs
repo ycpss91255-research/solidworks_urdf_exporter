@@ -822,6 +822,48 @@ namespace SW2URDF.URDFExport
             }
         }
 
+        // Materializes a top-level reference coordinate system at the global pose of a
+        // (possibly nested) coordinate system, and returns its name. The STL export
+        // coordinate-system preference only resolves coordinate systems at the top level of the
+        // document being saved, so a system defined inside a sub-assembly cannot be used to
+        // localize the mesh and SOLIDWORKS falls back to the global frame.
+        // The global transform is taken from GetCoordinateSystemTransform -- the same one the
+        // joint origin uses, which composes the owning component's Transform2 and is therefore
+        // correct at any nesting depth -- so the generated top-level system coincides with the
+        // selected one and the mesh is baked at the link origin, exactly as the auto-generated
+        // Origin_<joint> systems already are. Returns null if the transform cannot be resolved.
+        private string CreateGlobalMeshCoordinateSystem(Link link, string coordsysName)
+        {
+            MathTransform globalTransform = GetCoordinateSystemTransform(coordsysName);
+            if (globalTransform == null)
+            {
+                logger.Warn("Could not resolve a global transform for '" + coordsysName +
+                    "'; mesh for link " + link.Name + " will be exported in the global frame");
+                return null;
+            }
+
+            Joint meshFrame = new Joint();
+            meshFrame.Origin.SetXYZ(MathOps.GetXYZ(globalTransform));
+            meshFrame.Origin.SetRPY(MathOps.GetRPY(globalTransform));
+
+            // Like the generated joint frames: one of the same name and place (from an earlier
+            // export or preview) is used again, any other one is left alone and the next free
+            // name is taken. The name starts with Origin_ so that a cancelled preview removes it
+            // and a completed export files it in the URDF Export Configuration folder.
+            Origin wanted = meshFrame.Origin;
+            string name = GeneratedFeatureLog.ChooseName(
+                "Origin_mesh_" + link.Name.Replace('/', '_'), CoordinateSystemExists,
+                existing => CoordinateSystemIsAt(existing, wanted), out bool reuse);
+            if (reuse)
+            {
+                GeneratedFeatures.AddReused(GeneratedKind.CoordinateSystem, name);
+                return name;
+            }
+            meshFrame.CoordinateSystemName = name;
+            CreateRefOrigin(meshFrame);
+            return name;
+        }
+
         // Creates a Reference Axis to be used to calculate the joint axis
         private void CreateRefAxis(Joint Joint)
         {
