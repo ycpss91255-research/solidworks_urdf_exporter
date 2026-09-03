@@ -628,4 +628,18 @@ namespace SW2URDF.Test
             Assert.True(SwApp.CloseAllDocuments(true));
         }
     }
+
+    public class TestJointGeometry
+    {
+        [Theory]
+        [InlineData("fixed", false)]
+        [InlineData("revolute", true)]
+        [InlineData("continuous", true)]
+        [InlineData("prismatic", true)]
+        [InlineData("Automatically Detect", true)]
+        public void TestJointUsesAxis(string jointType, bool expected)
+        {
+            Assert.Equal(expected, ExportHelper.JointUsesAxis(jointType));
+        }
+    }
 }
