@@ -8,7 +8,11 @@
 
 #define MainBinaryName  "SW2URDF.dll"
 #define SetupBaseName   "sw2urdfSetup_"
-#define DllLocation     AddBackslash(SourcePath + "..\SW2URDF\bin\x64\Debug") + MainBinaryName
+; Build output subfolder under SW2URDF\bin. Override with: ISCC.exe /DBinDir=Release Install.iss
+#ifndef BinDir
+#define BinDir "x64\Debug"
+#endif
+#define DllLocation     AddBackslash(SourcePath + "..\SW2URDF\bin\" + BinDir) + MainBinaryName
 #define BuildVersion    GetFileVersion(DllLocation)
 #define CommitVersion   GetFileProductVersion(DllLocation)
 #define AVF1            Copy(BuildVersion, 1, Pos(".", BuildVersion) - 1) + "_" + Copy(BuildVersion, Pos(".", BuildVersion) + 1)
@@ -46,7 +50,7 @@ ArchitecturesInstallIn64BitMode=x64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: x64\Debug\*;  DestDir: {app}; Flags: ignoreversion; Check: IsWin64;
+Source: {#BinDir}\*;  DestDir: {app}; Flags: ignoreversion; Check: IsWin64;
 ;Source: x86\Debug\*;  DestDir: {app}; Flags: regserver ignoreversion; Check: not IsWin64
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
