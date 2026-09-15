@@ -332,3 +332,7 @@ ASALocalRun/
 *.zip
 
 SW2URDF/Versioning/VersionInfo.cs
+
+# Installer / packaging outputs
+INSTALL/OUTPUT/
+dist/
