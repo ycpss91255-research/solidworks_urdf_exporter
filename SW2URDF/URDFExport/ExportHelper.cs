@@ -476,12 +476,6 @@ namespace SW2URDF.URDFExport
                 (int)swSaveAsOptions_e.swSaveAsOptions_Copy;
             SetLinkSpecificSTLPreferences(exportCoordsysName, link.STLQualityFine, ActiveDoc);
 
-            // Align the link's visual/collision/inertial origins with its coordinate system
-            // so the exported mesh lines up with the URDF link frame. Without this, STL meshes
-            // for links whose coordinate system is not at the assembly origin are misplaced
-            // (issues #87 / #116). Mirrors the 3dxml export path.
-            LocalizeLinkToCoordinateSystem(link, coordsysName);
-
             logger.Info("Saving STL to " + windowsMeshFilename);
             ActiveDoc.Extension.SaveAs(windowsMeshFilename,
                 (int)swSaveAsVersion_e.swSaveAsCurrentVersion, saveOptions, null, ref errors, ref warnings);
