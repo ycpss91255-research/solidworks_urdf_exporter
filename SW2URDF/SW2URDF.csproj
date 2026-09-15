@@ -28,8 +28,7 @@
     <DelaySign>false</DelaySign>
     <OutputType>Library</OutputType>
     <RootNamespace>SW2URDF</RootNamespace>
-    <!-- SolidWorks install dir, used to locate the interop assemblies. Override with
-         /p:SolidWorksDir=... or a SolidWorksDir env var if installed elsewhere. -->
+    <!-- Override with /p:SolidWorksDir=... if SolidWorks is installed elsewhere. -->
     <SolidWorksDir Condition=" '$(SolidWorksDir)' == '' ">C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\</SolidWorksDir>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <StartupObject>
@@ -40,7 +39,7 @@
     </UpgradeBackupLocation>
     <StartProgram>C:\PROGRA~1\SOLIDW~1\SOLIDW~1\\SldWorks.exe</StartProgram>
     <StartAction>Program</StartAction>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <OldToolsVersion>2.0</OldToolsVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile>
@@ -345,7 +344,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ROS\ROSFiles.cs" />
-    <Compile Include="ROS\ROS2Files.cs" />
     <Compile Include="UI\TreeMergedEventArgs.cs" />
     <Compile Include="UI\TreeMergeWPF.xaml.cs">
       <DependentUpon>TreeMergeWPF.xaml</DependentUpon>
@@ -517,7 +515,6 @@
     <PreBuildEvent>"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ExecutionPolicy Bypass -File "$(SolutionDir)scripts\UpdateVersionInfo.ps1" --filename "$(ProjectDir)Versioning\VersionInfo.cs"</PreBuildEvent>
     <PostBuildEvent>
 :REGISTRATION
-IF "$(TargetFrameworkVersion)"=="v4.8" GOTO NET40
 IF "$(TargetFrameworkVersion)"=="v4.5.2" GOTO NET40
 IF "$(TargetFrameworkVersion)"=="v4.5" GOTO NET40
 IF "$(TargetFrameworkVersion)"=="v4.0" GOTO NET40

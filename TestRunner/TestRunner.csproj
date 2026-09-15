@@ -7,8 +7,7 @@
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
-    <!-- SolidWorks install dir, used to locate the interop assemblies. Override with
-         /p:SolidWorksDir=... or a SolidWorksDir env var if installed elsewhere. -->
+    <!-- Override with /p:SolidWorksDir=... if SolidWorks is installed elsewhere. -->
     <SolidWorksDir Condition=" '$(SolidWorksDir)' == '' ">C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\</SolidWorksDir>
   </PropertyGroup>
 
