@@ -44,7 +44,7 @@ namespace SW2URDF.URDFExport
         public void CreateRobotFromActiveModel()
         {
             URDFRobot = new Robot();
-            URDFRobot.Name = ActiveSWModel.GetTitle();
+            URDFRobot.Name = CommonSwOperations.TitleWithoutExtension(ActiveSWModel.GetTitle());
 
             Configuration swConfig = ActiveSWModel.ConfigurationManager.ActiveConfiguration;
             foreach (string state in swConfig.GetDisplayStates())
@@ -76,7 +76,7 @@ namespace SW2URDF.URDFExport
         private static Link CreateLinkFromPartModel(ModelDoc2 swModel)
         {
             Link Link = new Link(null);
-            Link.Name = swModel.GetTitle();
+            Link.Name = CommonSwOperations.TitleWithoutExtension(swModel.GetTitle());
 
             Link.isFixedFrame = false;
 

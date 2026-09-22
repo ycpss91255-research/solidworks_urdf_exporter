@@ -110,7 +110,7 @@ namespace SW2URDF.URDFExport
             iSwApp.GetUserProgressBar(out progressBar);
 
             SavePath = System.Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
-            PackageName = ActiveSWModel.GetTitle();
+            PackageName = CommonSwOperations.TitleWithoutExtension(ActiveSWModel.GetTitle());
 
             // Defaults must be set before the initial enumeration below so that out-of-the-box
             // behaviour (top level only, unfiltered) is unchanged.
@@ -537,6 +537,7 @@ namespace SW2URDF.URDFExport
             //Creating package directories
             URDFPackage package = new URDFPackage(PackageName, SavePath);
             package.CreateDirectories();
+            URDFRobot.Name = PackageName;
             string meshFileName = package.MeshesDirectory + URDFRobot.BaseLink.Name + ".STL";
             string windowsMeshFileName = package.WindowsMeshesDirectory + URDFRobot.BaseLink.Name + ".STL";
             string windowsURDFFileName = package.WindowsRobotsDirectory + URDFRobot.Name + ".urdf";

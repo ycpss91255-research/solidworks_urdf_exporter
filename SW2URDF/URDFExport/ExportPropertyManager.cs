@@ -135,7 +135,7 @@ namespace SW2URDF.URDFExport
             ActiveSWModel = swApp.ActiveDoc;
             Exporter = new ExportHelper(swApp);
             Exporter.URDFRobot = new Robot();
-            Exporter.URDFRobot.Name = ActiveSWModel.GetTitle();
+            Exporter.URDFRobot.Name = CommonSwOperations.TitleWithoutExtension(ActiveSWModel.GetTitle());
 
             linksToVisit = new List<Link>();
             docMenu = new ContextMenuStrip();
