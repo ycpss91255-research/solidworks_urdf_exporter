@@ -150,7 +150,10 @@ namespace SW2URDF.UI
             {
                 comboBox_coordsys.Items.Add(name);
             }
-            comboBox_coordsys.SelectedIndex = 0;
+            // A coordinate system named "Origin_global" used to be picked up silently; show that
+            // choice in the drop-down instead of hiding it.
+            int legacy = comboBox_coordsys.Items.IndexOf("Origin_global");
+            comboBox_coordsys.SelectedIndex = legacy > 0 ? legacy : 0;
 
             Exporter.URDFRobot.BaseLink.Visual.Origin.FillBoxes(textBox_collision_origin_x,
                                                              textBox_collision_origin_y,
