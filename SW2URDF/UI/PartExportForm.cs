@@ -31,6 +31,7 @@ namespace SW2URDF.UI
     public partial class PartExportForm : Form
     {
         public ExportHelper Exporter;
+        private const string PartOriginItem = "(part origin)";
 
         public PartExportForm(SldWorks iSwApp)
         {
@@ -120,8 +121,15 @@ namespace SW2URDF.UI
 
             Exporter.URDFRobot.BaseLink.STLQualityFine = radioButton_fine.Checked;
 
-            Exporter.ExportLink(checkBox_rotate.Checked);
+            string coordSysName = comboBox_coordsys.SelectedIndex > 0 ? comboBox_coordsys.Text : null;
+            Exporter.ExportLink(checkBox_rotate.Checked, coordSysName);
             Close();
+        }
+
+        // A chosen coordinate system fixes the orientation, so the Z-up rotation no longer applies.
+        private void ComboBoxCoordsysSelectedIndexChanged(object sender, EventArgs e)
+        {
+            checkBox_rotate.Enabled = comboBox_coordsys.SelectedIndex <= 0;
         }
 
         private void ButtonCancelClick(object sender, EventArgs e)
@@ -133,6 +141,16 @@ namespace SW2URDF.UI
         {
             Exporter.CreateRobotFromActiveModel();
             textBox_save_as.Text = Exporter.SavePath + "\\" + Exporter.PackageName;
+
+            // Link frame: the part origin (optionally rotated Z-up) or any reference coordinate
+            // system in the part, the same choice the assembly exporter offers per link.
+            comboBox_coordsys.Items.Clear();
+            comboBox_coordsys.Items.Add(PartOriginItem);
+            foreach (string name in Exporter.GetRefCoordinateSystems())
+            {
+                comboBox_coordsys.Items.Add(name);
+            }
+            comboBox_coordsys.SelectedIndex = 0;
 
             Exporter.URDFRobot.BaseLink.Visual.Origin.FillBoxes(textBox_collision_origin_x,
                                                              textBox_collision_origin_y,

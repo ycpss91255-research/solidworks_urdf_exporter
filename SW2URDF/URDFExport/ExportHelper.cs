@@ -525,11 +525,23 @@ namespace SW2URDF.URDFExport
             }
         }
 
-        public void ExportLink(bool zIsUp)
+        // coordSysName: a reference coordinate system in the part to use as the link frame (the
+        // same choice the assembly exporter offers per link). Null/empty keeps the historical
+        // behaviour: a coordinate system named "Origin_global" if the part has one, otherwise one
+        // is created at the part origin, rotated so +Y becomes +Z when zIsUp is set.
+        public void ExportLink(bool zIsUp, string coordSysName = null)
         {
-            CreateBaseRefOrigin(zIsUp);
+            string frameName = string.IsNullOrEmpty(coordSysName) ? "Origin_global" : coordSysName;
+            if (frameName == "Origin_global")
+            {
+                CreateBaseRefOrigin(zIsUp);
+            }
             MathTransform coordSysTransform =
-                ActiveSWModel.Extension.GetCoordinateSystemTransformByName("Origin_global");
+                ActiveSWModel.Extension.GetCoordinateSystemTransformByName(frameName);
+            if (coordSysTransform == null)
+            {
+                throw new InvalidOperationException("Coordinate system '" + frameName + "' was not found in the part");
+            }
             Matrix<double> GlobalTransform = MathOps.GetTransformation(coordSysTransform);
 
             LocalizeLink(URDFRobot.BaseLink, GlobalTransform);
