@@ -1,8 +1,12 @@
 ﻿using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using SW2URDF.URDF;
 using SW2URDF.URDFExport;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using Xunit;
 
 namespace SW2URDF.Test
@@ -205,30 +209,122 @@ namespace SW2URDF.Test
             Assert.True(SwApp.CloseAllDocuments(true));
         }
 
-        /*
-         * TODO(SIMINT-164) Part document tests not working (OpenSWPartDocument)
         [Theory]
-        [InlineData("TOY_BLOCK")]
-        public void TestExportLink(string modelName)
+        [InlineData("TOY_BLOCK", "BlockA")]
+        public void TestCreateRobotFromActiveModel(string modelName, string partName)
         {
-            ModelDoc2 doc = OpenSWPartDocument(modelName);
+            OpenSWPartDocument(modelName, partName);
             ExportHelper helper = new ExportHelper(SwApp);
+            helper.CreateRobotFromActiveModel();
+            Assert.NotNull(helper.URDFRobot);
+            Assert.Equal(partName, helper.URDFRobot.BaseLink.Name);
+            Assert.True(SwApp.CloseAllDocuments(true));
+        }
+
+        // Part export with the default frame: the part origin rotated so +Y becomes +Z.
+        [Theory]
+        [InlineData("TOY_BLOCK", "BlockA")]
+        public void TestExportLink(string modelName, string partName)
+        {
+            OpenSWPartDocument(modelName, partName);
+            ExportHelper helper = new ExportHelper(SwApp);
+            helper.CreateRobotFromActiveModel();
+            helper.SavePath = CreateRandomTempDirectory() + Path.DirectorySeparatorChar;
             helper.ExportLink(true);
-            Assert.True(true, "Part export failed");
+
+            XElement visualOrigin = LoadExportedVisualOrigin(helper);
+            AssertVector(new[] { 0.0, 0.0, 0.0 }, visualOrigin.Attribute("xyz").Value);
+            AssertVector(new[] { Math.PI / 2, 0.0, 0.0 }, visualOrigin.Attribute("rpy").Value);
+            Assert.True(SwApp.CloseAllDocuments(true));
+        }
+
+        // Part export with an explicit reference coordinate system as the link frame: the mesh
+        // stays in the part frame and the inverse of the frame pose lands in the visual origin,
+        // exactly like the assembly exporter does per link.
+        [Theory]
+        [InlineData("TOY_BLOCK", "BlockA")]
+        public void TestExportLinkWithCoordinateSystem(string modelName, string partName)
+        {
+            ModelDoc2 doc = OpenSWPartDocument(modelName, partName);
+            // frame 0.1 m along X, rotated -90 deg about X (part +Y -> frame +Z)
+            Feature frame = doc.FeatureManager.CreateCoordinateSystemUsingNumericalValues(
+                true, 0.1, 0, 0, true, -Math.PI / 2, 0, 0);
+            Assert.NotNull(frame);
+            frame.Name = "TestFrame";
+
+            ExportHelper helper = new ExportHelper(SwApp);
+            helper.CreateRobotFromActiveModel();
+            helper.SavePath = CreateRandomTempDirectory() + Path.DirectorySeparatorChar;
+            helper.ExportLink(false, "TestFrame");
+
+            XElement visualOrigin = LoadExportedVisualOrigin(helper);
+            // inverse pose: R^T * (-t) = Rx(+90) * (-0.1, 0, 0) = (-0.1, 0, 0); rpy = (+90 deg, 0, 0)
+            AssertVector(new[] { -0.1, 0.0, 0.0 }, visualOrigin.Attribute("xyz").Value);
+            AssertVector(new[] { Math.PI / 2, 0.0, 0.0 }, visualOrigin.Attribute("rpy").Value);
+            Assert.True(SwApp.CloseAllDocuments(true));   // discards the test frame
+        }
+
+        // A part with exactly one reference coordinate system exports relative to it by default.
+        [Theory]
+        [InlineData("TOY_BLOCK", "BlockA")]
+        public void TestExportLinkSingleCoordinateSystemIsDefault(string modelName, string partName)
+        {
+            ModelDoc2 doc = OpenSWPartDocument(modelName, partName);
+            // BlockA ships with an "Origin_global" left by earlier exports; remove it so the part
+            // has exactly one coordinate system (the document is discarded afterwards).
+            foreach (string existing in new ExportHelper(SwApp).GetRefCoordinateSystems())
+            {
+                Assert.True(doc.Extension.SelectByID2(existing, "COORDSYS", 0, 0, 0, false, 0, null, 0));
+                Assert.True(doc.Extension.DeleteSelection2((int)swDeleteSelectionOptions_e.swDelete_Absorbed));
+            }
+            Feature frame = doc.FeatureManager.CreateCoordinateSystemUsingNumericalValues(
+                true, 0, 0.2, 0, false, 0, 0, 0);
+            Assert.NotNull(frame);
+            frame.Name = "OnlyFrame";
+
+            ExportHelper helper = new ExportHelper(SwApp);          // enumerates coordinate systems now
+            Assert.Equal("OnlyFrame", helper.DefaultLinkFrame());
+            helper.CreateRobotFromActiveModel();
+            helper.SavePath = CreateRandomTempDirectory() + Path.DirectorySeparatorChar;
+            helper.ExportLink(true);                                 // no name, Z-up must be ignored
+
+            XElement visualOrigin = LoadExportedVisualOrigin(helper);
+            AssertVector(new[] { 0.0, -0.2, 0.0 }, visualOrigin.Attribute("xyz").Value);
+            AssertVector(new[] { 0.0, 0.0, 0.0 }, visualOrigin.Attribute("rpy").Value);
             Assert.True(SwApp.CloseAllDocuments(true));
         }
 
         [Theory]
-        [InlineData("TOY_BLOCK")]
-        public void TestCreateRobotFromActiveModel(string modelName)
+        [InlineData("TOY_BLOCK", "BlockA")]
+        public void TestExportLinkUnknownCoordinateSystemThrows(string modelName, string partName)
         {
-            ModelDoc2 doc = OpenSWPartDocument(modelName);
+            OpenSWPartDocument(modelName, partName);
             ExportHelper helper = new ExportHelper(SwApp);
             helper.CreateRobotFromActiveModel();
-            Assert.NotNull(helper.URDFRobot);
+            helper.SavePath = CreateRandomTempDirectory() + Path.DirectorySeparatorChar;
+            Assert.Throws<InvalidOperationException>(() => helper.ExportLink(false, "NoSuchFrame"));
             Assert.True(SwApp.CloseAllDocuments(true));
         }
-        */
+
+        private static XElement LoadExportedVisualOrigin(ExportHelper helper)
+        {
+            string urdf = Path.Combine(helper.SavePath, helper.PackageName, "urdf", helper.URDFRobot.Name + ".urdf");
+            Assert.True(File.Exists(urdf), urdf);
+            XDocument document = XDocument.Load(urdf);
+            XElement origin = document.Descendants("visual").First().Element("origin");
+            Assert.NotNull(origin);
+            return origin;
+        }
+
+        private static void AssertVector(double[] expected, string actual)
+        {
+            double[] values = actual.Split(' ').Select(double.Parse).ToArray();
+            Assert.Equal(expected.Length, values.Length);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                Assert.Equal(expected[i], values[i], 6);
+            }
+        }
 
         [Theory]
         [InlineData("3_DOF_ARM")]

@@ -106,16 +106,17 @@ namespace SW2URDF.Test
             return doc;
         }
 
-        public ModelDoc2 OpenSWPartDocument(string modelName)
+        // partName: file stem inside examples\<modelName> (e.g. TOY_BLOCK holds BlockA.SLDPRT)
+        public ModelDoc2 OpenSWPartDocument(string modelName, string partName = null)
         {
             Assert.True(SwApp.CloseAllDocuments(true));
 
             string modelDirectory = GetModelDirectory(modelName);
-            string filename = Path.Combine(modelDirectory, modelName + ".SLDPRT");
+            string filename = Path.Combine(modelDirectory, (partName ?? modelName) + ".SLDPRT");
             Assert.True(File.Exists(filename));
             int errors = 0;
             int warnings = 0;
-            int filetype = (int)swDocumentTypes_e.swDocASSEMBLY;
+            int filetype = (int)swDocumentTypes_e.swDocPART;
             string configuration = "";
 
             ModelDoc2 doc = SwApp.OpenDoc6(filename, filetype, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, 

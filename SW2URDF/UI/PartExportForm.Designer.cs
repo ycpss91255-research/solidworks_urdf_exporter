@@ -116,6 +116,8 @@
             this.button_savename_browse = new System.Windows.Forms.Button();
             this.saveFileDialog_save_as = new System.Windows.Forms.SaveFileDialog();
             this.checkBox_rotate = new System.Windows.Forms.CheckBox();
+            this.label_coordsys = new System.Windows.Forms.Label();
+            this.comboBox_coordsys = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -944,11 +946,32 @@
             this.checkBox_rotate.Text = "Rotate global origin to make Z-axis vertical";
             this.checkBox_rotate.UseVisualStyleBackColor = true;
             // 
+            // label_coordsys
+            // 
+            this.label_coordsys.AutoSize = true;
+            this.label_coordsys.Location = new System.Drawing.Point(262, 74);
+            this.label_coordsys.Name = "label_coordsys";
+            this.label_coordsys.Size = new System.Drawing.Size(58, 13);
+            this.label_coordsys.TabIndex = 75;
+            this.label_coordsys.Text = "Link frame";
+            // 
+            // comboBox_coordsys
+            // 
+            this.comboBox_coordsys.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_coordsys.FormattingEnabled = true;
+            this.comboBox_coordsys.Location = new System.Drawing.Point(326, 70);
+            this.comboBox_coordsys.Name = "comboBox_coordsys";
+            this.comboBox_coordsys.Size = new System.Drawing.Size(171, 21);
+            this.comboBox_coordsys.TabIndex = 76;
+            this.comboBox_coordsys.SelectedIndexChanged += new System.EventHandler(this.ComboBoxCoordsysSelectedIndexChanged);
+            // 
             // PartExportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(569, 705);
+            this.Controls.Add(this.comboBox_coordsys);
+            this.Controls.Add(this.label_coordsys);
             this.Controls.Add(this.checkBox_rotate);
             this.Controls.Add(this.button_savename_browse);
             this.Controls.Add(this.textBox_save_as);
@@ -1063,5 +1086,7 @@
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.RadioButton radioButton3;
         private System.Windows.Forms.CheckBox checkBox_rotate;
+        private System.Windows.Forms.Label label_coordsys;
+        private System.Windows.Forms.ComboBox comboBox_coordsys;
     }
 }
