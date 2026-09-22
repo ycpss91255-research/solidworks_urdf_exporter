@@ -525,12 +525,24 @@ namespace SW2URDF.URDFExport
             }
         }
 
+        // The link frame a part export uses when the caller does not name one: the part's only
+        // reference coordinate system if it has exactly one, otherwise null = generate one at the
+        // part origin (what the assembly exporter's "Automatically Generate" does for the base link).
+        public string DefaultLinkFrame()
+        {
+            return ReferenceCoordinateSystemNames.Count == 1 ? ReferenceCoordinateSystemNames[0] : null;
+        }
+
         // coordSysName: a reference coordinate system in the part to use as the link frame (the
-        // same choice the assembly exporter offers per link). Null/empty keeps the historical
-        // behaviour: a coordinate system named "Origin_global" if the part has one, otherwise one
-        // is created at the part origin, rotated so +Y becomes +Z when zIsUp is set.
+        // same choice the assembly exporter offers per link). Null/empty means DefaultLinkFrame():
+        // the single coordinate system in the part, or an automatically generated one at the part
+        // origin, rotated so +Y becomes +Z when zIsUp is set.
         public void ExportLink(bool zIsUp, string coordSysName = null)
         {
+            if (string.IsNullOrEmpty(coordSysName))
+            {
+                coordSysName = DefaultLinkFrame();
+            }
             string frameName = string.IsNullOrEmpty(coordSysName) ? "Origin_global" : coordSysName;
             if (frameName == "Origin_global")
             {

@@ -31,7 +31,7 @@ namespace SW2URDF.UI
     public partial class PartExportForm : Form
     {
         public ExportHelper Exporter;
-        private const string PartOriginItem = "(part origin)";
+        private const string PartOriginItem = "Automatically Generate";   // same wording as the assembly exporter
 
         public PartExportForm(SldWorks iSwApp)
         {
@@ -142,18 +142,18 @@ namespace SW2URDF.UI
             Exporter.CreateRobotFromActiveModel();
             textBox_save_as.Text = Exporter.SavePath + "\\" + Exporter.PackageName;
 
-            // Link frame: the part origin (optionally rotated Z-up) or any reference coordinate
-            // system in the part, the same choice the assembly exporter offers per link.
+            // Link frame: any reference coordinate system in the part, or one generated at the
+            // part origin (optionally rotated Z-up) - the same choice the assembly exporter offers
+            // per link. A part with exactly one coordinate system defaults to it.
             comboBox_coordsys.Items.Clear();
             comboBox_coordsys.Items.Add(PartOriginItem);
             foreach (string name in Exporter.GetRefCoordinateSystems())
             {
                 comboBox_coordsys.Items.Add(name);
             }
-            // A coordinate system named "Origin_global" used to be picked up silently; show that
-            // choice in the drop-down instead of hiding it.
-            int legacy = comboBox_coordsys.Items.IndexOf("Origin_global");
-            comboBox_coordsys.SelectedIndex = legacy > 0 ? legacy : 0;
+            string preset = Exporter.DefaultLinkFrame();
+            int index = preset == null ? -1 : comboBox_coordsys.Items.IndexOf(preset);
+            comboBox_coordsys.SelectedIndex = index > 0 ? index : 0;
 
             Exporter.URDFRobot.BaseLink.Visual.Origin.FillBoxes(textBox_collision_origin_x,
                                                              textBox_collision_origin_y,

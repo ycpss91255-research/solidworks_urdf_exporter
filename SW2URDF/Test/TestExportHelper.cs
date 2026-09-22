@@ -1,4 +1,5 @@
 ﻿using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using SW2URDF.URDF;
 using SW2URDF.URDFExport;
 using System;
@@ -261,6 +262,36 @@ namespace SW2URDF.Test
             AssertVector(new[] { -0.1, 0.0, 0.0 }, visualOrigin.Attribute("xyz").Value);
             AssertVector(new[] { Math.PI / 2, 0.0, 0.0 }, visualOrigin.Attribute("rpy").Value);
             Assert.True(SwApp.CloseAllDocuments(true));   // discards the test frame
+        }
+
+        // A part with exactly one reference coordinate system exports relative to it by default.
+        [Theory]
+        [InlineData("TOY_BLOCK", "BlockA")]
+        public void TestExportLinkSingleCoordinateSystemIsDefault(string modelName, string partName)
+        {
+            ModelDoc2 doc = OpenSWPartDocument(modelName, partName);
+            // BlockA ships with an "Origin_global" left by earlier exports; remove it so the part
+            // has exactly one coordinate system (the document is discarded afterwards).
+            foreach (string existing in new ExportHelper(SwApp).GetRefCoordinateSystems())
+            {
+                Assert.True(doc.Extension.SelectByID2(existing, "COORDSYS", 0, 0, 0, false, 0, null, 0));
+                Assert.True(doc.Extension.DeleteSelection2((int)swDeleteSelectionOptions_e.swDelete_Absorbed));
+            }
+            Feature frame = doc.FeatureManager.CreateCoordinateSystemUsingNumericalValues(
+                true, 0, 0.2, 0, false, 0, 0, 0);
+            Assert.NotNull(frame);
+            frame.Name = "OnlyFrame";
+
+            ExportHelper helper = new ExportHelper(SwApp);          // enumerates coordinate systems now
+            Assert.Equal("OnlyFrame", helper.DefaultLinkFrame());
+            helper.CreateRobotFromActiveModel();
+            helper.SavePath = CreateRandomTempDirectory() + Path.DirectorySeparatorChar;
+            helper.ExportLink(true);                                 // no name, Z-up must be ignored
+
+            XElement visualOrigin = LoadExportedVisualOrigin(helper);
+            AssertVector(new[] { 0.0, -0.2, 0.0 }, visualOrigin.Attribute("xyz").Value);
+            AssertVector(new[] { 0.0, 0.0, 0.0 }, visualOrigin.Attribute("rpy").Value);
+            Assert.True(SwApp.CloseAllDocuments(true));
         }
 
         [Theory]
