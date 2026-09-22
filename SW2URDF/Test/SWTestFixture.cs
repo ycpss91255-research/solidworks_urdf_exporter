@@ -1,4 +1,7 @@
-﻿using SolidWorks.Interop.sldworks;
+﻿using Moq;
+using SolidWorks.Interop.sldworks;
+using SW2URDF.UI;
+using SW2URDF.URDFExport;
 using System;
 
 namespace SW2URDF.Test
@@ -18,6 +21,9 @@ namespace SW2URDF.Test
             {
                 SwApp = (SldWorks)Activator.CreateInstance(Type.GetTypeFromProgID("SldWorks.Application"));
                 SwApp.Visible = true;
+                // The exporter ends every package with a modal "Creating URDF Package ..." box;
+                // swap in a silent one so the SolidWorks-attached tests run unattended.
+                URDFPackage.MessageBox = new Mock<IMessageBox>().Object;
                 Initialized = true;
             }
         }

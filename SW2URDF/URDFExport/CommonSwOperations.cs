@@ -35,6 +35,27 @@ namespace SW2URDF.URDFExport
     {
         private static readonly ILog logger = Logger.GetLogger();
 
+        // ModelDoc2.GetTitle() includes the ".SLDPRT"/".SLDASM" suffix whenever Windows Explorer is
+        // set to show file extensions, and that suffix used to leak into the package folder, the
+        // <robot> name and the .urdf file name ("D4-1111-CX.SLDPRT.urdf"). Strip it once here so
+        // every name derived from a document title agrees.
+        public static string TitleWithoutExtension(string title)
+        {
+            if (string.IsNullOrEmpty(title))
+            {
+                return title;
+            }
+            string trimmed = title.Trim();
+            foreach (string ext in new[] { ".sldprt", ".sldasm" })
+            {
+                if (trimmed.EndsWith(ext, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return trimmed.Substring(0, trimmed.Length - ext.Length);
+                }
+            }
+            return trimmed;
+        }
+
         //Selects the components of a link. Helps highlight when the associated node is
         // selected from the tree
         public static void SelectComponents(ModelDoc2 model, Link Link, bool clearSelection, int mark = -1)
