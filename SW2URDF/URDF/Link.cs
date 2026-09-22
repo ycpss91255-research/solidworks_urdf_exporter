@@ -35,6 +35,10 @@ namespace SW2URDF.URDF
         [DataMember]
         public Collision Collision;
 
+        // Simplified collision geometry (part export only). When non-empty these are written
+        // instead of Collision. Not a DataMember: rebuilt on every export, never persisted.
+        public List<CollisionBox> CollisionBoxes = new List<CollisionBox>();
+
         [DataMember]
         public Joint Joint;
 
@@ -127,7 +131,14 @@ namespace SW2URDF.URDF
             {
                 Visual.WriteURDF(writer);
             }
-            if (Collision != null)
+            if (CollisionBoxes != null && CollisionBoxes.Count > 0)
+            {
+                foreach (CollisionBox box in CollisionBoxes)
+                {
+                    box.WriteURDF(writer);
+                }
+            }
+            else if (Collision != null)
             {
                 Collision.WriteURDF(writer);
             }

@@ -41,6 +41,14 @@ namespace SW2URDF.URDFExport
     // Many of the methods are overloaded, but seek to reduce repeated code as much as possible
     // (i.e. the overloaded methods call eachother).
     // These methods are used by the PartExportForm, the AssemblyExportForm and the PropertyManager Page
+    // How a part export describes its collision geometry.
+    public enum PartCollisionGeometry
+    {
+        Mesh,             // the visual STL (upstream behaviour)
+        BoundingBox,      // one box around all visible bodies
+        CollisionBodies,  // one box per body whose name starts with "collision" (case-insensitive)
+    }
+
     public partial class ExportHelper
     {
         #region class variables
@@ -537,7 +545,8 @@ namespace SW2URDF.URDFExport
         // same choice the assembly exporter offers per link). Null/empty means DefaultLinkFrame():
         // the single coordinate system in the part, or an automatically generated one at the part
         // origin, rotated so +Y becomes +Z when zIsUp is set.
-        public void ExportLink(bool zIsUp, string coordSysName = null)
+        public void ExportLink(bool zIsUp, string coordSysName = null,
+                               PartCollisionGeometry collision = PartCollisionGeometry.Mesh)
         {
             if (string.IsNullOrEmpty(coordSysName))
             {
@@ -557,6 +566,7 @@ namespace SW2URDF.URDFExport
             Matrix<double> GlobalTransform = MathOps.GetTransformation(coordSysTransform);
 
             LocalizeLink(URDFRobot.BaseLink, GlobalTransform);
+            URDFRobot.BaseLink.CollisionBoxes = BuildCollisionBoxes(collision, URDFRobot.BaseLink);
 
             //Creating package directories
             URDFPackage package = new URDFPackage(PackageName, SavePath);
@@ -645,6 +655,94 @@ namespace SW2URDF.URDFExport
                 }
             }
         }
+
+        #region Collision boxes
+
+        public const string CollisionBodyPrefix = "collision";
+
+        // Bodies of the active part whose name starts with CollisionBodyPrefix. These are the
+        // simplified shapes the user models for physics; they are expected to be hidden so they
+        // stay out of the visual STL and of the mass properties.
+        public List<Body2> GetCollisionBodies()
+        {
+            List<Body2> result = new List<Body2>();
+            PartDoc part = ActiveSWModel as PartDoc;
+            if (part == null)
+            {
+                return result;
+            }
+            object[] bodies = (object[])part.GetBodies2((int)swBodyType_e.swSolidBody, false);
+            if (bodies == null)
+            {
+                return result;
+            }
+            foreach (object obj in bodies)
+            {
+                Body2 body = (Body2)obj;
+                if (body.Name != null && body.Name.StartsWith(CollisionBodyPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    result.Add(body);
+                }
+            }
+            return result;
+        }
+
+        // One CollisionBox per body: the body's axis-aligned bounding box in part coordinates,
+        // placed in the link frame through the same pose the visual mesh got (Link.Visual.Origin
+        // after LocalizeLink), so boxes and mesh line up whatever the chosen link frame is.
+        private List<CollisionBox> BuildCollisionBoxes(PartCollisionGeometry mode, Link link)
+        {
+            List<CollisionBox> boxes = new List<CollisionBox>();
+            if (mode == PartCollisionGeometry.Mesh)
+            {
+                return boxes;
+            }
+            PartDoc part = ActiveSWModel as PartDoc;
+            if (part == null)
+            {
+                return boxes;
+            }
+            double[] rpy = link.Visual.Origin.GetRPY();
+            double[] xyz = link.Visual.Origin.GetXYZ();
+            Matrix<double> partToLink = MathOps.GetTransformation(xyz, rpy);
+
+            if (mode == PartCollisionGeometry.BoundingBox)
+            {
+                object[] visible = (object[])part.GetBodies2((int)swBodyType_e.swSolidBody, true);
+                double[] box = null;
+                foreach (object obj in visible ?? new object[0])
+                {
+                    double[] b = (double[])((Body2)obj).GetBodyBox();
+                    box = box == null ? b : new[] { Math.Min(box[0], b[0]), Math.Min(box[1], b[1]), Math.Min(box[2], b[2]),
+                                                     Math.Max(box[3], b[3]), Math.Max(box[4], b[4]), Math.Max(box[5], b[5]) };
+                }
+                if (box != null)
+                {
+                    boxes.Add(BoxFromBounds("bounding_box", box, partToLink, rpy));
+                }
+                return boxes;
+            }
+
+            foreach (Body2 body in GetCollisionBodies())
+            {
+                boxes.Add(BoxFromBounds(body.Name, (double[])body.GetBodyBox(), partToLink, rpy));
+            }
+            if (boxes.Count == 0)
+            {
+                logger.Warn("Collision bodies requested but the part has no body named '" + CollisionBodyPrefix + "*'; falling back to the mesh");
+            }
+            return boxes;
+        }
+
+        private static CollisionBox BoxFromBounds(string name, double[] b, Matrix<double> partToLink, double[] rpy)
+        {
+            double[] size = { b[3] - b[0], b[4] - b[1], b[5] - b[2] };
+            double[] centre = { (b[0] + b[3]) / 2, (b[1] + b[4]) / 2, (b[2] + b[5]) / 2 };
+            Matrix<double> inLink = partToLink * MathOps.GetTranslation(centre);
+            return new CollisionBox(name, size, MathOps.GetXYZ(inLink), (double[])rpy.Clone());
+        }
+
+        #endregion Collision boxes
 
         #region STL Preference shuffling
 

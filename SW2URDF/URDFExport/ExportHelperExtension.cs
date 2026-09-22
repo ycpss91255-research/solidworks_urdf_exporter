@@ -80,8 +80,13 @@ namespace SW2URDF.URDFExport
 
             Link.isFixedFrame = false;
 
-            //Get link properties from SolidWorks part
-            IMassProperty swMass = swModel.Extension.CreateMassProperty();
+            //Get link properties from SolidWorks part. Hidden bodies are left out, as the STL
+            // export leaves them out: they are helper geometry (e.g. the collision_* boxes), not
+            // mass. IMassProperty (CreateMassProperty) always includes them; IMassProperty2 can
+            // be told not to.
+            IMassProperty2 swMass = swModel.Extension.CreateMassProperty2();
+            swMass.IncludeHiddenBodiesOrComponents = false;
+            swMass.Recalculate();
             Link.Inertial.Mass.Value = swMass.Mass;
 
             // returned as double with values [Lxx, Lxy, Lxz, Lyx, Lyy, Lyz, Lzx, Lzy, Lzz]

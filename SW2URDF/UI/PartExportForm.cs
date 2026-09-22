@@ -122,7 +122,8 @@ namespace SW2URDF.UI
             Exporter.URDFRobot.BaseLink.STLQualityFine = radioButton_fine.Checked;
 
             string coordSysName = comboBox_coordsys.SelectedIndex > 0 ? comboBox_coordsys.Text : null;
-            Exporter.ExportLink(checkBox_rotate.Checked, coordSysName);
+            PartCollisionGeometry collision = (PartCollisionGeometry)Math.Max(0, comboBox_collision_geometry.SelectedIndex);
+            Exporter.ExportLink(checkBox_rotate.Checked, coordSysName, collision);
             Close();
         }
 
@@ -151,6 +152,18 @@ namespace SW2URDF.UI
             {
                 comboBox_coordsys.Items.Add(name);
             }
+            // Collision geometry, in PartCollisionGeometry order. The bodies entry is only offered
+            // when the part actually has collision_* bodies, and is then the default.
+            int collisionBodies = Exporter.GetCollisionBodies().Count;
+            comboBox_collision_geometry.Items.Clear();
+            comboBox_collision_geometry.Items.Add("Mesh (visual STL)");
+            comboBox_collision_geometry.Items.Add("Bounding box");
+            if (collisionBodies > 0)
+            {
+                comboBox_collision_geometry.Items.Add("Boxes from " + collisionBodies + " collision_* bodies");
+            }
+            comboBox_collision_geometry.SelectedIndex = collisionBodies > 0 ? 2 : 0;
+
             string preset = Exporter.DefaultLinkFrame();
             int index = preset == null ? -1 : comboBox_coordsys.Items.IndexOf(preset);
             comboBox_coordsys.SelectedIndex = index > 0 ? index : 0;

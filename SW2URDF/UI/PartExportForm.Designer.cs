@@ -117,6 +117,8 @@
             this.saveFileDialog_save_as = new System.Windows.Forms.SaveFileDialog();
             this.checkBox_rotate = new System.Windows.Forms.CheckBox();
             this.label_coordsys = new System.Windows.Forms.Label();
+            this.label_collision_geometry = new System.Windows.Forms.Label();
+            this.comboBox_collision_geometry = new System.Windows.Forms.ComboBox();
             this.comboBox_coordsys = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -838,6 +840,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.comboBox_collision_geometry);
+            this.groupBox3.Controls.Add(this.label_collision_geometry);
             this.groupBox3.Controls.Add(this.radioButton4);
             this.groupBox3.Controls.Add(this.radioButton3);
             this.groupBox3.Controls.Add(this.label27);
@@ -860,6 +864,24 @@
             this.groupBox3.Size = new System.Drawing.Size(543, 141);
             this.groupBox3.TabIndex = 67;
             this.groupBox3.TabStop = false;
+            // 
+            // label_collision_geometry
+            // 
+            this.label_collision_geometry.AutoSize = true;
+            this.label_collision_geometry.Location = new System.Drawing.Point(253, 26);
+            this.label_collision_geometry.Name = "label_collision_geometry";
+            this.label_collision_geometry.Size = new System.Drawing.Size(94, 13);
+            this.label_collision_geometry.TabIndex = 74;
+            this.label_collision_geometry.Text = "Collision geometry";
+            // 
+            // comboBox_collision_geometry
+            // 
+            this.comboBox_collision_geometry.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_collision_geometry.FormattingEnabled = true;
+            this.comboBox_collision_geometry.Location = new System.Drawing.Point(256, 45);
+            this.comboBox_collision_geometry.Name = "comboBox_collision_geometry";
+            this.comboBox_collision_geometry.Size = new System.Drawing.Size(270, 21);
+            this.comboBox_collision_geometry.TabIndex = 75;
             // 
             // radioButton4
             // 
@@ -1087,6 +1109,8 @@
         private System.Windows.Forms.RadioButton radioButton3;
         private System.Windows.Forms.CheckBox checkBox_rotate;
         private System.Windows.Forms.Label label_coordsys;
+        private System.Windows.Forms.Label label_collision_geometry;
+        private System.Windows.Forms.ComboBox comboBox_collision_geometry;
         private System.Windows.Forms.ComboBox comboBox_coordsys;
     }
 }

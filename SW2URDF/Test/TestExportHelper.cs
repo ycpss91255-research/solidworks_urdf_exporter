@@ -2,6 +2,7 @@
 using SolidWorks.Interop.swconst;
 using SW2URDF.URDF;
 using SW2URDF.URDFExport;
+using SW2URDF.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -291,6 +292,41 @@ namespace SW2URDF.Test
             XElement visualOrigin = LoadExportedVisualOrigin(helper);
             AssertVector(new[] { 0.0, -0.2, 0.0 }, visualOrigin.Attribute("xyz").Value);
             AssertVector(new[] { 0.0, 0.0, 0.0 }, visualOrigin.Attribute("rpy").Value);
+            Assert.True(SwApp.CloseAllDocuments(true));
+        }
+
+        // Collision as one bounding box: size = the body's extent, centre expressed in the
+        // (Z-up rotated) link frame, and no mesh collision left in the file.
+        [Theory]
+        [InlineData("TOY_BLOCK", "BlockA")]
+        public void TestExportLinkBoundingBoxCollision(string modelName, string partName)
+        {
+            ModelDoc2 doc = OpenSWPartDocument(modelName, partName);
+            PartDoc part = (PartDoc)doc;
+            object[] bodies = (object[])part.GetBodies2((int)swBodyType_e.swSolidBody, true);
+            double[] box = (double[])((Body2)bodies[0]).GetBodyBox();
+            double[] expectedSize = { box[3] - box[0], box[4] - box[1], box[5] - box[2] };
+            double[] centre = { (box[0] + box[3]) / 2, (box[1] + box[4]) / 2, (box[2] + box[5]) / 2 };
+
+            ExportHelper helper = new ExportHelper(SwApp);
+            helper.CreateRobotFromActiveModel();
+            helper.SavePath = CreateRandomTempDirectory() + Path.DirectorySeparatorChar;
+            helper.ExportLink(false, "Origin_global", PartCollisionGeometry.BoundingBox);   // BlockA ships with that frame
+
+            string urdf = Path.Combine(helper.SavePath, helper.PackageName, "urdf", helper.URDFRobot.Name + ".urdf");
+            XDocument document = XDocument.Load(urdf);
+            XElement link = document.Descendants("link").First();
+            List<XElement> collisions = link.Elements("collision").ToList();
+            Assert.Single(collisions);
+            Assert.Null(collisions[0].Element("geometry").Element("mesh"));
+            AssertVector(expectedSize, collisions[0].Element("geometry").Element("box").Attribute("size").Value);
+            // the box sits where the visual mesh's pose puts the part-frame centre
+            XElement visualOrigin = link.Element("visual").Element("origin");
+            double[] vxyz = visualOrigin.Attribute("xyz").Value.Split(' ').Select(double.Parse).ToArray();
+            double[] vrpy = visualOrigin.Attribute("rpy").Value.Split(' ').Select(double.Parse).ToArray();
+            double[] expectedCentre = MathOps.GetXYZ(MathOps.GetTransformation(vxyz, vrpy) * MathOps.GetTranslation(centre));
+            AssertVector(expectedCentre, collisions[0].Element("origin").Attribute("xyz").Value);
+            AssertVector(vrpy, collisions[0].Element("origin").Attribute("rpy").Value);
             Assert.True(SwApp.CloseAllDocuments(true));
         }
 

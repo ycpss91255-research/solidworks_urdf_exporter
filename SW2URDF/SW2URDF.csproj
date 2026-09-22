@@ -388,6 +388,7 @@
     <Compile Include="URDF\Calibration.cs" />
     <Compile Include="URDF\ChildLink.cs" />
     <Compile Include="URDF\Collision.cs" />
+    <Compile Include="URDF\CollisionBox.cs" />
     <Compile Include="URDF\Color.cs" />
     <Compile Include="URDF\Dynamics.cs" />
     <Compile Include="URDF\Geometry.cs" />
