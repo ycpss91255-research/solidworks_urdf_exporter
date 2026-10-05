@@ -572,6 +572,14 @@ namespace SW2URDF.URDFExport
         //Method which builds a single link
         private Link CreateLinkFromComponents(Link parent, LinkNode node)
         {
+            node.Link.isFixedFrame = node.Link.SWComponents.Count == 0;
+            node.Link.SWMainComponent = null;
+            if (node.Link.isFixedFrame && parent != null)
+            {
+                node.Link.Joint.Type = "fixed";
+                node.Link.Joint.Parent.Name = parent.Name;
+                node.Link.Joint.Child.Name = node.Link.Name;
+            }
             if (node.Link.SWComponents.Count > 0)
             {
                 List<Component2> components = node.Link.SWComponents;
@@ -590,12 +598,12 @@ namespace SW2URDF.URDFExport
                 }
             }
 
-            if (ComputeInertialValues)
+            if (ComputeInertialValues && !node.Link.isFixedFrame)
             {
                 ComputeInertialProperties(node.Link);
             }
 
-            if (ComputeVisualCollision)
+            if (ComputeVisualCollision && !node.Link.isFixedFrame)
             {
                 ComputeVisualCollisionProperties(node.Link);
             }
@@ -649,6 +657,12 @@ namespace SW2URDF.URDFExport
             child.Joint.Child.Name = child.Name;
             if (child.isFixedFrame)
             {
+                if (coordSysName == "Automatically Generate")
+                {
+                    ExportErrorWhy = string.Format(
+                        ui.Get("Select an existing reference coordinate system for empty link {0}"), child.Name);
+                    return false;
+                }
                 axisName = "";
                 jointType = "fixed";
                 child.Joint.Type = jointType;
