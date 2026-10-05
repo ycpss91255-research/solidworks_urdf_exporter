@@ -26,6 +26,15 @@ See the [ROS Wiki](http://wiki.ros.org/sw_urdf_exporter) and associated [tutoria
 
 Loading values from the CSV of an earlier export: [docs/LOAD_FROM_CSV.md](docs/LOAD_FROM_CSV.md) (English and 繁體中文).
 
+### Reference-only links
+
+In the assembly exporter, leave **Link Components** empty to export a reference
+frame without inertial, visual, collision, or mesh data. For a non-base link,
+select an existing reference coordinate system for its origin; it is connected
+to its parent by a fixed joint, so no reference axis is needed. Empty links may
+have children. An empty base link may also use the automatically generated global
+coordinate system.
+
 ## Development
 
 1. Install Visual Studio 2017
