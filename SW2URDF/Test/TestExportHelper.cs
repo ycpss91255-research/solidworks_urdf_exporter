@@ -20,6 +20,75 @@ namespace SW2URDF.Test
 {
     public class TestComponentMassProperties
     {
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void ThreeDxmlExportPreservesInertialAndCorrectsMeshPlacement(bool subassembly)
+        {
+            var helper = CreateHelper();
+            var app = new Moq.Mock<ISldWorks>();
+            var document = new Moq.Mock<ModelDoc2>();
+            var extension = new Moq.Mock<ModelDocExtension>();
+            var componentDocument = new Moq.Mock<ModelDoc2>();
+            var componentExtension = new Moq.Mock<ModelDocExtension>();
+            var component = new Moq.Mock<Component2>();
+            var transform = new Moq.Mock<MathTransform>();
+            var selection = new Moq.Mock<SelectionMgr>();
+            selection.Setup(s => s.CreateSelectData()).Returns(new Moq.Mock<SelectData>().Object);
+            document.SetupGet(d => d.SelectionManager).Returns(selection.Object);
+            // A translated frame rotated 90 degrees about Z exposes both double translation
+            // and unwanted rotation/sign changes of the off-diagonal inertia entries.
+            transform.SetupGet(t => t.ArrayData).Returns(new double[] {
+                0, 1, 0, -1, 0, 0, 0, 0, 1, 0.1, -0.2, 0.3, 1, 0, 0, 0 });
+            document.SetupGet(d => d.Extension).Returns(extension.Object);
+            componentDocument.SetupGet(d => d.Extension).Returns(componentExtension.Object);
+            component.Setup(c => c.GetModelDoc2()).Returns(componentDocument.Object);
+            var coordinateExtension = subassembly ? componentExtension : extension;
+            coordinateExtension.Setup(e => e.GetCoordinateSystemTransformByName("frame")).Returns(transform.Object);
+            helper.iSwApp = app.Object;
+            helper.ActiveSWModel = document.Object;
+            var link = new Link { Name = "link", SWMainComponent = component.Object };
+            link.Joint.CoordinateSystemName = subassembly ? "frame <component-1>" : "frame";
+            link.Inertial.Mass.Value = 2.5;
+            link.Inertial.Origin.SetXYZ(new double[] { 0.01, 0.02, -0.03 });
+            link.Inertial.Origin.SetRPY(new double[] { 0.1, 0.2, 0.3 });
+            link.Inertial.Inertia.SetMomentMatrix(new double[] { 4, 0.1, 0.2, 0.1, 5, 0.3, 0.2, 0.3, 6 });
+            double[] moment = link.Inertial.Inertia.GetMoment();
+            link.Visual.Origin.SetXYZ(new double[] { 0.4, 0.5, 0.6 });
+            link.Collision.Origin.SetXYZ(new double[] { 0.2, 0.3, 0.4 });
+
+            new PrivateObject(helper).Invoke("Save3dxml", link, "unused.3dxml");
+
+            Assert.Equal(2.5, link.Inertial.Mass.Value);
+            Assert.Equal(new double[] { 0.01, 0.02, -0.03 }, link.Inertial.Origin.GetXYZ());
+            Assert.Equal(new double[] { 0.1, 0.2, 0.3 }, link.Inertial.Origin.GetRPY());
+            Assert.Equal(moment, link.Inertial.Inertia.GetMoment());
+            double[] visual = { 0.7, -0.3, 0.3 };
+            double[] collision = { 0.5, -0.1, 0.1 };
+            for (int i = 0; i < 3; i++)
+            {
+                Assert.Equal(visual[i], link.Visual.Origin.GetXYZ()[i], 12);
+                Assert.Equal(collision[i], link.Collision.Origin.GetXYZ()[i], 12);
+            }
+            Assert.Equal(-System.Math.PI / 2, link.Visual.Origin.Yaw, 12);
+            Assert.Equal(-System.Math.PI / 2, link.Collision.Origin.Yaw, 12);
+            coordinateExtension.Verify(e => e.GetCoordinateSystemTransformByName("frame"), Moq.Times.Once());
+        }
+
+        [Fact]
+        public void PartLocalizationStillTransformsCenterOfMass()
+        {
+            var link = new Link();
+            link.Inertial.Origin.SetXYZ(new double[] { 1, 2, 3 });
+            var transform = MathOps.GetTranslation(new double[] { 0.1, 0.2, 0.3 });
+            var method = typeof(ExportHelper).GetMethod("LocalizeLink",
+                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            method.Invoke(null, new object[] { link, transform });
+            double[] expected = { 0.9, 1.8, 2.7 };
+            for (int i = 0; i < 3; i++)
+                Assert.Equal(expected[i], link.Inertial.Origin.GetXYZ()[i], 12);
+        }
+
         private static ExportHelper CreateHelper()
         {
             return (ExportHelper)System.Runtime.Serialization.FormatterServices
