@@ -194,15 +194,6 @@ namespace SW2URDF.URDFExport
             Matrix<double> linkCoMTransform = MathOps.GetTranslation(Link.Inertial.Origin.GetXYZ());
             Matrix<double> localLinkCoMTransform = GlobalTransformInverse * linkCoMTransform;
 
-            Matrix<double> linkVisualTransform =
-                MathOps.GetTransformation(Link.Visual.Origin.GetXYZ(), Link.Visual.Origin.GetRPY());
-            Matrix<double> localVisualTransform = GlobalTransformInverse * linkVisualTransform;
-
-            Matrix<double> linkCollisionTransform =
-                MathOps.GetTransformation(Link.Collision.Origin.GetXYZ(), Link.Collision.Origin.GetRPY());
-            Matrix<double> localCollisionTransform =
-                GlobalTransformInverse * linkCollisionTransform;
-
             // The linear array in Link.Inertial.Inertia.Moment is in row major order, but this
             // matrix constructor uses column major order. It's a rotation matrix, so this
             // shouldn't matter. If it does, just transpose linkGlobalMomentInertia. These three
@@ -222,6 +213,21 @@ namespace SW2URDF.URDFExport
             // order, you are writing it in row-major order here. Yes, yes I am.
             double[] moment = linkLocalMomentInertia.ToRowMajorArray();
             Link.Inertial.Inertia.SetMomentMatrix(moment);
+
+            LocalizeMeshOrigins(Link, GlobalTransform);
+        }
+
+        // Mesh placement is independent of the already-local assembly inertial properties.
+        private static void LocalizeMeshOrigins(Link Link, Matrix<double> GlobalTransform)
+        {
+            Matrix<double> GlobalTransformInverse = GlobalTransform.Inverse();
+            Matrix<double> linkVisualTransform =
+                MathOps.GetTransformation(Link.Visual.Origin.GetXYZ(), Link.Visual.Origin.GetRPY());
+            Matrix<double> localVisualTransform = GlobalTransformInverse * linkVisualTransform;
+
+            Matrix<double> linkCollisionTransform =
+                MathOps.GetTransformation(Link.Collision.Origin.GetXYZ(), Link.Collision.Origin.GetRPY());
+            Matrix<double> localCollisionTransform = GlobalTransformInverse * linkCollisionTransform;
 
             Link.Collision.Origin.SetXYZ(MathOps.GetXYZ(localCollisionTransform));
             Link.Collision.Origin.SetRPY(MathOps.GetRPY(localCollisionTransform));
