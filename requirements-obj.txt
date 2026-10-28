@@ -1,0 +1,5 @@
+trimesh==5.2.0
+numpy==2.3.5
+lxml==6.1.1
+networkx==3.7
+pillow==12.3.0
