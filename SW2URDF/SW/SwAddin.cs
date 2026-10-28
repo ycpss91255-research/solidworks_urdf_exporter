@@ -48,6 +48,8 @@ namespace SW2URDF.SW
         )]
     public class SwAddin : ISwAddin
     {
+        private UiText ui = new UiText(null);
+        private string ExportMenuPath { get { return ui.Get("Export as URDF") + "@&Tools"; } }
         #region Static Variables
 
         private static readonly log4net.ILog logger = Logger.GetLogger();
@@ -191,6 +193,7 @@ namespace SW2URDF.SW
         {
             logger.Info("Attempting to connect to SW");
             SwApp = (ISldWorks)ThisSW;
+            ui = UiText.FromSolidWorks(SwApp);
             add_in_id_ = cookie;
 
             //Setup callbacks
@@ -253,16 +256,16 @@ namespace SW2URDF.SW
                 "C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\URDFExporter\\images\\ros_logo_96x96.png",
                 "C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\URDFExporter\\images\\ros_logo_128x128.png",
             };
-            int ret = SwApp.AddMenuItem5((int)swDocumentTypes_e.swDocASSEMBLY, add_in_id_, "Export as URDF@&Tools",
-                -1, "AssemblyURDFExporter", "", "Export assembly as URDF file", images);
+            int ret = SwApp.AddMenuItem5((int)swDocumentTypes_e.swDocASSEMBLY, add_in_id_, ExportMenuPath,
+                -1, "AssemblyURDFExporter", "", ui.Get("Export assembly as URDF file"), images);
             if (ret < 0)
             {
                 logger.Error("Failure to add menu item 'Export as URDF' to menu 'Tools'");
                 return;
             }
             logger.Info("Adding Assembly export to file menu");
-            ret = SwApp.AddMenuItem5((int)swDocumentTypes_e.swDocPART, add_in_id_, "Export as URDF@&Tools",
-                -1, "PartURDFExporter", "", "Export part as URDF file", images);
+            ret = SwApp.AddMenuItem5((int)swDocumentTypes_e.swDocPART, add_in_id_, ExportMenuPath,
+                -1, "PartURDFExporter", "", ui.Get("Export part as URDF file"), images);
             if (ret < 0)
             {
                 logger.Error("Failure to add menu item 'Export as URDF' to menu 'Tools'");
@@ -278,9 +281,9 @@ namespace SW2URDF.SW
         }
         public void RemoveCommandMgr()
         {
-            SwApp.RemoveMenu((int)swDocumentTypes_e.swDocASSEMBLY, "Export as URDF@&File", "");
+            SwApp.RemoveMenu((int)swDocumentTypes_e.swDocASSEMBLY, ExportMenuPath, "");
             logger.Info("Removing assembly export from file menu");
-            SwApp.RemoveMenu((int)swDocumentTypes_e.swDocPART, "Export as URDF@&File", "");
+            SwApp.RemoveMenu((int)swDocumentTypes_e.swDocPART, ExportMenuPath, "");
             logger.Info("Removing part export from file menu");
         }
 

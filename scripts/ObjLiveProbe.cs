@@ -36,6 +36,15 @@ public static class ObjLiveProbe
     {
         ((Control)form.GetType().GetField(field, BindingFlags.NonPublic|BindingFlags.Instance).GetValue(form)).Text = value;
     }
+    static void RecordLanguage(Form form, SldWorks app, string output, string mode)
+    {
+        string language=app.GetCurrentLanguage();
+        var text=UiText.FromSolidWorks(app);
+        string english=mode=="part" ? "SolidWorks Part to URDF Link Exporter" : "SolidWorks Assembly to URDF Exporter";
+        if(form.Text!=text.Get(english))throw new Exception("Form did not follow native language");
+        File.WriteAllLines(Path.Combine(output,mode+"-language.txt"),
+            new[]{"PID="+app.GetProcessID(),"native_language="+language,"resource_culture="+text.Culture.Name,"title="+form.Text});
+    }
     [STAThread] public static int Main(string[] args)
     {
         try
@@ -78,7 +87,7 @@ public static class ObjLiveProbe
             {
                 using(var form=new PartExportForm(app))
                 {
-                    form.Shown += delegate { SetText(form,"textBox_save_as",Path.Combine(output,"part_obj")); };
+                    form.Shown += delegate { SetText(form,"textBox_save_as",Path.Combine(output,"part_obj")); RecordLanguage(form,app,output,mode); };
                     Application.Run(form);
                 }
             }
@@ -89,8 +98,12 @@ public static class ObjLiveProbe
                 var missing=new List<string>(); CommonSwOperations.LoadSWComponents(model,tree,missing);
                 if(missing.Count>0)throw new Exception("Missing saved references");
                 var helper=new ExportHelper(app); helper.SavePath=output;
-                 helper.CreateRobotFromTreeView(tree);
-                using(var form=new AssemblyExportForm(app,tree,helper)) Application.Run(form);
+                helper.CreateRobotFromTreeView(tree);
+                using(var form=new AssemblyExportForm(app,tree,helper))
+                {
+                    form.Shown += delegate { RecordLanguage(form,app,output,mode); };
+                    Application.Run(form);
+                }
             }
             app.CloseDoc(title); // disposable models only; no save
             File.WriteAllText(Path.Combine(output,mode+"-ui-closed.txt"),"PID="+pid+"; closed copied model without saving");

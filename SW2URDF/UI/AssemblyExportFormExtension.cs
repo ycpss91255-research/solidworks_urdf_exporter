@@ -149,42 +149,42 @@ namespace SW2URDF.UI
 
             if (joint != null && (joint.Type == "revolute" || joint.Type == "continuous"))
             {
-                labelLowerLimit.Text = "lower (rad)";
-                labelLimitUpper.Text = "upper (rad)";
-                labelEffort.Text = "effort (N-m)";
-                labelVelocity.Text = "velocity (rad/s)";
-                labelFriction.Text = "friction (N-m)";
-                labelDamping.Text = "damping (N-m-s/rad)";
-                labelSoftLower.Text = "soft lower limit (rad)";
-                labelSoftUpper.Text = "soft upper limit (rad)";
-                labelKPosition.Text = "k position";
-                labelKVelocity.Text = "k velocity";
+                labelLowerLimit.Text = ui.Get("lower (rad)");
+                labelLimitUpper.Text = ui.Get("upper (rad)");
+                labelEffort.Text = ui.Get("effort (N-m)");
+                labelVelocity.Text = ui.Get("velocity (rad/s)");
+                labelFriction.Text = ui.Get("friction (N-m)");
+                labelDamping.Text = ui.Get("damping (N-m-s/rad)");
+                labelSoftLower.Text = ui.Get("soft lower limit (rad)");
+                labelSoftUpper.Text = ui.Get("soft upper limit (rad)");
+                labelKPosition.Text = ui.Get("k position");
+                labelKVelocity.Text = ui.Get("k velocity");
             }
             else if (joint != null && joint.Type == "prismatic")
             {
-                labelLowerLimit.Text = "lower (m)";
-                labelLimitUpper.Text = "upper (m)";
-                labelEffort.Text = "effort (N)";
-                labelVelocity.Text = "velocity (m/s)";
-                labelFriction.Text = "friction (N)";
-                labelDamping.Text = "damping (N-s/m)";
-                labelSoftLower.Text = "soft lower limit (m)";
-                labelSoftUpper.Text = "soft upper limit (m)";
-                labelKPosition.Text = "k position";
-                labelKVelocity.Text = "k velocity";
+                labelLowerLimit.Text = ui.Get("lower (m)");
+                labelLimitUpper.Text = ui.Get("upper (m)");
+                labelEffort.Text = ui.Get("effort (N)");
+                labelVelocity.Text = ui.Get("velocity (m/s)");
+                labelFriction.Text = ui.Get("friction (N)");
+                labelDamping.Text = ui.Get("damping (N-s/m)");
+                labelSoftLower.Text = ui.Get("soft lower limit (m)");
+                labelSoftUpper.Text = ui.Get("soft upper limit (m)");
+                labelKPosition.Text = ui.Get("k position");
+                labelKVelocity.Text = ui.Get("k velocity");
             }
             else
             {
-                labelLowerLimit.Text = "lower";
-                labelLimitUpper.Text = "upper";
-                labelEffort.Text = "effort";
-                labelVelocity.Text = "velocity";
-                labelFriction.Text = "friction";
-                labelDamping.Text = "damping";
-                labelSoftLower.Text = "soft lower limit";
-                labelSoftUpper.Text = "soft upper limit";
-                labelKPosition.Text = "k position";
-                labelKVelocity.Text = "k velocity";
+                labelLowerLimit.Text = ui.Get("lower");
+                labelLimitUpper.Text = ui.Get("upper");
+                labelEffort.Text = ui.Get("effort");
+                labelVelocity.Text = ui.Get("velocity");
+                labelFriction.Text = ui.Get("friction");
+                labelDamping.Text = ui.Get("damping");
+                labelSoftLower.Text = ui.Get("soft lower limit");
+                labelSoftUpper.Text = ui.Get("soft upper limit");
+                labelKPosition.Text = ui.Get("k position");
+                labelKVelocity.Text = ui.Get("k velocity");
             }
             comboBoxOrigin.Items.Clear();
             List<string> originNames = Exporter.GetRefCoordinateSystems();

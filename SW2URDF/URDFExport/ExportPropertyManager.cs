@@ -46,6 +46,7 @@ namespace SW2URDF.URDFExport
 
         private static readonly log4net.ILog logger = Logger.GetLogger();
         public SldWorks swApp;
+        private readonly UiText ui;
         public ModelDoc2 ActiveSWModel;
 
         public ExportHelper Exporter;
@@ -127,6 +128,7 @@ namespace SW2URDF.URDFExport
         public ExportPropertyManager(SldWorks swAppPtr)
         {
             swApp = swAppPtr;
+            ui = UiText.FromSolidWorks(swAppPtr);
             ActiveSWModel = swApp.ActiveDoc;
             Exporter = new ExportHelper(swApp);
             Exporter.URDFRobot = new Robot();
@@ -146,7 +148,7 @@ namespace SW2URDF.URDFExport
             #region Create and instantiate components of PM page
 
             //Set the variables for the page
-            string PageTitle = "URDF Exporter";
+            string PageTitle = ui.Get("URDF Exporter");
             long options = (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton +
                 (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton +
                 (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_HandleKeystrokes;
@@ -294,7 +296,7 @@ namespace SW2URDF.URDFExport
             PMComputeVisualCollision.Checked = !e.UsedCSVVisualCollision;
             PMComputeJointKinematics.Checked = !e.UsedCSVJointKinematics;
             PMComputeJointLimits.Checked = !e.UsedCSVJointOther;
-            PMLabelCSVFilename.Caption = "Filename: " + e.CSVFilename;
+            PMLabelCSVFilename.Caption = ui.Get("Filename: ") + e.CSVFilename;
 
             // Make the controls visible, but only enable them if values have been loaded from the CSV
             // otherwise they do need to be computed.
@@ -700,14 +702,14 @@ namespace SW2URDF.URDFExport
         {
             //Begin adding the controls to the page
             //Create the group box
-            caption = "Configure and Organize Links";
+            caption = ui.Get("Configure and Organize Links");
             options = (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Visible +
                 (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded;
             PMGroup = (PropertyManagerPageGroup)PMPage.AddGroupBox(GroupID, caption, (int)options);
 
             //Create the parent link label (static)
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Parent Link";
+            caption = ui.Get("Parent Link");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
@@ -722,8 +724,8 @@ namespace SW2URDF.URDFExport
 
             //Create the link name text box label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Link Name";
-            tip = "Enter the name of the link";
+            caption = ui.Get("Link Name");
+            tip = ui.Get("Enter the name of the link");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
@@ -732,7 +734,7 @@ namespace SW2URDF.URDFExport
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Textbox;
             caption = "base_link";
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_Indent;
-            tip = "Enter the name of the link";
+            tip = ui.Get("Enter the name of the link");
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
             PMTextBoxLinkName = (PropertyManagerPageTextbox)PMGroup.AddControl2(
@@ -740,8 +742,8 @@ namespace SW2URDF.URDFExport
 
             //Create the joint name text box label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Joint Name";
-            tip = "Enter the name of the joint";
+            caption = ui.Get("Joint Name");
+            tip = ui.Get("Enter the name of the joint");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible;
             PMLabelJointName = (PropertyManagerPageLabel)PMGroup.AddControl2(
@@ -751,15 +753,15 @@ namespace SW2URDF.URDFExport
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Textbox;
             caption = "";
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_Indent;
-            tip = "Enter the name of the joint";
+            tip = ui.Get("Enter the name of the joint");
             options = (int)swAddControlOptions_e.swControlOptions_Visible;
             PMTextBoxJointName = (PropertyManagerPageTextbox)PMGroup.AddControl2(
                 TextBoxLinkNameID, (short)(controlType), caption, (short)alignment, (int)options, tip);
 
             //Create the global origin coordinate sys label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Global Origin Coordinate System";
-            tip = "Select the reference coordinate system for the global origin";
+            caption = ui.Get("Global Origin Coordinate System");
+            tip = ui.Get("Select the reference coordinate system for the global origin");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible;
             PMLabelGlobalCoordsys = (PropertyManagerPageLabel)PMGroup.AddControl2(
@@ -767,8 +769,8 @@ namespace SW2URDF.URDFExport
 
             // Create pull down menu for Coordinate systems
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Combobox;
-            caption = "Global Origin Coordinate System Name";
-            tip = "Select the reference coordinate system for the global origin";
+            caption = ui.Get("Global Origin Coordinate System Name");
+            tip = ui.Get("Select the reference coordinate system for the global origin");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_Indent;
             options = (int)swAddControlOptions_e.swControlOptions_Visible;
             PMComboBoxGlobalCoordsys = (PropertyManagerPageCombobox)PMGroup.AddControl2(
@@ -778,8 +780,8 @@ namespace SW2URDF.URDFExport
 
             //Create the ref coordinate sys label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Reference Coordinate System";
-            tip = "Select the reference coordinate system for the joint origin";
+            caption = ui.Get("Reference Coordinate System");
+            tip = ui.Get("Select the reference coordinate system for the joint origin");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = 0;
             PMLabelCoordSys = (PropertyManagerPageLabel)PMGroup.AddControl2(
@@ -787,8 +789,8 @@ namespace SW2URDF.URDFExport
 
             // Create pull down menu for Coordinate systems
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Combobox;
-            caption = "Reference Coordinate System Name";
-            tip = "Select the reference coordinate system for the joint origin";
+            caption = ui.Get("Reference Coordinate System Name");
+            tip = ui.Get("Select the reference coordinate system for the joint origin");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_Indent;
             options = 0;
             PMComboBoxCoordSys = (PropertyManagerPageCombobox)PMGroup.AddControl2(
@@ -798,8 +800,8 @@ namespace SW2URDF.URDFExport
 
             //Create the ref axis label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Reference Axis";
-            tip = "Select the reference axis for the joint";
+            caption = ui.Get("Reference Axis");
+            tip = ui.Get("Select the reference axis for the joint");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible;
             PMLabelAxes = (PropertyManagerPageLabel)PMGroup.AddControl2(
@@ -807,8 +809,8 @@ namespace SW2URDF.URDFExport
 
             // Create pull down menu for axes
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Combobox;
-            caption = "Reference Axis Name";
-            tip = "Select the reference axis for the joint";
+            caption = ui.Get("Reference Axis Name");
+            tip = ui.Get("Select the reference axis for the joint");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_Indent;
             options = (int)swAddControlOptions_e.swControlOptions_Visible;
             PMComboBoxAxes = (PropertyManagerPageCombobox)PMGroup.AddControl2(
@@ -818,8 +820,8 @@ namespace SW2URDF.URDFExport
 
             //Create the joint type label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Joint Type";
-            tip = "Select the joint type";
+            caption = ui.Get("Joint Type");
+            tip = ui.Get("Select the joint type");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible;
             PMLabelJointType = (PropertyManagerPageLabel)PMGroup.AddControl2(
@@ -827,8 +829,8 @@ namespace SW2URDF.URDFExport
 
             // Create pull down menu for joint type
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Combobox;
-            caption = "Joint type";
-            tip = "Select the joint type";
+            caption = ui.Get("Joint type");
+            tip = ui.Get("Select the joint type");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_Indent;
             options = (int)swAddControlOptions_e.swControlOptions_Visible;
             PMComboBoxJointType = (PropertyManagerPageCombobox)PMGroup.AddControl2(
@@ -840,18 +842,18 @@ namespace SW2URDF.URDFExport
 
             //Create the selection box label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Link Components";
-            tip = "Select components associated with this link";
+            caption = ui.Get("Link Components");
+            tip = ui.Get("Select components associated with this link");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
             
             //Create selection box
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Selectionbox;
-            caption = "Link Components";
+            caption = ui.Get("Link Components");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_Indent;
             options = (int)swAddControlOptions_e.swControlOptions_Visible + (int)swAddControlOptions_e.swControlOptions_Enabled;
-            tip = "Select components associated with this link";
+            tip = ui.Get("Select components associated with this link");
             PMSelection = (PropertyManagerPageSelectionbox)PMGroup.AddControl2(
                 SelectionID, (short)controlType, caption, (short)alignment, (int)options, tip);
 
@@ -869,8 +871,8 @@ namespace SW2URDF.URDFExport
             //Create the number box label
             //Create the link name text box label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Number of child links";
-            tip = "Enter the number of child links and they will be automatically added";
+            caption = ui.Get("Number of child links");
+            tip = ui.Get("Enter the number of child links and they will be automatically added");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
@@ -879,7 +881,7 @@ namespace SW2URDF.URDFExport
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Numberbox;
             caption = "";
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_Indent;
-            tip = "Enter the number of child links and they will be automatically added";
+            tip = ui.Get("Enter the number of child links and they will be automatically added");
             options = (int)swAddControlOptions_e.swControlOptions_Enabled +
                 (int)swAddControlOptions_e.swControlOptions_Visible;
             PMNumberBoxChildCount = PMGroup.AddControl2(
@@ -890,8 +892,8 @@ namespace SW2URDF.URDFExport
 
             // Load Configuration button
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Button;
-            caption = "Load Configuration...";
-            tip = "Import values from a CSV file";
+            caption = ui.Get("Load Configuration...");
+            tip = ui.Get("Import values from a CSV file");
             alignment = 0;// (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_DoubleIndent;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
@@ -901,7 +903,7 @@ namespace SW2URDF.URDFExport
 
             // Loaded CSV Filename label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            caption = "Imported File: ";
+            caption = ui.Get("Imported File: ");
             tip = "";
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = 0;
@@ -910,36 +912,36 @@ namespace SW2URDF.URDFExport
 
             // Create Check Boxes to select whether to recompute values
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
-            caption = "Compute Mass and Inertia";
+            caption = ui.Get("Compute Mass and Inertia");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            tip = "External values have been loaded. Check this box to recompute the Mass and Inertia values";
+            tip = ui.Get("External values have been loaded. Check this box to recompute the Mass and Inertia values");
             options = 0;
             PMComputeMassInertia = PMGroup.AddControl2(
                 ComputeMassInertiaID, (short)controlType, caption, (short)alignment, (int)options, tip);
             PMComputeMassInertia.Checked = true;
 
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
-            caption = "Compute Visual and Collision";
+            caption = ui.Get("Compute Visual and Collision");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            tip = "External values have been loaded. Check this box to recompute the visual and collision values";
+            tip = ui.Get("External values have been loaded. Check this box to recompute the visual and collision values");
             options = 0;
             PMComputeVisualCollision = PMGroup.AddControl2(
                 ComputeVisualCollisionID, (short)controlType, caption, (short)alignment, (int)options, tip);
             PMComputeVisualCollision.Checked = true;
 
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
-            caption = "Compute Joint Kinematics";
+            caption = ui.Get("Compute Joint Kinematics");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            tip = "External values have been loaded. Check this box to recompute the joint kinematics";
+            tip = ui.Get("External values have been loaded. Check this box to recompute the joint kinematics");
             options = 0;
             PMComputeJointKinematics = PMGroup.AddControl2(
                 ComputeJointKinematicsID, (short)controlType, caption, (short)alignment, (int)options, tip);
             PMComputeJointKinematics.Checked = true;
 
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
-            caption = "Compute Joint Limits";
+            caption = ui.Get("Compute Joint Limits");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            tip = "External values have been loaded. Check this box to recompute the joint limits";
+            tip = ui.Get("External values have been loaded. Check this box to recompute the joint limits");
             options = 0;
             PMComputeJointLimits = PMGroup.AddControl2(
                 ComputeJointLimitsID, (short)controlType, caption, (short)alignment, (int)options, tip);
@@ -953,7 +955,7 @@ namespace SW2URDF.URDFExport
             (PMButtonExport as IPropertyManagerPageControl).Width = 200;
 
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_WindowFromHandle;
-            caption = "Link Tree";
+            caption = ui.Get("Link Tree");
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;

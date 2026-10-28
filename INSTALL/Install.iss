@@ -47,6 +47,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: x64\Debug\*;  DestDir: {app}; Flags: ignoreversion; Check: IsWin64;
+Source: x64\Debug\zh-TW\*.resources.dll; DestDir: {app}\zh-TW; Flags: ignoreversion; Check: IsWin64;
 ;Source: x86\Debug\*;  DestDir: {app}; Flags: regserver ignoreversion; Check: not IsWin64
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files

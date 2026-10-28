@@ -31,10 +31,14 @@ namespace SW2URDF.UI
     public partial class PartExportForm : Form
     {
         public ExportHelper Exporter;
+        private readonly UiText ui;
 
         public PartExportForm(SldWorks iSwApp)
         {
             InitializeComponent();
+            ui = UiText.FromSolidWorks(iSwApp);
+            ui.Apply(this);
+            label33.Left = domainUpDown_alpha.Left - label33.PreferredWidth - 6;
             Exporter = new ExportHelper(iSwApp);
         }
 
