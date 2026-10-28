@@ -1,4 +1,4 @@
-﻿namespace SW2URDF.UI
+namespace SW2URDF.UI
 {
     partial class AssemblyExportForm
     {
@@ -589,11 +589,16 @@
             // 
             // groupBox1
             // 
+            this.radioButtonObj = new System.Windows.Forms.RadioButton();
+            this.radioButtonObj.AutoSize = true;
+            this.radioButtonObj.Location = new System.Drawing.Point(11, 76);
+            this.radioButtonObj.Text = "OBJ + MTL";
+            this.groupBox1.Controls.Add(this.radioButtonObj);
             this.groupBox1.Controls.Add(this.radioButton3dxml);
             this.groupBox1.Controls.Add(this.radioButtonStl);
             this.groupBox1.Location = new System.Drawing.Point(184, 147);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(122, 90);
+            this.groupBox1.Size = new System.Drawing.Size(122, 104);
             this.groupBox1.TabIndex = 74;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Mesh Format";
@@ -1874,6 +1879,7 @@
         private System.Windows.Forms.Label MimicEquationLabel;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton radioButton3dxml;
+        private System.Windows.Forms.RadioButton radioButtonObj;
         private System.Windows.Forms.RadioButton radioButtonStl;
     }
 }
