@@ -120,7 +120,7 @@ namespace SW2URDF.UI
 
             Exporter.URDFRobot.BaseLink.STLQualityFine = radioButton_fine.Checked;
 
-            Exporter.ExportLink(checkBox_rotate.Checked);
+            Exporter.ExportLink(checkBox_rotate.Checked, objExport.Checked ? MeshExportFormat.OBJ : MeshExportFormat.STL);
             Close();
         }
 
