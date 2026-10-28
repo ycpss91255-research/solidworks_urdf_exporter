@@ -313,6 +313,10 @@ namespace SW2URDF.UI
                 {
                     meshFormat = MeshExportFormat.STL;
                 }
+                else if(radioButtonObj.Checked)
+                {
+                    meshFormat = MeshExportFormat.OBJ;
+                }
                 else if(radioButton3dxml.Checked)
                 {
                     meshFormat = MeshExportFormat.THREEDXML;

@@ -948,7 +948,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(569, 705);
+            this.ClientSize = new System.Drawing.Size(569, 735);
+            this.objExport = new System.Windows.Forms.CheckBox();
+            this.objExport.Text = "OBJ + MTL (native colors)";
+            this.objExport.AutoSize = true;
+            this.objExport.Location = new System.Drawing.Point(120, 707);
+            this.Controls.Add(this.objExport);
             this.Controls.Add(this.checkBox_rotate);
             this.Controls.Add(this.button_savename_browse);
             this.Controls.Add(this.textBox_save_as);
@@ -1062,6 +1067,7 @@
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.RadioButton radioButton3;
+        private System.Windows.Forms.CheckBox objExport;
         private System.Windows.Forms.CheckBox checkBox_rotate;
     }
 }
