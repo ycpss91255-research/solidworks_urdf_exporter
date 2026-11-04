@@ -163,7 +163,7 @@
     <value>父連桿：</value>
   </data>
   <data xml:space="preserve" name="pitch">
-    <value>俯仰</value>
+    <value>P</value>
   </data>
   <data xml:space="preserve" name="position (m)">
     <value>位置 (m)</value>
@@ -178,7 +178,7 @@
     <value>紅</value>
   </data>
   <data xml:space="preserve" name="roll">
-    <value>滾轉</value>
+    <value>R</value>
   </data>
   <data xml:space="preserve" name="rotate global origin to make z-axis vertical">
     <value>旋轉全域座標系，使 Z 軸垂直</value>
@@ -241,7 +241,7 @@
     <value>外觀與碰撞網格</value>
   </data>
   <data xml:space="preserve" name="yaw">
-    <value>偏航</value>
+    <value>Y</value>
   </data>
   <data xml:space="preserve" name="damping (n*m*s*rad^-1)">
     <value>阻尼 (N·m·s/rad)</value>

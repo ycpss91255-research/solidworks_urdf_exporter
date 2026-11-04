@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015 Stephen Brawner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -53,6 +53,8 @@ namespace SW2URDF.UI
 
         private void AlignFieldLabels()
         {
+            label63.Left = textBoxJointName.Left;
+            label62.Left = comboBoxJointType.Left;
             UiText.AlignLabel(label14, textBoxIxx);
             UiText.AlignLabel(label11, textBoxIxz);
             UiText.AlignLabel(label13, textBoxInertialOriginX);
