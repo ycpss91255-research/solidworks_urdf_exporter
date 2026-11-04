@@ -1,6 +1,10 @@
 # Offline serialization checks; does not connect to SOLIDWORKS or register COM.
 param([string]$AssemblyPath = "$PSScriptRoot/../SW2URDF/bin/x64/Debug/SW2URDF.dll")
 $ErrorActionPreference = 'Stop'
+if ($PSVersionTable.PSEdition -eq 'Core') {
+    & powershell.exe -NoProfile -File $PSCommandPath -AssemblyPath $AssemblyPath
+    exit $LASTEXITCODE
+}
 $AssemblyPath = (Resolve-Path -LiteralPath $AssemblyPath).Path
 $directory = Split-Path -Parent $AssemblyPath
 [void][Reflection.Assembly]::LoadFrom((Join-Path $directory 'log4net.dll'))

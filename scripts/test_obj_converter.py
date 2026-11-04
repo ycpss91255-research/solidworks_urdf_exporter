@@ -30,7 +30,9 @@ class ObjTests(unittest.TestCase):
             transform = trimesh.transformations.rotation_matrix(np.pi/2, [0, 0, 1])
             transform[:3, 3] = [1000, 2000, 3000]
             scene.add_geometry(mesh, node_name='instance#1:2', transform=transform)
-            scene.add_geometry(mesh.copy(), node_name='instance#1:3')
+            second = trimesh.Trimesh(vertices=mesh.vertices.copy(), faces=mesh.faces.copy(), process=False)
+            second.visual.face_colors = [0, 0, 255, 255]
+            scene.add_geometry(second, node_name='instance#1:3')
             with patch.object(converter.trimesh, 'load_scene', return_value=scene):
                 converter.convert(source, target)
             loaded = trimesh.load_scene(target, process=False)
@@ -43,7 +45,8 @@ class ObjTests(unittest.TestCase):
             expected = trimesh.transform_points(mesh.vertices, transform) / 1000
             np.testing.assert_allclose(vertices[:8], expected, atol=1e-15)
             np.testing.assert_allclose(vertices[8:], mesh.vertices / 1000, atol=1e-15)
-            np.testing.assert_allclose(normals[:8], trimesh.transform_points(mesh.vertex_normals, transform, translate=False), atol=1e-15)
+            expected_normals = np.sign(mesh.vertices) / np.sqrt(3)
+            np.testing.assert_allclose(normals[:8], trimesh.transform_points(expected_normals, transform, translate=False), atol=1e-15)
 
     def test_failure_preserves_existing_output(self):
         with tempfile.TemporaryDirectory() as folder:
