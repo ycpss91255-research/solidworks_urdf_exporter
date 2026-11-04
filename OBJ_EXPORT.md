@@ -60,7 +60,11 @@ The STL reference is explicitly Fine for every link; the unchanged engineering
 comparison limit is 0.2 mm. Coarse STL is not an equivalent Fine reference.
 Run into a new output directory to retain evidence from earlier runs.
 
-Validation scope: the integration fork passed native part/assembly CLI and form
-exports. The clean ROS master port builds against .NET Framework 4.5.2. Run
-fresh native checks on this branch before using the fork measurements as PR
-evidence: the upstream STL exporter and package defaults differ from the fork.
+On SOLIDWORKS 2023 SP5, the ROS master port was built for .NET Framework 4.5.2
+and tested with fresh copies of the 3_DOF_ARM part/assembly fixture. The CLI
+exported both formats for the part and four-link assembly (three joints), and
+the mesh/reference, inertia, relocation and surface checks passed. An additional
+comparison of the native face colours/opacity against the OBJ face assignments
+and MTL values passed for all 3,942 faces in the five exported meshes. Both
+English form controls also produced OBJ packages. These results cover this
+fixture and host version, not every possible input assembly.
