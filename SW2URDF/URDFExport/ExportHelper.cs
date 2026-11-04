@@ -530,7 +530,12 @@ namespace SW2URDF.URDFExport
             return success;
         }
 
-        public void ExportLink(bool zIsUp, MeshExportFormat meshFormat = MeshExportFormat.STL)
+        public void ExportLink(bool zIsUp)
+        {
+            ExportLink(zIsUp, MeshExportFormat.STL);
+        }
+
+        public void ExportLink(bool zIsUp, MeshExportFormat meshFormat)
         {
             CreateBaseRefOrigin(zIsUp);
             MathTransform coordSysTransform =

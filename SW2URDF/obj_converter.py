@@ -35,9 +35,12 @@ def _write(source, target):
         offset = 1
         for node in scene.graph.nodes_geometry:
             transform, geometry = scene.graph[node]
-            mesh = scene.geometry[geometry].copy()
+            native = scene.geometry[geometry]
+            # ColorVisuals.copy() derives unused vertex colours through SciPy.
+            # Copy geometry only; face colours are read directly below.
+            mesh = trimesh.Trimesh(vertices=native.vertices.copy(), faces=native.faces.copy(), process=False)
             mesh.apply_transform(transform)
-            if getattr(mesh.visual, 'kind', None) == 'texture':
+            if getattr(native.visual, 'kind', None) == 'texture':
                 raise ValueError('Image textures are not supported by the solid-colour OBJ exporter')
             if not np.isfinite(mesh.vertices).all():
                 raise ValueError('3DXML contains non-finite vertices')
@@ -46,12 +49,19 @@ def _write(source, target):
                 iterator = iter(ids)
                 return all(any(v == w for v in iterator) for w in wanted)
             applicable = [(wanted, color) for wanted, color in overrides if matches(wanted)]
-            colors = mesh.visual.face_colors.astype(float) / 255.0
+            colors = native.visual.face_colors.astype(float) / 255.0
             if applicable:
                 colors[:] = max(applicable, key=lambda x: (len(x[0]), ids.index(x[0][-1])))[1]
             for vertex in mesh.vertices / 1000.0:
                 obj.write('v %.17g %.17g %.17g\n' % tuple(vertex))
-            for normal in mesh.vertex_normals:
+            # Angle-weighted vertex normals, using NumPy only. SciPy is not a
+            # runtime dependency of this exporter.
+            normals = np.zeros_like(mesh.vertices)
+            for corner in range(3):
+                np.add.at(normals, mesh.faces[:, corner], mesh.face_normals * mesh.face_angles[:, corner, None])
+            lengths = np.linalg.norm(normals, axis=1)
+            normals /= np.where(lengths == 0, 1, lengths)[:, None]
+            for normal in normals:
                 obj.write('vn %.17g %.17g %.17g\n' % tuple(normal))
             current = None
             for face, color in zip(mesh.faces, colors):

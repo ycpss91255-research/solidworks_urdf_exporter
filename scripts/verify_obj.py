@@ -16,7 +16,8 @@ def verify(source, target, reload=False):
     cursor = 0
     for node in nodes:
         transform, geometry = scene.graph[node]
-        mesh = scene.geometry[geometry].copy()
+        native = scene.geometry[geometry]
+        mesh = trimesh.Trimesh(vertices=native.vertices.copy(), faces=native.faces.copy(), process=False)
         mesh.apply_transform(transform)
         expected[cursor:cursor + len(mesh.faces)] = mesh.triangles / 1000.0
         cursor += len(mesh.faces)
