@@ -35,6 +35,15 @@ namespace SW2URDF.UI
             return Resources.GetString(english.ToLowerInvariant(), Culture) ?? english;
         }
 
+        // Designer coordinates assume English caption widths. Measure the translated
+        // label after font scaling and line it up with the field it describes.
+        internal static void AlignLabel(Label label, Control field)
+        {
+            int gap = Math.Max(2, (int)Math.Round(field.Font.Height / 4.0));
+            label.Left = field.Left - label.PreferredWidth - gap;
+            label.Top = field.Top + (field.Height - label.PreferredHeight) / 2;
+        }
+
         public void Apply(Control control)
         {
             // Editable values, tree node names and protocol-valued ComboBoxes

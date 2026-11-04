@@ -165,7 +165,7 @@
             // 
             // textBox_ixz
             // 
-            this.textBox_ixz.Location = new System.Drawing.Point(463, 60);
+            this.textBox_ixz.Location = new System.Drawing.Point(463, 59);
             this.textBox_ixz.Name = "textBox_ixz";
             this.textBox_ixz.Size = new System.Drawing.Size(65, 20);
             this.textBox_ixz.TabIndex = 9;
@@ -179,14 +179,14 @@
             // 
             // textBox_iyz
             // 
-            this.textBox_iyz.Location = new System.Drawing.Point(463, 86);
+            this.textBox_iyz.Location = new System.Drawing.Point(463, 85);
             this.textBox_iyz.Name = "textBox_iyz";
             this.textBox_iyz.Size = new System.Drawing.Size(65, 20);
             this.textBox_iyz.TabIndex = 11;
             // 
             // textBox_izz
             // 
-            this.textBox_izz.Location = new System.Drawing.Point(463, 112);
+            this.textBox_izz.Location = new System.Drawing.Point(463, 111);
             this.textBox_izz.Name = "textBox_izz";
             this.textBox_izz.Size = new System.Drawing.Size(65, 20);
             this.textBox_izz.TabIndex = 12;
@@ -653,7 +653,7 @@
             // 
             // textBox_collision_origin_x
             // 
-            this.textBox_collision_origin_x.Location = new System.Drawing.Point(45, 59);
+            this.textBox_collision_origin_x.Location = new System.Drawing.Point(44, 59);
             this.textBox_collision_origin_x.Name = "textBox_collision_origin_x";
             this.textBox_collision_origin_x.Size = new System.Drawing.Size(65, 20);
             this.textBox_collision_origin_x.TabIndex = 50;
