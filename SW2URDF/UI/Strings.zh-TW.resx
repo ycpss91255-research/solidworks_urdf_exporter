@@ -394,7 +394,7 @@
     <value>選填：只列出名稱包含此文字的座標系或軸（不區分大小寫）。留白表示全部。</value>
   </data>
   <data xml:space="preserve" name="customize the joint properties. if you want to adjust the coordinate systems and axes in the model, click cancel and restart the export. the tool will recognize your changes on the next run.">
-    <value>設定關節屬性。若要調整模型中的座標系或軸，請取消並重新啟動匯出；工具會在下次執行時讀取變更。</value>
+    <value>若要修改座標系或軸，請先取消匯出。修改後重新匯出即可套用變更。</value>
   </data>
   <data xml:space="preserve" name="lower">
     <value>下限</value>
