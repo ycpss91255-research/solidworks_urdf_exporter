@@ -33,11 +33,8 @@ namespace SW2URDF.UI
         public ExportHelper Exporter;
         private readonly UiText ui;
 
-        public PartExportForm(SldWorks iSwApp)
+        private void AlignFieldLabels()
         {
-            InitializeComponent();
-            ui = UiText.FromSolidWorks(iSwApp);
-            ui.Apply(this);
             UiText.AlignLabel(label9, textBox_inertial_origin_x);
             UiText.AlignLabel(label10, textBox_inertial_origin_y);
             UiText.AlignLabel(label11, textBox_inertial_origin_z);
@@ -69,6 +66,14 @@ namespace SW2URDF.UI
             UiText.AlignLabel(label42, textBox_collision_origin_pitch);
             UiText.AlignLabel(label43, textBox_collision_origin_yaw);
             UiText.AlignLabel(label45, textBox_save_as);
+        }
+
+        public PartExportForm(SldWorks iSwApp)
+        {
+            InitializeComponent();
+            ui = UiText.FromSolidWorks(iSwApp);
+            ui.Apply(this);
+            AlignFieldLabels();
             Exporter = new ExportHelper(iSwApp);
         }
 

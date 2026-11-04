@@ -51,15 +51,8 @@ namespace SW2URDF.UI
         private readonly Control[] linkBoxes;
         private readonly LinkNode BaseNode;
 
-        public AssemblyExportForm(SldWorks SwApp, LinkNode node, ExportHelper exporter)
+        private void AlignFieldLabels()
         {
-            Application.ThreadException +=
-                new ThreadExceptionEventHandler(ExceptionHandler);
-            AppDomain.CurrentDomain.UnhandledException +=
-                new UnhandledExceptionEventHandler(UnhandledException);
-            InitializeComponent();
-            ui = UiText.FromSolidWorks(SwApp);
-            ui.Apply(this);
             UiText.AlignLabel(label14, textBoxIxx);
             UiText.AlignLabel(label11, textBoxIxz);
             UiText.AlignLabel(label13, textBoxInertialOriginX);
@@ -108,6 +101,18 @@ namespace SW2URDF.UI
             UiText.AlignLabel(label66, comboBoxOrigin);
             UiText.AlignLabel(MimicMultiplierLabel, textBoxMimicMultiplier);
             UiText.AlignLabel(MimicOffsetLabel, textBoxMimicOffset);
+        }
+
+        public AssemblyExportForm(SldWorks SwApp, LinkNode node, ExportHelper exporter)
+        {
+            Application.ThreadException +=
+                new ThreadExceptionEventHandler(ExceptionHandler);
+            AppDomain.CurrentDomain.UnhandledException +=
+                new UnhandledExceptionEventHandler(UnhandledException);
+            InitializeComponent();
+            ui = UiText.FromSolidWorks(SwApp);
+            ui.Apply(this);
+            AlignFieldLabels();
             swApp = SwApp;
             BaseNode = node;
             ActiveSWModel = swApp.ActiveDoc;
