@@ -39,8 +39,28 @@ Trimesh's large OBJ reload exhausted available memory on later runs; the geometr
 verifier streams OBJ lines and compares all triangles in batches. Its optional
 `--trimesh-reload` enables that separate high-memory reload check.
 
-Pending release gates: visible, isolated SOLIDWORKS part and assembly exports
-through the new controls; full package relocation/reopen; multi-link coordinate
-and inertia regression; installer/runtime setup; target simulator imports.
-Existing MR15 Fine-STL comparison failure is not resolved by this tool change.
-This build is not yet accepted as a production export workflow.
+Native integration checks (use copies of all four `examples/3_DOF_ARM` files):
+
+```powershell
+./scripts/test_obj_live.ps1 -TargetPid $ownedPid -ModelsDirectory $copies `
+  -OutputDirectory $output -PythonExecutable $python
+& $python ./scripts/verify_obj_live.py $output $copies validation.json
+# After CLI passes, optional visible form acceptance using the same owned PID:
+./scripts/test_obj_live.ps1 -TargetPid $ownedPid -ModelsDirectory $copies `
+  -OutputDirectory $formOutput -PythonExecutable $python -Form part
+# Repeat with -Form assembly, select OBJ + MTL, and export the meshes.
+```
+
+These checks bind an existing exact PID, reject unrelated open documents,
+localize copied assembly references, cold reopen inputs and export part and
+four-link assembly packages. They compare every OBJ triangle with native 3DXML,
+reload relocated packages, compare joint/inertia values and mesh poses with STL,
+and measure bidirectional vertex/face-centroid distance to the opposite surface.
+The STL reference is explicitly Fine for every link; the unchanged engineering
+comparison limit is 0.2 mm. Coarse STL is not an equivalent Fine reference.
+Run into a new output directory to retain evidence from earlier runs.
+
+Validation scope: the integration fork passed native part/assembly CLI and form
+exports. The clean ROS master port builds against .NET Framework 4.5.2. Run
+fresh native checks on this branch before using the fork measurements as PR
+evidence: the upstream STL exporter and package defaults differ from the fork.
