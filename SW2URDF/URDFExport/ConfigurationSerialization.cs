@@ -65,6 +65,7 @@ namespace SW2URDF.URDFExport
         /// <returns>TreeView LinkNode loaded from configuration</returns>
         public static LinkNode LoadBaseNodeFromModel(ModelDoc2 model, out bool error)
         {
+            LogOrphanConfigurationAttributes(model);
             string data = GetConfigTreeData(model, out double configVersion);
 
             LinkNode basenode;
@@ -347,6 +348,46 @@ namespace SW2URDF.URDFExport
                 return null;
             }
             return (SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2();
+        }
+
+        /// <summary>
+        /// Detection only (issue #11): logs per-configuration attributes that match no
+        /// configuration. Nothing is changed and loading is never blocked.
+        /// </summary>
+        private static void LogOrphanConfigurationAttributes(ModelDoc2 model)
+        {
+            try
+            {
+                List<string> attributeNames = new List<string>();
+                foreach (Feature feature in GetConfigurationAttributeFeatures(model))
+                {
+                    SolidWorks.Interop.sldworks.Attribute att =
+                        (SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2();
+                    // Instances of the shared attribute definitions also carry data/exporterVersion
+                    if (att.GetName() != null && !IsSharedAttributeName(att.GetName()))
+                    {
+                        attributeNames.Add(att.GetName());
+                    }
+                }
+                string[] configNames = model.GetConfigurationNames() as string[];
+                List<string> orphans = OrphanAttributes.FindOrphans(attributeNames, configNames);
+                string message = OrphanAttributes.BuildLogMessage(
+                    orphans, OrphanAttributes.FindConfigurationsWithoutAttribute(attributeNames, configNames));
+                if (message != null)
+                {
+                    logger.Warn(message);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Checking for orphan URDF configuration attributes failed", e);
+            }
+        }
+
+        private static bool IsSharedAttributeName(string name)
+        {
+            return name == ConfigurationFormat.SharedAttributeName ||
+                ConfigurationFormat.PreviousSharedAttributeNames.Contains(name);
         }
 
         private static string GetActiveConfigurationName(ModelDoc2 model)
