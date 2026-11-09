@@ -1,4 +1,4 @@
-namespace SW2URDF.UI
+﻿namespace SW2URDF.UI
 {
     partial class AssemblyExportForm
     {
@@ -73,6 +73,9 @@ namespace SW2URDF.UI
             this.radioButtonStl = new System.Windows.Forms.RadioButton();
             this.radioButtonFine = new System.Windows.Forms.RadioButton();
             this.radioButtonCourse = new System.Windows.Forms.RadioButton();
+            this.radioButtonObj = new System.Windows.Forms.RadioButton();
+            this.flowLayoutPanelMeshFormat = new System.Windows.Forms.FlowLayoutPanel();
+            this.labelObjQualityNote = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.textBoxVisualOriginZ = new System.Windows.Forms.TextBox();
@@ -187,6 +190,7 @@ namespace SW2URDF.UI
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.flowLayoutPanelMeshFormat.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelLinkProperties
@@ -462,7 +466,7 @@ namespace SW2URDF.UI
             this.label44.Name = "label44";
             this.label44.Size = new System.Drawing.Size(144, 13);
             this.label44.TabIndex = 23;
-            this.label44.Text = "Moment of Inertia (Kg * m^2)";
+            this.label44.Text = "Moment of Inertia (Kg * m^-2)";
             // 
             // label45
             // 
@@ -550,6 +554,7 @@ namespace SW2URDF.UI
             // 
             this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.groupBox1);
+            this.groupBox4.Controls.Add(this.labelObjQualityNote);
             this.groupBox4.Controls.Add(this.radioButtonFine);
             this.groupBox4.Controls.Add(this.radioButtonCourse);
             this.groupBox4.Controls.Add(this.label10);
@@ -589,16 +594,10 @@ namespace SW2URDF.UI
             // 
             // groupBox1
             // 
-            this.radioButtonObj = new System.Windows.Forms.RadioButton();
-            this.radioButtonObj.AutoSize = true;
-            this.radioButtonObj.Location = new System.Drawing.Point(11, 76);
-            this.radioButtonObj.Text = "OBJ + MTL";
-            this.groupBox1.Controls.Add(this.radioButtonObj);
-            this.groupBox1.Controls.Add(this.radioButton3dxml);
-            this.groupBox1.Controls.Add(this.radioButtonStl);
+            this.groupBox1.Controls.Add(this.flowLayoutPanelMeshFormat);
             this.groupBox1.Location = new System.Drawing.Point(184, 147);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(122, 104);
+            this.groupBox1.Size = new System.Drawing.Size(122, 90);
             this.groupBox1.TabIndex = 74;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Mesh Format";
@@ -606,7 +605,7 @@ namespace SW2URDF.UI
             // radioButton3dxml
             // 
             this.radioButton3dxml.AutoSize = true;
-            this.radioButton3dxml.Location = new System.Drawing.Point(11, 54);
+            this.radioButton3dxml.Location = new System.Drawing.Point(3, 26);
             this.radioButton3dxml.Name = "radioButton3dxml";
             this.radioButton3dxml.Size = new System.Drawing.Size(90, 16);
             this.radioButton3dxml.TabIndex = 1;
@@ -614,11 +613,47 @@ namespace SW2URDF.UI
             this.radioButton3dxml.Text = "3dxml (color)";
             this.radioButton3dxml.UseVisualStyleBackColor = true;
             // 
+            // flowLayoutPanelMeshFormat
+            //
+            this.flowLayoutPanelMeshFormat.AutoSize = true;
+            this.flowLayoutPanelMeshFormat.Controls.Add(this.radioButtonStl);
+            this.flowLayoutPanelMeshFormat.Controls.Add(this.radioButton3dxml);
+            this.flowLayoutPanelMeshFormat.Controls.Add(this.radioButtonObj);
+            this.flowLayoutPanelMeshFormat.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowLayoutPanelMeshFormat.Location = new System.Drawing.Point(8, 16);
+            this.flowLayoutPanelMeshFormat.Name = "flowLayoutPanelMeshFormat";
+            this.flowLayoutPanelMeshFormat.Size = new System.Drawing.Size(110, 69);
+            this.flowLayoutPanelMeshFormat.TabIndex = 0;
+            this.flowLayoutPanelMeshFormat.WrapContents = false;
+            //
+            // radioButtonObj
+            //
+            this.radioButtonObj.AutoSize = true;
+            this.radioButtonObj.Location = new System.Drawing.Point(3, 49);
+            this.radioButtonObj.Name = "radioButtonObj";
+            this.radioButtonObj.Size = new System.Drawing.Size(73, 17);
+            this.radioButtonObj.TabIndex = 2;
+            this.radioButtonObj.TabStop = true;
+            this.radioButtonObj.Text = "OBJ + MTL";
+            this.radioButtonObj.UseVisualStyleBackColor = true;
+            this.radioButtonObj.CheckedChanged += new System.EventHandler(this.RadioButtonObjCheckedChanged);
+            //
+            // labelObjQualityNote
+            //
+            this.labelObjQualityNote.AutoSize = true;
+            this.labelObjQualityNote.Location = new System.Drawing.Point(184, 238);
+            this.labelObjQualityNote.MaximumSize = new System.Drawing.Size(190, 0);
+            this.labelObjQualityNote.Name = "labelObjQualityNote";
+            this.labelObjQualityNote.Size = new System.Drawing.Size(150, 13);
+            this.labelObjQualityNote.TabIndex = 75;
+            this.labelObjQualityNote.Text = "OBJ mesh density is determined by SolidWorks.";
+            this.labelObjQualityNote.Visible = false;
+            //
             // radioButtonStl
-            // 
+            //
             this.radioButtonStl.AutoSize = true;
             this.radioButtonStl.Checked = true;
-            this.radioButtonStl.Location = new System.Drawing.Point(11, 24);
+            this.radioButtonStl.Location = new System.Drawing.Point(3, 3);
             this.radioButtonStl.Name = "radioButtonStl";
             this.radioButtonStl.Size = new System.Drawing.Size(104, 16);
             this.radioButtonStl.TabIndex = 0;
@@ -1719,6 +1754,8 @@ namespace SW2URDF.UI
             this.groupBox4.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.flowLayoutPanelMeshFormat.ResumeLayout(false);
+            this.flowLayoutPanelMeshFormat.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1880,6 +1917,8 @@ namespace SW2URDF.UI
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton radioButton3dxml;
         private System.Windows.Forms.RadioButton radioButtonObj;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelMeshFormat;
+        private System.Windows.Forms.Label labelObjQualityNote;
         private System.Windows.Forms.RadioButton radioButtonStl;
     }
 }
