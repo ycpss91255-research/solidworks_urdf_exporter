@@ -120,10 +120,14 @@
             this.flowLayoutPanelOptions = new System.Windows.Forms.FlowLayoutPanel();
             this.labelObjQualityNote = new System.Windows.Forms.Label();
             this.labelObjColorNote = new System.Windows.Forms.Label();
+            this.panelObjQualityNote = new System.Windows.Forms.Panel();
+            this.panelObjColorNote = new System.Windows.Forms.Panel();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.flowLayoutPanelOptions.SuspendLayout();
+            this.panelObjQualityNote.SuspendLayout();
+            this.panelObjColorNote.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox_inertial_origin_x
@@ -761,8 +765,8 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.labelObjColorNote);
-            this.groupBox2.Controls.Add(this.labelObjQualityNote);
+            this.groupBox2.Controls.Add(this.panelObjColorNote);
+            this.groupBox2.Controls.Add(this.panelObjQualityNote);
             this.groupBox2.Controls.Add(this.radioButton_fine);
             this.groupBox2.Controls.Add(this.radioButton_course);
             this.groupBox2.Controls.Add(this.label1);
@@ -972,27 +976,41 @@
             this.flowLayoutPanelOptions.Size = new System.Drawing.Size(396, 23);
             this.flowLayoutPanelOptions.TabIndex = 75;
             //
+            // panelObjQualityNote
+            //
+            this.panelObjQualityNote.Controls.Add(this.labelObjQualityNote);
+            this.panelObjQualityNote.Location = new System.Drawing.Point(249, 114);
+            this.panelObjQualityNote.Name = "panelObjQualityNote";
+            this.panelObjQualityNote.Size = new System.Drawing.Size(125, 54);
+            this.panelObjQualityNote.TabIndex = 77;
+            this.panelObjQualityNote.Visible = false;
+            //
             // labelObjQualityNote
             //
-            this.labelObjQualityNote.AutoSize = true;
-            this.labelObjQualityNote.Location = new System.Drawing.Point(249, 114);
-            this.labelObjQualityNote.MaximumSize = new System.Drawing.Size(140, 0);
+            this.labelObjQualityNote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelObjQualityNote.Location = new System.Drawing.Point(0, 0);
             this.labelObjQualityNote.Name = "labelObjQualityNote";
-            this.labelObjQualityNote.Size = new System.Drawing.Size(250, 13);
-            this.labelObjQualityNote.TabIndex = 69;
+            this.labelObjQualityNote.Size = new System.Drawing.Size(125, 54);
+            this.labelObjQualityNote.TabIndex = 0;
             this.labelObjQualityNote.Text = "OBJ mesh density is determined by SolidWorks.";
-            this.labelObjQualityNote.Visible = false;
+            //
+            // panelObjColorNote
+            //
+            this.panelObjColorNote.Controls.Add(this.labelObjColorNote);
+            this.panelObjColorNote.Location = new System.Drawing.Point(70, 177);
+            this.panelObjColorNote.Name = "panelObjColorNote";
+            this.panelObjColorNote.Size = new System.Drawing.Size(300, 18);
+            this.panelObjColorNote.TabIndex = 76;
+            this.panelObjColorNote.Visible = false;
             //
             // labelObjColorNote
             //
-            this.labelObjColorNote.AutoSize = true;
-            this.labelObjColorNote.Location = new System.Drawing.Point(220, 141);
-            this.labelObjColorNote.MaximumSize = new System.Drawing.Size(150, 0);
+            this.labelObjColorNote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelObjColorNote.Location = new System.Drawing.Point(0, 0);
             this.labelObjColorNote.Name = "labelObjColorNote";
-            this.labelObjColorNote.Size = new System.Drawing.Size(150, 26);
-            this.labelObjColorNote.TabIndex = 76;
+            this.labelObjColorNote.Size = new System.Drawing.Size(300, 18);
+            this.labelObjColorNote.TabIndex = 0;
             this.labelObjColorNote.Text = "OBJ color and texture are defined by the MTL file.";
-            this.labelObjColorNote.Visible = false;
             // 
             // PartExportForm
             // 
@@ -1020,6 +1038,8 @@
             this.groupBox3.PerformLayout();
             this.flowLayoutPanelOptions.ResumeLayout(false);
             this.flowLayoutPanelOptions.PerformLayout();
+            this.panelObjQualityNote.ResumeLayout(false);
+            this.panelObjColorNote.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1118,6 +1138,8 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelOptions;
         private System.Windows.Forms.Label labelObjQualityNote;
         private System.Windows.Forms.Label labelObjColorNote;
+        private System.Windows.Forms.Panel panelObjQualityNote;
+        private System.Windows.Forms.Panel panelObjColorNote;
         private System.Windows.Forms.CheckBox checkBox_rotate;
     }
 }

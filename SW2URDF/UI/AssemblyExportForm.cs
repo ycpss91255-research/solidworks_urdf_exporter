@@ -157,7 +157,7 @@ namespace SW2URDF.UI
             bool stl = !radioButtonObj.Checked;
             radioButtonFine.Enabled = stl;
             radioButtonCourse.Enabled = stl;
-            labelObjQualityNote.Visible = !stl;
+            panelObjQualityNote.Visible = !stl;
 
             // OBJ writes no URDF <material>; color and texture come from the MTL file.
             Control[] colorControls = {
@@ -168,7 +168,7 @@ namespace SW2URDF.UI
             {
                 control.Enabled = stl;
             }
-            labelObjColorNote.Visible = !stl;
+            panelObjColorNote.Visible = !stl;
         }
 
         private void ButtonJointNextClick(object sender, EventArgs e)
