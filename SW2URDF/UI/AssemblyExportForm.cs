@@ -145,6 +145,21 @@ namespace SW2URDF.UI
             FillJointTree();
         }
 
+        private void RadioButtonObjCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMeshQualityControls();
+        }
+
+        // The OBJ path is exported through 3DXML, so the STL Fine/Coarse
+        // preference has no effect on it.
+        private void UpdateMeshQualityControls()
+        {
+            bool stl = !radioButtonObj.Checked;
+            radioButtonFine.Enabled = stl;
+            radioButtonCourse.Enabled = stl;
+            labelObjQualityNote.Visible = !stl;
+        }
+
         private void ButtonJointNextClick(object sender, EventArgs e)
         {
             if (!(previouslySelectedNode == null || previouslySelectedNode.Link.Joint == null))

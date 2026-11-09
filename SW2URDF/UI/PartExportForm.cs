@@ -124,6 +124,22 @@ namespace SW2URDF.UI
             Close();
         }
 
+        private void ObjExportCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMeshQualityControls();
+        }
+
+        // The OBJ path is exported through 3DXML, so the STL Fine/Coarse
+        // preference has no effect on it.
+        private void UpdateMeshQualityControls()
+        {
+            bool stl = !objExport.Checked;
+            label1.Enabled = stl;
+            radioButton_fine.Enabled = stl;
+            radioButton_course.Enabled = stl;
+            labelObjQualityNote.Visible = !stl;
+        }
+
         private void ButtonCancelClick(object sender, EventArgs e)
         {
             Close();
