@@ -16,19 +16,49 @@ namespace SW2URDF.URDFExport
     /// </summary>
     public static class ConfigurationFormat
     {
-        public const double CurrentVersion = 0;
-        public const double MinDataContractVersion = 0;
-        public const string SharedAttributeName = "";
-        public static readonly IList<string> PreviousSharedAttributeNames = new List<string>();
+        /// <summary>
+        /// Version written to the "exporterVersion" parameter of every saved configuration. It
+        /// versions the data format only and is independent of the exporter release number.
+        /// </summary>
+        public const double CurrentVersion = 1.4;
+
+        /// <summary>
+        /// Data written before this version used the older XmlSerializer scheme.
+        /// </summary>
+        public const double MinDataContractVersion = 1.3;
+
+        /// <summary>
+        /// Name of the shared (all configurations) attribute. It carries a version for historical
+        /// reasons and must not be renamed: older models store their data under this name.
+        /// </summary>
+        public const string SharedAttributeName = "URDF Export Configuration (v1.4)";
+
+        /// <summary>
+        /// Shared attribute names used by earlier exporters, read as a fallback.
+        /// </summary>
+        public static readonly IList<string> PreviousSharedAttributeNames = new List<string>
+        {
+            "URDF Export Configuration (v1.3)",
+            "URDF Export Configuration"
+        };
 
         public static ConfigurationFormatKind Classify(double version)
         {
-            return ConfigurationFormatKind.None;
+            if (version <= 0.0)
+            {
+                return ConfigurationFormatKind.None;
+            }
+            if (version > CurrentVersion)
+            {
+                return ConfigurationFormatKind.TooNew;
+            }
+            return version >= MinDataContractVersion ?
+                ConfigurationFormatKind.DataContract : ConfigurationFormatKind.LegacyXml;
         }
 
         public static bool NeedsUpgrade(double version)
         {
-            return false;
+            return version > 0.0 && version < CurrentVersion;
         }
     }
 }
