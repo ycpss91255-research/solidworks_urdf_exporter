@@ -71,6 +71,25 @@ public static class ObjFormCheck {
         }
     }
 
+    // Controls that only matter for the URDF <material> element. OBJ exports take
+    // color and texture from the MTL file, so these must be inert while OBJ is selected.
+    static readonly string[] PartColorControls = {
+        "label28", "label29", "label30", "label31", "label32", "label33", "label34",
+        "comboBox_materials", "domainUpDown_red", "domainUpDown_green", "domainUpDown_blue",
+        "domainUpDown_alpha", "textBox_texture", "button_texturebrowse" };
+    static readonly string[] AssemblyColorControls = {
+        "label28", "label29", "label30", "label31", "label32", "label33", "label34",
+        "comboBoxMaterials", "domainUpDownRed", "domainUpDownGreen", "domainUpDownBlue",
+        "domainUpDownAlpha", "textBoxTexture", "buttonTextureBrowse" };
+
+    static void RequireColor(Control root, string[] names, bool enabled, string context) {
+        Control note = Find<Control>(root, "labelObjColorNote");
+        Require(Shown(note) == !enabled, context + ": color note visibility");
+        foreach (string name in names) {
+            Require(Find<Control>(root, name).Enabled == enabled, context + ": " + name + " enabled must be " + enabled);
+        }
+    }
+
     public static void Forms(string shots) {
         using (PartExportForm part = Create<PartExportForm>()) {
             CheckBox obj = Find<CheckBox>(part, "objExport");
@@ -80,12 +99,15 @@ public static class ObjFormCheck {
             Require(obj.Parent is FlowLayoutPanel, "objExport must live in a FlowLayoutPanel");
             Require(Find<CheckBox>(part, "checkBox_rotate").Parent == obj.Parent, "rotate and OBJ share one panel");
             Require(fine.Enabled && coarse.Enabled && !Shown(note), "Part: default quality enabled");
+            RequireColor(part, PartColorControls, true, "Part default");
             Shot(part, shots, "part_default");
             obj.Checked = true;
             Require(!fine.Enabled && !coarse.Enabled && Shown(note), "Part: OBJ disables quality");
+            RequireColor(part, PartColorControls, false, "Part OBJ");
             Shot(part, shots, "part_obj");
             obj.Checked = false;
             Require(fine.Enabled && coarse.Enabled && !Shown(note), "Part: STL re-enables quality");
+            RequireColor(part, PartColorControls, true, "Part back to STL");
         }
         using (AssemblyExportForm assembly = Create<AssemblyExportForm>()) {
             // The link page is hidden behind the joint page until it is completed; show only it.
@@ -99,15 +121,19 @@ public static class ObjFormCheck {
             Require(objRadio.Parent is FlowLayoutPanel && stl.Parent == objRadio.Parent && xml.Parent == objRadio.Parent,
                 "Mesh format radios must share a FlowLayoutPanel");
             Require(fine.Enabled && coarse.Enabled && !Shown(note), "Assembly: default quality enabled");
+            RequireColor(assembly, AssemblyColorControls, true, "Assembly default");
             Shot(assembly, shots, "assembly_default");
             objRadio.Checked = true;
             Require(!fine.Enabled && !coarse.Enabled && Shown(note), "Assembly: OBJ disables quality");
+            RequireColor(assembly, AssemblyColorControls, false, "Assembly OBJ");
             Shot(assembly, shots, "assembly_obj");
             xml.Checked = true;
             Require(fine.Enabled && coarse.Enabled && !Shown(note), "Assembly: 3dxml re-enables quality");
+            RequireColor(assembly, AssemblyColorControls, true, "Assembly 3dxml");
             objRadio.Checked = true;
             stl.Checked = true;
             Require(fine.Enabled && coarse.Enabled && !Shown(note), "Assembly: STL re-enables quality");
+            RequireColor(assembly, AssemblyColorControls, true, "Assembly STL");
         }
     }
 
