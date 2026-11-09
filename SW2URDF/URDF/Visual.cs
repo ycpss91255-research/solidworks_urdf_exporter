@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.Serialization;
 
 namespace SW2URDF.URDF
@@ -8,16 +9,14 @@ namespace SW2URDF.URDF
     {
         public override void WriteURDF(System.Xml.XmlWriter writer)
         {
-            // OBJ's native per-face MTL colours are authoritative. A link-wide
-            // URDF colour can override those in importers.
-            bool nativeMaterial = System.String.Equals(
-                System.IO.Path.GetExtension(Geometry.Mesh.Filename), ".obj",
-                System.StringComparison.OrdinalIgnoreCase);
+            // OBJ files carry their colours in the MTL. A link-wide URDF colour would
+            // override those in importers, so omit it for OBJ meshes.
+            bool nativeMaterial = String.Equals(
+                System.IO.Path.GetExtension(Geometry.Mesh.Filename), ".obj", StringComparison.OrdinalIgnoreCase);
             if (nativeMaterial) ChildElements.Remove(Material);
             try { base.WriteURDF(writer); }
             finally { if (nativeMaterial) ChildElements.Add(Material); }
         }
-
         [DataMember]
         public readonly Origin Origin;
 
