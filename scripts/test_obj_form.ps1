@@ -101,6 +101,34 @@ public static class ObjFormCheck {
         }
     }
 
+    static void CollectText(Control root, List<string> texts) {
+        foreach (Control control in root.Controls) {
+            if (control is Label) texts.Add(control.Text);
+            CollectText(control, texts);
+        }
+    }
+
+    // SolidWorks reports mass properties in SI and URDF <inertia> is kg*m^2, so the
+    // unit shown next to the inertia tensor must be m^2, not m^-2.
+    public static void InertiaUnits() {
+        using (PartExportForm part = Create<PartExportForm>())
+        using (AssemblyExportForm assembly = Create<AssemblyExportForm>()) {
+            foreach (Form form in new Form[] { part, assembly }) {
+                List<string> texts = new List<string>();
+                CollectText(form, texts);
+                int found = 0;
+                foreach (string text in texts) {
+                    Require(!text.Contains("m^-2"), form.GetType().Name + ": wrong inertia unit label: " + text);
+                    if (text.StartsWith("Moment of Inertia")) {
+                        found++;
+                        Require(text == "Moment of Inertia (kg * m^2)", form.GetType().Name + ": inertia label is " + text);
+                    }
+                }
+                Require(found == 1, form.GetType().Name + ": expected one inertia label, found " + found);
+            }
+        }
+    }
+
     public static void Forms(string shots) {
         using (PartExportForm part = Create<PartExportForm>()) {
             CheckBox obj = Find<CheckBox>(part, "objExport");
@@ -313,6 +341,7 @@ public static class ObjFormCheck {
 Add-Type -TypeDefinition $code -ReferencedAssemblies @($AssemblyPath, 'System.Windows.Forms', 'System.Drawing', 'System.Runtime.Serialization', 'System.Xml')
 if ($ScreenshotDirectory) { New-Item -ItemType Directory -Force -Path $ScreenshotDirectory | Out-Null }
 [ObjFormCheck]::Forms($ScreenshotDirectory)
+[ObjFormCheck]::InertiaUnits()
 [ObjFormCheck]::Layouts($ScreenshotDirectory, $ZhResx)
 if (-not $ZhResx) { Write-Output 'NOTE: -ZhResx not given; Traditional Chinese layouts were not checked' }
 [ObjFormCheck]::Serialization()
