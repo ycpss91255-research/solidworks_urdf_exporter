@@ -327,6 +327,7 @@
     <Compile Include="Test\TestExportHelper.cs" />
     <Compile Include="Test\TestLogger.cs" />
     <Compile Include="Test\TestMathOps.cs" />
+    <Compile Include="Test\TestMissingComponentPolicy.cs" />
     <Compile Include="Test\TestPropertyManager.cs" />
     <Compile Include="Test\TestROSFIles.cs" />
     <Compile Include="Test\TestSerialization.cs" />
@@ -366,6 +367,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="URDFExport\CommonSwOperations.cs" />
+    <Compile Include="URDFExport\MissingComponentPolicy.cs" />
     <Compile Include="URDFExport\ExportPropertyManagerExtension.cs" />
     <Compile Include="Utilities\MathOPS.cs" />
     <Compile Include="SW\EventHandling.cs" />
