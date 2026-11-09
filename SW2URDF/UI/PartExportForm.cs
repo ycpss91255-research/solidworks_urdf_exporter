@@ -138,6 +138,17 @@ namespace SW2URDF.UI
             radioButton_fine.Enabled = stl;
             radioButton_course.Enabled = stl;
             labelObjQualityNote.Visible = !stl;
+
+            // OBJ writes no URDF <material>; color and texture come from the MTL file.
+            Control[] colorControls = {
+                label28, label29, label30, label31, label32, label33, label34,
+                comboBox_materials, domainUpDown_red, domainUpDown_green, domainUpDown_blue,
+                domainUpDown_alpha, textBox_texture, button_texturebrowse };
+            foreach (Control control in colorControls)
+            {
+                control.Enabled = stl;
+            }
+            labelObjColorNote.Visible = !stl;
         }
 
         private void ButtonCancelClick(object sender, EventArgs e)

@@ -76,6 +76,7 @@
             this.radioButtonObj = new System.Windows.Forms.RadioButton();
             this.flowLayoutPanelMeshFormat = new System.Windows.Forms.FlowLayoutPanel();
             this.labelObjQualityNote = new System.Windows.Forms.Label();
+            this.labelObjColorNote = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.textBoxVisualOriginZ = new System.Windows.Forms.TextBox();
@@ -554,6 +555,7 @@
             // 
             this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.groupBox1);
+            this.groupBox4.Controls.Add(this.labelObjColorNote);
             this.groupBox4.Controls.Add(this.labelObjQualityNote);
             this.groupBox4.Controls.Add(this.radioButtonFine);
             this.groupBox4.Controls.Add(this.radioButtonCourse);
@@ -648,6 +650,17 @@
             this.labelObjQualityNote.TabIndex = 75;
             this.labelObjQualityNote.Text = "OBJ mesh density is determined by SolidWorks.";
             this.labelObjQualityNote.Visible = false;
+            //
+            // labelObjColorNote
+            //
+            this.labelObjColorNote.AutoSize = true;
+            this.labelObjColorNote.Location = new System.Drawing.Point(150, 225);
+            this.labelObjColorNote.MaximumSize = new System.Drawing.Size(220, 0);
+            this.labelObjColorNote.Name = "labelObjColorNote";
+            this.labelObjColorNote.Size = new System.Drawing.Size(220, 26);
+            this.labelObjColorNote.TabIndex = 76;
+            this.labelObjColorNote.Text = "OBJ color and texture are defined by the MTL file.";
+            this.labelObjColorNote.Visible = false;
             //
             // radioButtonStl
             //
@@ -1919,6 +1932,7 @@
         private System.Windows.Forms.RadioButton radioButtonObj;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelMeshFormat;
         private System.Windows.Forms.Label labelObjQualityNote;
+        private System.Windows.Forms.Label labelObjColorNote;
         private System.Windows.Forms.RadioButton radioButtonStl;
     }
 }
