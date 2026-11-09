@@ -116,9 +116,13 @@
             this.button_savename_browse = new System.Windows.Forms.Button();
             this.saveFileDialog_save_as = new System.Windows.Forms.SaveFileDialog();
             this.checkBox_rotate = new System.Windows.Forms.CheckBox();
+            this.objExport = new System.Windows.Forms.CheckBox();
+            this.flowLayoutPanelOptions = new System.Windows.Forms.FlowLayoutPanel();
+            this.labelObjQualityNote = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.flowLayoutPanelOptions.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox_inertial_origin_x
@@ -288,7 +292,7 @@
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(144, 13);
             this.label12.TabIndex = 23;
-            this.label12.Text = "Moment of Inertia (Kg * m^2)";
+            this.label12.Text = "Moment of Inertia (Kg * m^-2)";
             // 
             // label13
             // 
@@ -756,6 +760,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.labelObjQualityNote);
             this.groupBox2.Controls.Add(this.radioButton_fine);
             this.groupBox2.Controls.Add(this.radioButton_course);
             this.groupBox2.Controls.Add(this.label1);
@@ -937,24 +942,51 @@
             this.checkBox_rotate.AutoSize = true;
             this.checkBox_rotate.Checked = true;
             this.checkBox_rotate.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_rotate.Location = new System.Drawing.Point(12, 73);
+            this.checkBox_rotate.Location = new System.Drawing.Point(3, 3);
             this.checkBox_rotate.Name = "checkBox_rotate";
             this.checkBox_rotate.Size = new System.Drawing.Size(226, 17);
             this.checkBox_rotate.TabIndex = 74;
             this.checkBox_rotate.Text = "Rotate global origin to make Z-axis vertical";
             this.checkBox_rotate.UseVisualStyleBackColor = true;
+            //
+            // objExport
+            //
+            this.objExport.AutoSize = true;
+            this.objExport.Location = new System.Drawing.Point(235, 3);
+            this.objExport.Name = "objExport";
+            this.objExport.Size = new System.Drawing.Size(158, 17);
+            this.objExport.TabIndex = 1;
+            this.objExport.Text = "OBJ + MTL (native colors)";
+            this.objExport.UseVisualStyleBackColor = true;
+            this.objExport.CheckedChanged += new System.EventHandler(this.ObjExportCheckedChanged);
+            //
+            // flowLayoutPanelOptions
+            //
+            this.flowLayoutPanelOptions.AutoSize = true;
+            this.flowLayoutPanelOptions.Controls.Add(this.checkBox_rotate);
+            this.flowLayoutPanelOptions.Controls.Add(this.objExport);
+            this.flowLayoutPanelOptions.Location = new System.Drawing.Point(9, 70);
+            this.flowLayoutPanelOptions.Name = "flowLayoutPanelOptions";
+            this.flowLayoutPanelOptions.Size = new System.Drawing.Size(396, 23);
+            this.flowLayoutPanelOptions.TabIndex = 75;
+            //
+            // labelObjQualityNote
+            //
+            this.labelObjQualityNote.AutoSize = true;
+            this.labelObjQualityNote.Location = new System.Drawing.Point(249, 114);
+            this.labelObjQualityNote.MaximumSize = new System.Drawing.Size(140, 0);
+            this.labelObjQualityNote.Name = "labelObjQualityNote";
+            this.labelObjQualityNote.Size = new System.Drawing.Size(250, 13);
+            this.labelObjQualityNote.TabIndex = 69;
+            this.labelObjQualityNote.Text = "OBJ mesh density is determined by SolidWorks.";
+            this.labelObjQualityNote.Visible = false;
             // 
             // PartExportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(569, 735);
-            this.objExport = new System.Windows.Forms.CheckBox();
-            this.objExport.Text = "OBJ + MTL (native colors)";
-            this.objExport.AutoSize = true;
-            this.objExport.Location = new System.Drawing.Point(120, 707);
-            this.Controls.Add(this.objExport);
-            this.Controls.Add(this.checkBox_rotate);
+            this.ClientSize = new System.Drawing.Size(569, 705);
+            this.Controls.Add(this.flowLayoutPanelOptions);
             this.Controls.Add(this.button_savename_browse);
             this.Controls.Add(this.textBox_save_as);
             this.Controls.Add(this.label45);
@@ -973,6 +1005,8 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.flowLayoutPanelOptions.ResumeLayout(false);
+            this.flowLayoutPanelOptions.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1068,6 +1102,8 @@
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.RadioButton radioButton3;
         private System.Windows.Forms.CheckBox objExport;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelOptions;
+        private System.Windows.Forms.Label labelObjQualityNote;
         private System.Windows.Forms.CheckBox checkBox_rotate;
     }
 }
