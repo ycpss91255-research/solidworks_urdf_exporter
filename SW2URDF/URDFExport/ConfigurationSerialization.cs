@@ -29,19 +29,13 @@ namespace SW2URDF.URDFExport
         /// <summary>
         /// Current Serialization version
         /// </summary>
-        private const double SerializationVersion = 1.4;
-
-        /// <summary>
-        /// Previous versions of serialization were set at 1 in the SW Document. This is
-        /// used to denote the version at which the serialization scheme was modified.
-        /// </summary>
-        private const double MinDataContractVersion = 1.3;
+        private const double SerializationVersion = ConfigurationFormat.CurrentVersion;
 
         /// <summary>
         /// The name given to the URDF configuration in the ModelDoc Feature tree. This is displayed to the
         /// user
         /// </summary>
-        public const string UrdfConfigurationSwAttributeName= "URDF Export Configuration (v1.4)";
+        public const string UrdfConfigurationSwAttributeName = ConfigurationFormat.SharedAttributeName;
 
         /// <summary>
         /// Definition name of the per-SolidWorks-configuration attribute. One instance is stored per
@@ -59,10 +53,8 @@ namespace SW2URDF.URDFExport
         /// </summary>
         public const string ConfigurationAttributeFolderName = "URDF Export Configuration";
 
-        public static List<string> PREVIOUS_URDF_CONFIGURATION_NAMES = new List<string>() {
-            "URDF Export Configuration (v1.3)",
-            "URDF Export Configuration"
-            };
+        public static List<string> PREVIOUS_URDF_CONFIGURATION_NAMES =
+            new List<string>(ConfigurationFormat.PreviousSharedAttributeNames);
 
         #region Public Methods
 
@@ -76,7 +68,8 @@ namespace SW2URDF.URDFExport
             string data = GetConfigTreeData(model, out double configVersion);
 
             LinkNode basenode;
-            if (configVersion > SerializationVersion)
+            ConfigurationFormatKind kind = ConfigurationFormat.Classify(configVersion);
+            if (kind == ConfigurationFormatKind.TooNew)
             {
                 MessageBox.Show("The configuration saved in this model is newer than what this " +
                     "exporter supports " + string.Format("({0} > {1})", configVersion, SerializationVersion) +
@@ -85,7 +78,7 @@ namespace SW2URDF.URDFExport
                 return null;
             }
 
-            if (configVersion >= MinDataContractVersion)
+            if (kind == ConfigurationFormatKind.DataContract)
             {
                 basenode = DeserializeFromString(data);
             }
@@ -109,12 +102,11 @@ namespace SW2URDF.URDFExport
         public static void SaveConfigTreeXML(SldWorks swApp, ModelDoc2 model, LinkNode BaseNode, bool warnUser)
         {
             string oldData = GetConfigTreeData(model, out double version);
-            if (oldData.Length > 0 && version < SerializationVersion)
+            if (oldData.Length > 0 && ConfigurationFormat.NeedsUpgrade(version))
             {
                 MessageBox.Show("You have a URDF configuration with an outdated save format. It will automatically be " +
-                    "upgraded to the latest version and saved to the configuration named \"" +
-                    UrdfConfigurationSwAttributeName + "\". " +
-                    "Old configurations can be deleted at your convenience.");
+                    "upgraded to the latest version and saved for the active SolidWorks configuration. " +
+                    "The old data is left in place and can be deleted at your convenience.");
                 warnUser = false;
             }
 
