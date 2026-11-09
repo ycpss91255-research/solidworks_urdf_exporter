@@ -3,11 +3,14 @@
 # Optional -ScreenshotDirectory saves PNGs of both forms (default and OBJ selected).
 param(
     [string]$AssemblyPath = "$PSScriptRoot/../SW2URDF/bin/x64/Debug/SW2URDF.dll",
-    [string]$ScreenshotDirectory = ''
+    [string]$ScreenshotDirectory = '',
+    # Optional Traditional Chinese resource file (Strings.zh-TW.resx from the i18n work).
+    # Without it only the English layouts are checked.
+    [string]$ZhResx = ''
 )
 $ErrorActionPreference = 'Stop'
 if ($PSVersionTable.PSEdition -eq 'Core') {
-    & powershell.exe -NoProfile -File $PSCommandPath -AssemblyPath $AssemblyPath -ScreenshotDirectory $ScreenshotDirectory
+    & powershell.exe -NoProfile -File $PSCommandPath -AssemblyPath $AssemblyPath -ScreenshotDirectory $ScreenshotDirectory -ZhResx $ZhResx
     exit $LASTEXITCODE
 }
 $AssemblyPath = (Resolve-Path -LiteralPath $AssemblyPath).Path
@@ -20,6 +23,7 @@ Add-Type -AssemblyName System.Runtime.Serialization
 $code = @'
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
@@ -37,8 +41,15 @@ public static class ObjFormCheck {
     // The forms need SOLIDWORKS to construct normally. Skip the constructor and run
     // only the designer-generated InitializeComponent so event wiring is exercised.
     static T Create<T>() where T : Form {
+        return Create<T>(null);
+    }
+
+    // A non-null font is applied before InitializeComponent, which is how a larger
+    // system font (display scaling, CJK UI font) reaches AutoScaleMode.Font forms.
+    static T Create<T>(Font font) where T : Form {
         T form = (T)FormatterServices.GetUninitializedObject(typeof(T));
         typeof(Form).GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null).Invoke(form, null);
+        if (font != null) form.Font = font;
         typeof(T).GetMethod("InitializeComponent", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(form, null);
         EventHandlerList events = (EventHandlerList)typeof(Component).GetProperty("Events", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(form, null);
         object loadKey = typeof(Form).GetField("EVENT_LOAD", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
@@ -137,6 +148,126 @@ public static class ObjFormCheck {
         }
     }
 
+    // ---- Layout checks -------------------------------------------------------------
+
+    static Dictionary<string, string> LoadResx(string path) {
+        Dictionary<string, string> map = new Dictionary<string, string>();
+        System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+        doc.Load(path);
+        foreach (System.Xml.XmlNode node in doc.SelectNodes("/root/data")) {
+            map[node.Attributes["name"].Value] = node.SelectSingleNode("value").InnerText;
+        }
+        // The OBJ notes are new in this branch and not in the i18n catalog yet.
+        map["obj mesh density is determined by solidworks."] = "OBJ 7db2683c5bc65ea67531 SolidWorks 6c7a5b9a3002";
+        map["obj color and texture are defined by the mtl file."] = "OBJ 7684984f827282078cbc57167531 MTL 6a9468486c7a5b9a3002";
+        return map;
+    }
+
+    static void Translate(Control root, Dictionary<string, string> map) {
+        foreach (Control control in root.Controls) {
+            string key = control.Text == null ? null : control.Text.Trim().ToLowerInvariant();
+            string value;
+            if (!string.IsNullOrEmpty(key) && map.TryGetValue(key, out value)) control.Text = value;
+            Translate(control, map);
+        }
+    }
+
+    // Returns a description of every problem for the given control: outside its parent's
+    // client area, or overlapping a visible sibling. Hidden controls are ignored.
+    public static List<string> LayoutProblems(Control control) {
+        List<string> problems = new List<string>();
+        Control parent = control.Parent;
+        if (parent == null || !Shown(control)) return problems;
+        Rectangle client = parent.ClientRectangle;
+        if (!client.Contains(control.Bounds)) {
+            problems.Add(control.Name + " " + control.Bounds + " is outside " + parent.Name + " " + client);
+        }
+        foreach (Control sibling in parent.Controls) {
+            if (sibling == control || !Shown(sibling)) continue;
+            Rectangle overlap = Rectangle.Intersect(control.Bounds, sibling.Bounds);
+            if (overlap.Width > 0 && overlap.Height > 0) {
+                problems.Add(control.Name + " " + control.Bounds + " overlaps " + sibling.Name + " " + sibling.Bounds);
+            }
+        }
+        return problems;
+    }
+
+    static void CheckLayout(Form form, string[] names, string context, string shots, string shotName) {
+        form.StartPosition = FormStartPosition.Manual;
+        form.Location = new Point(-32000, -32000);
+        form.ShowInTaskbar = false;
+        form.Show();
+        Application.DoEvents();
+        List<string> problems = new List<string>();
+        foreach (string name in names) {
+            Control control = Find<Control>(form, name);
+            problems.AddRange(LayoutProblems(control));
+            // Children of a flow panel must stay inside it (otherwise they are clipped).
+            if (control is FlowLayoutPanel) {
+                foreach (Control child in control.Controls) problems.AddRange(LayoutProblems(child));
+            }
+        }
+        Require(problems.Count == 0, context + " layout: " + string.Join("; ", problems.ToArray()));
+        using (Bitmap bitmap = new Bitmap(form.Width, form.Height)) {
+            form.DrawToBitmap(bitmap, new Rectangle(Point.Empty, bitmap.Size));
+            if (!string.IsNullOrEmpty(shots)) bitmap.Save(Path.Combine(shots, shotName + ".png"), System.Drawing.Imaging.ImageFormat.Png);
+        }
+        form.Hide();
+    }
+
+    static readonly string[] PartObjLayout = {
+        "flowLayoutPanelOptions", "objExport", "checkBox_rotate", "label1", "radioButton_fine",
+        "radioButton_course", "labelObjQualityNote", "labelObjColorNote", "comboBox_materials" };
+    static readonly string[] AssemblyObjLayout = {
+        "flowLayoutPanelMeshFormat", "radioButtonStl", "radioButton3dxml", "radioButtonObj",
+        "label10", "radioButtonFine", "radioButtonCourse", "labelObjQualityNote",
+        "labelObjColorNote", "comboBoxMaterials" };
+
+    // Self-check: the detector must actually report overlap and clipping.
+    public static void LayoutDetectorWorks() {
+        using (Panel panel = new Panel()) {
+            panel.Size = new Size(100, 100);
+            Label a = new Label { Name = "a", AutoSize = false, Bounds = new Rectangle(10, 10, 50, 20) };
+            Label b = new Label { Name = "b", AutoSize = false, Bounds = new Rectangle(40, 15, 50, 20) };
+            Label c = new Label { Name = "c", AutoSize = false, Bounds = new Rectangle(80, 80, 50, 50) };
+            panel.Controls.AddRange(new Control[] { a, b, c });
+            Require(LayoutProblems(a).Count == 1, "Detector reports overlap");
+            Require(LayoutProblems(c).Count >= 1, "Detector reports clipping");
+            b.Left = 70;
+            Require(LayoutProblems(a).Count == 0, "Detector accepts a clean layout");
+        }
+    }
+
+    public static void Layouts(string shots, string zhResx) {
+        LayoutDetectorWorks();
+        Dictionary<string, string> zh = string.IsNullOrEmpty(zhResx) ? null : LoadResx(zhResx);
+        // Display scale is simulated through the font the AutoScaleMode.Font forms scale against.
+        float[] scales = { 1.0f, 1.25f, 1.5f };
+        string[] languages = zh == null ? new string[] { "en" } : new string[] { "en", "zh-TW" };
+        foreach (string language in languages) {
+            foreach (float scale in scales) {
+                Font font = language == "en"
+                    ? new Font("Microsoft Sans Serif", 8.25f * scale)
+                    : new Font("Microsoft JhengHei UI", 9f * scale);
+                string tag = language + "_" + (int)(scale * 100);
+                string context = language + " at " + (int)(scale * 100) + "%";
+                foreach (bool obj in new bool[] { false, true }) {
+                    using (PartExportForm part = Create<PartExportForm>(font)) {
+                        if (zh != null && language != "en") Translate(part, zh);
+                        Find<CheckBox>(part, "objExport").Checked = obj;
+                        CheckLayout(part, PartObjLayout, "Part " + context + (obj ? " OBJ" : ""), shots, "layout_part_" + tag + (obj ? "_obj" : ""));
+                    }
+                    using (AssemblyExportForm assembly = Create<AssemblyExportForm>(font)) {
+                        if (zh != null && language != "en") Translate(assembly, zh);
+                        foreach (Control page in assembly.Controls) page.Visible = page.Name == "panelLinkProperties";
+                        Find<RadioButton>(assembly, "radioButtonObj").Checked = obj;
+                        CheckLayout(assembly, AssemblyObjLayout, "Assembly " + context + (obj ? " OBJ" : ""), shots, "layout_assembly_" + tag + (obj ? "_obj" : ""));
+                    }
+                }
+            }
+        }
+    }
+
     static string Serialize(Link link) {
         DataContractSerializer serializer = new DataContractSerializer(typeof(Link));
         using (MemoryStream stream = new MemoryStream()) {
@@ -174,5 +305,7 @@ public static class ObjFormCheck {
 Add-Type -TypeDefinition $code -ReferencedAssemblies @($AssemblyPath, 'System.Windows.Forms', 'System.Drawing', 'System.Runtime.Serialization', 'System.Xml')
 if ($ScreenshotDirectory) { New-Item -ItemType Directory -Force -Path $ScreenshotDirectory | Out-Null }
 [ObjFormCheck]::Forms($ScreenshotDirectory)
+[ObjFormCheck]::Layouts($ScreenshotDirectory, $ZhResx)
+if (-not $ZhResx) { Write-Output 'NOTE: -ZhResx not given; Traditional Chinese layouts were not checked' }
 [ObjFormCheck]::Serialization()
 Write-Output 'PASS: OBJ quality controls follow the format selection; STLQualityFine serialization is compatible'
