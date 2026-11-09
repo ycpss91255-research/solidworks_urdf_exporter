@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Xml.Serialization;
 
@@ -346,43 +347,60 @@ namespace SW2URDF.URDFExport
             link.Collision.Geometry.Mesh.Filename = meshFilename;
         }
 
-        private static void ConvertObj(string source, string target)
+        /// <summary>Cancels an OBJ conversion that is in progress (for example from a progress dialog).</summary>
+        public CancellationToken CancellationToken { get; set; }
+
+        private void ConvertObj(string source, string target, string linkName)
         {
-            string python = System.Environment.GetEnvironmentVariable("SW2URDF_PYTHON");
-            if (string.IsNullOrWhiteSpace(python) || !File.Exists(python))
-                throw new InvalidOperationException("OBJ requires SW2URDF_PYTHON pointing to Python with trimesh 5.2.0 and numpy.");
-            string script = Path.Combine(Path.GetDirectoryName(typeof(ExportHelper).Assembly.Location), "obj_converter.py");
-            var start = new System.Diagnostics.ProcessStartInfo(python,
-                "\"" + script + "\" \"" + source + "\" \"" + target + "\"")
-            {
-                UseShellExecute = false, CreateNoWindow = true,
-                RedirectStandardError = true
-            };
-            // Scene conversion uses small matrices. Avoid one BLAS worker per
-            // host CPU reserving excessive memory alongside SOLIDWORKS.
-            start.EnvironmentVariables["OPENBLAS_NUM_THREADS"] = "1";
-            start.EnvironmentVariables["OMP_NUM_THREADS"] = "1";
-            using (var process = System.Diagnostics.Process.Start(start))
-            {
-                string error = process.StandardError.ReadToEnd();
-                process.WaitForExit();
-                if (process.ExitCode != 0)
-                    throw new InvalidOperationException("OBJ conversion failed: " + error);
-            }
-            if (!File.Exists(target) || !File.Exists(Path.ChangeExtension(target, ".mtl")))
-                throw new IOException("OBJ conversion did not produce OBJ and MTL.");
+            ObjConversionRunner.Run(source, target, linkName, CancellationToken);
         }
 
         private void SaveObj(Link link, string target)
         {
             string source = Path.ChangeExtension(target, ".3dxml");
-            if (File.Exists(source)) File.Delete(source);
-            Save3dxml(link, source, true);
-            if (!File.Exists(source)) throw new IOException("Native 3DXML export failed: " + source);
-            ConvertObj(source, target);
+            SaveObjSource(link, source);
+            ConvertObj(source, target, link.Name);
         }
 
-        private void Save3dxml(Link link, string windowsMeshFilename, bool meshOnly = false)
+        // Native 3DXML export of one link, the input of the OBJ conversion. Unlike STL, the 3DXML
+        // keeps the global vertices, so the link frame is applied to the mesh origins instead.
+        private void SaveObjSource(Link link, string source)
+        {
+            string coordsysName = link.Joint.CoordinateSystemName;
+            Dictionary<string, string> names = GetComponentRefGeoNames(coordsysName);
+
+            MathTransform frame = GetCoordinateSystemTransform(coordsysName);
+            if (frame == null) throw new InvalidOperationException("Missing OBJ link frame: " + coordsysName);
+            Matrix<double> inverse = MathOps.GetTransformation(frame).Inverse();
+            foreach (Origin origin in new[] { link.Visual.Origin, link.Collision.Origin })
+            {
+                Matrix<double> local = MathOps.GetTransformation(origin.GetXYZ(), origin.GetRPY()) * inverse;
+                origin.SetXYZ(MathOps.GetXYZ(local));
+                origin.SetRPY(MathOps.GetRPY(local));
+            }
+
+            CommonSwOperations.ShowComponents(ActiveSWModel, link.SWComponents);
+            try
+            {
+                SetLinkSpecificSTLPreferences(names["geo"], link.STLQualityFine, ActiveSWModel);
+                SaveNative3dxml(ActiveSWModel, source);
+            }
+            finally { CommonSwOperations.HideComponents(ActiveSWModel, link.SWComponents); }
+        }
+
+        private static void SaveNative3dxml(ModelDoc2 model, string source)
+        {
+            int errors = 0;
+            int warnings = 0;
+            if (File.Exists(source)) File.Delete(source);
+            bool saved = model.Extension.SaveAs(source, (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
+                (int)swSaveAsOptions_e.swSaveAsOptions_Silent | (int)swSaveAsOptions_e.swSaveAsOptions_Copy,
+                null, ref errors, ref warnings);
+            if (!saved || errors != 0 || !File.Exists(source))
+                throw new IOException("Native 3DXML export failed (" + errors + "): " + source);
+        }
+
+        private void Save3dxml(Link link, string windowsMeshFilename)
         {
             int errors = 0;
             int warnings = 0;
@@ -404,91 +422,70 @@ namespace SW2URDF.URDFExport
 
             logger.Info("Saving 3dxml to " + windowsMeshFilename);
 
-            // Align the link's visual/collision/inertial origins with its coordinate system
-            // so the exported mesh lines up with the URDF link frame.
-            if (meshOnly)
+            // === 3dxml Localize Link === //
+
+            // Remove suffix from coordinate-system name.
+            // ex. "Joint Origin <Arm_link-1>" -> "Joint Origin"
+            // Suffix is included when coordinate is inside sub-assembly.
+            string linkModelName = names["component"];
+            string linkModelSuffix = " <" + linkModelName + ">";
+            if(coordsysName.Contains(linkModelSuffix))
             {
-                // Assembly inertia has already been computed in the link frame.
-                // STL bakes the global-to-link transform into its vertices; OBJ
-                // keeps native global vertices and appends that transform to the
-                // authored mesh origin instead. Never localize inertia twice.
-                MathTransform frame = GetCoordinateSystemTransform(coordsysName);
-                if (frame == null) throw new InvalidOperationException("Missing OBJ link frame: " + coordsysName);
-                Matrix<double> inverse = MathOps.GetTransformation(frame).Inverse();
-                foreach (var origin in new[] { link.Visual.Origin, link.Collision.Origin })
-                {
-                    Matrix<double> local = MathOps.GetTransformation(origin.GetXYZ(), origin.GetRPY()) * inverse;
-                    origin.SetXYZ(MathOps.GetXYZ(local));
-                    origin.SetRPY(MathOps.GetRPY(local));
-                }
+                coordsysName = coordsysName.Replace(linkModelSuffix, "");
+                logger.Info($"Suffix of {linkModelName} was removed from coordsysName : {coordsysName}");
+            }
+
+            // Get the model document of the link.
+            ModelDoc2 linkModel;
+            bool isBaseLink = linkModelName == "";
+            if (isBaseLink)
+            {
+                linkModel = ActiveDoc;
             }
             else
             {
-                // === 3dxml Localize Link === //
-
-                // Remove suffix from coordinate-system name.
-                // ex. "Joint Origin <Arm_link-1>" -> "Joint Origin"
-                // Suffix is included when coordinate is inside sub-assembly.
-                string linkModelName = names["component"];
-                string linkModelSuffix = " <" + linkModelName + ">";
-                if(coordsysName.Contains(linkModelSuffix))
+                if (link.SWMainComponent != null)
                 {
-                    coordsysName = coordsysName.Replace(linkModelSuffix, "");
-                    logger.Info($"Suffix of {linkModelName} was removed from coordsysName : {coordsysName}");
-                }
-
-                // Get the model document of the link.
-                ModelDoc2 linkModel;
-                bool isBaseLink = linkModelName == "";
-                if (isBaseLink)
-                {
-                    linkModel = ActiveDoc;
+                    linkModel = link.SWMainComponent.GetModelDoc2();
                 }
                 else
                 {
-                    if (link.SWMainComponent != null)
-                    {
-                        linkModel = link.SWMainComponent.GetModelDoc2();
-                    }
-                    else
-                    {
-                        logger.Warn("Could not get linkModel because SWMainComponent was null");
-                        linkModel = null;
-                    }
+                    logger.Warn("Could not get linkModel because SWMainComponent was null");
+                    linkModel = null;
                 }
-
-                // Localize the link to the certain place.
-                if (linkModel != null)
-                {
-                    MathTransform coordSysTransform =
-                        linkModel.Extension.GetCoordinateSystemTransformByName(coordsysName);
-                    if (coordSysTransform != null)
-                    {
-                        logger.Info("Localizing Link : " + coordsysName);
-                        Matrix<double> GlobalTransform = MathOps.GetTransformation(coordSysTransform);
-                        LocalizeLink(link, GlobalTransform);
-                    }
-                    else
-                    {
-                        logger.Warn("coordSysTransform was null : " + coordsysName);
-                    }
-                }
-                else
-                {
-                    logger.Warn("Link model was null.");
-                }
-                // === 3dxml Localize Link === //
             }
 
-            try
+            // Localize the link to the certain place.
+            if (linkModel != null)
             {
-                bool saved = ActiveDoc.Extension.SaveAs(windowsMeshFilename,
-                    (int)swSaveAsVersion_e.swSaveAsCurrentVersion, saveOptions, null, ref errors, ref warnings);
-                if (!saved || errors != 0 || !File.Exists(windowsMeshFilename))
-                    throw new IOException("Exporting 3dxml for " + link.Name + " failed: " + errors);
-                if (warnings != 0) logger.Warn("3dxml export warnings: " + warnings);
+                MathTransform coordSysTransform =
+                    linkModel.Extension.GetCoordinateSystemTransformByName(coordsysName);
+                if (coordSysTransform != null)
+                {
+                    logger.Info("Localizing Link : " + coordsysName);
+                    Matrix<double> GlobalTransform = MathOps.GetTransformation(coordSysTransform);
+                    LocalizeLink(link, GlobalTransform);
+                }
+                else
+                {
+                    logger.Warn("coordSysTransform was null : " + coordsysName);
+                }
             }
-            finally { CommonSwOperations.HideComponents(ActiveSWModel, link.SWComponents); }
+            else
+            { 
+                logger.Warn("Link model was null.");
+            }
+            // === 3dxml Localize Link === //
+
+            ActiveDoc.Extension.SaveAs(windowsMeshFilename,
+                (int)swSaveAsVersion_e.swSaveAsCurrentVersion, saveOptions, null, ref errors, ref warnings);
+
+            if (errors + warnings != 0)
+            {
+                logger.Warn("Exporting 3dxml for link " + link.Name + " failed with error " + errors +
+                    " or warnings " + warnings);
+            }
+            CommonSwOperations.HideComponents(ActiveSWModel, link.SWComponents);
         }
 
         private bool SaveSTL(Link link, string windowsMeshFilename)
@@ -571,17 +568,12 @@ namespace SW2URDF.URDFExport
                     meshFileName = Path.ChangeExtension(meshFileName, ".obj");
                     windowsMeshFileName = Path.ChangeExtension(windowsMeshFileName, ".obj");
                     string source = Path.ChangeExtension(windowsMeshFileName, ".3dxml");
-                    if (File.Exists(source)) File.Delete(source);
-                    bool saved = ActiveSWModel.Extension.SaveAs(source,
-                        (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
-                        (int)swSaveAsOptions_e.swSaveAsOptions_Silent | (int)swSaveAsOptions_e.swSaveAsOptions_Copy,
-                        null, ref errors, ref warnings);
-                    if (!saved || errors != 0 || !File.Exists(source))
-                        throw new IOException("Native 3DXML export failed: " + errors);
-                    ConvertObj(source, windowsMeshFileName);
+                    SaveNative3dxml(ActiveSWModel, source);
+                    ConvertObj(source, windowsMeshFileName, URDFRobot.BaseLink.Name);
                 }
                 else
                 {
+                    //Saving part as STL mesh
                     ActiveSWModel.Extension.SaveAs(windowsMeshFileName, (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
                         (int)swSaveAsOptions_e.swSaveAsOptions_Silent, null, ref errors, ref warnings);
                 }
@@ -603,8 +595,6 @@ namespace SW2URDF.URDFExport
             URDFWriter uWriter = new URDFWriter(windowsURDFFileName);
             //mRobot.addLink(mLink);
             URDFRobot.WriteURDF(uWriter.writer);
-
-
         }
 
         //Writes an empty header to the STL to get rid of the BS that SolidWorks adds to a binary STL file

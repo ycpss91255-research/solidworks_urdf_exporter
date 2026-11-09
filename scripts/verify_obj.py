@@ -10,7 +10,6 @@ import trimesh
 def verify(source, target, reload=False):
     scene = trimesh.load_scene(source, process=False)
     nodes = list(scene.graph.nodes_geometry)
-    vertex_count = sum(len(scene.geometry[scene.graph[node][1]].vertices) for node in nodes)
     face_count = sum(len(scene.geometry[scene.graph[node][1]].faces) for node in nodes)
     expected = np.empty((face_count, 3, 3), dtype=np.float64)
     cursor = 0
@@ -23,6 +22,10 @@ def verify(source, target, reload=False):
         cursor += len(mesh.faces)
     del scene, mesh
     gc.collect()
+    # trimesh merges duplicate positions while loading, so the vertex count of
+    # the OBJ is taken from the file itself; triangles are compared by position.
+    with Path(target).open(encoding='utf-8') as stream:
+        vertex_count = sum(1 for line in stream if line.startswith('v '))
     vertices = np.empty((vertex_count, 3), dtype=np.float64)
     normals = np.empty_like(vertices)
     faces = np.empty((face_count, 3), dtype=np.int32)
@@ -50,7 +53,7 @@ def verify(source, target, reload=False):
                 library = line.strip()[7:]
             elif fields[0] == 'usemtl':
                 materials.add(fields[1])
-    assert vi == ni == vertex_count and fi == face_count
+    assert vi == ni == vertex_count and fi == face_count, (vi, ni, vertex_count, fi, face_count)
     assert np.isfinite(vertices).all() and np.isfinite(normals).all()
     assert faces.min() >= 0 and faces.max() < len(vertices)
     assert len(vertices) == len(normals)
@@ -63,6 +66,23 @@ def verify(source, target, reload=False):
     mtl = Path(target).parent / library
     defined = {line.split()[1] for line in mtl.read_text().splitlines() if line.startswith('newmtl ')}
     assert materials == defined
+    fields = {}
+    current = None
+    for line in mtl.read_text(encoding='utf-8').splitlines():
+        if not line.strip() or line.startswith('#'):
+            continue
+        key, _, value = line.partition(' ')
+        if key == 'newmtl':
+            current = fields.setdefault(value, {})
+        else:
+            current[key] = list(map(float, value.split()))
+    for name, entry in fields.items():
+        assert {'Ka', 'Kd', 'Ks', 'Ns', 'd', 'illum'} <= set(entry), (name, sorted(entry))
+        assert 'Tr' not in entry, name
+        assert all(0.0 <= x <= 1.0 for key in ('Ka', 'Kd', 'Ks') for x in entry[key]), name
+        assert 0.0 <= entry['Ns'][0] <= 1000.0 and 0.0 <= entry['d'][0] <= 1.0, name
+        has_specular = any(x > 0 for x in entry['Ks'])
+        assert entry['illum'][0] == (2 if has_specular else 1), name
     result = dict(triangles=len(faces), vertices=len(vertices), materials=len(materials),
                   max_coordinate_error_m=error,
                   bounds_m=[vertices.min(axis=0).tolist(), vertices.max(axis=0).tolist()])
