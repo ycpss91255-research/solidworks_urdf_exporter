@@ -1,4 +1,4 @@
-# Offline checks for the OBJ options on the export forms and for STLQualityFine
+﻿# Offline checks for the OBJ options on the export forms and for STLQualityFine
 # serialization compatibility. Does not connect to SOLIDWORKS or register COM.
 # Optional -ScreenshotDirectory saves PNGs of both forms (default and OBJ selected).
 param(
@@ -94,7 +94,7 @@ public static class ObjFormCheck {
         "domainUpDownAlpha", "textBoxTexture", "buttonTextureBrowse" };
 
     static void RequireColor(Control root, string[] names, bool enabled, string context) {
-        Control note = Find<Control>(root, "labelObjColorNote");
+        Control note = Find<Control>(root, "panelObjColorNote");
         Require(Shown(note) == !enabled, context + ": color note visibility");
         foreach (string name in names) {
             Require(Find<Control>(root, name).Enabled == enabled, context + ": " + name + " enabled must be " + enabled);
@@ -106,7 +106,7 @@ public static class ObjFormCheck {
             CheckBox obj = Find<CheckBox>(part, "objExport");
             Control fine = Find<Control>(part, "radioButton_fine");
             Control coarse = Find<Control>(part, "radioButton_course");
-            Control note = Find<Control>(part, "labelObjQualityNote");
+            Control note = Find<Control>(part, "panelObjQualityNote");
             Require(obj.Parent is FlowLayoutPanel, "objExport must live in a FlowLayoutPanel");
             Require(Find<CheckBox>(part, "checkBox_rotate").Parent == obj.Parent, "rotate and OBJ share one panel");
             Require(fine.Enabled && coarse.Enabled && !Shown(note), "Part: default quality enabled");
@@ -128,7 +128,7 @@ public static class ObjFormCheck {
             RadioButton xml = Find<RadioButton>(assembly, "radioButton3dxml");
             Control fine = Find<Control>(assembly, "radioButtonFine");
             Control coarse = Find<Control>(assembly, "radioButtonCourse");
-            Control note = Find<Control>(assembly, "labelObjQualityNote");
+            Control note = Find<Control>(assembly, "panelObjQualityNote");
             Require(objRadio.Parent is FlowLayoutPanel && stl.Parent == objRadio.Parent && xml.Parent == objRadio.Parent,
                 "Mesh format radios must share a FlowLayoutPanel");
             Require(fine.Enabled && coarse.Enabled && !Shown(note), "Assembly: default quality enabled");
@@ -158,8 +158,8 @@ public static class ObjFormCheck {
             map[node.Attributes["name"].Value] = node.SelectSingleNode("value").InnerText;
         }
         // The OBJ notes are new in this branch and not in the i18n catalog yet.
-        map["obj mesh density is determined by solidworks."] = "OBJ 7db2683c5bc65ea67531 SolidWorks 6c7a5b9a3002";
-        map["obj color and texture are defined by the mtl file."] = "OBJ 7684984f827282078cbc57167531 MTL 6a9468486c7a5b9a3002";
+        map["obj mesh density is determined by solidworks."] = "OBJ 網格密度由 SolidWorks 決定。";
+        map["obj color and texture are defined by the mtl file."] = "OBJ 的顏色與貼圖由 MTL 檔案決定。";
         return map;
     }
 
@@ -203,6 +203,14 @@ public static class ObjFormCheck {
             Control control = Find<Control>(form, name);
             problems.AddRange(LayoutProblems(control));
             // Children of a flow panel must stay inside it (otherwise they are clipped).
+            // Wrapped note text must fit its label (otherwise the last line is cut off).
+            foreach (Control child in control.Controls) {
+                Label label = child as Label;
+                if (label == null) continue;
+                Size needed = TextRenderer.MeasureText(label.Text, label.Font, new Size(label.Width, 0),
+                    TextFormatFlags.WordBreak | TextFormatFlags.NoPadding);
+                if (needed.Height > label.Height) problems.Add(label.Name + " text needs height " + needed.Height + " but is " + label.Height);
+            }
             if (control is FlowLayoutPanel) {
                 foreach (Control child in control.Controls) problems.AddRange(LayoutProblems(child));
             }
@@ -217,11 +225,11 @@ public static class ObjFormCheck {
 
     static readonly string[] PartObjLayout = {
         "flowLayoutPanelOptions", "objExport", "checkBox_rotate", "label1", "radioButton_fine",
-        "radioButton_course", "labelObjQualityNote", "labelObjColorNote", "comboBox_materials" };
+        "radioButton_course", "panelObjQualityNote", "panelObjColorNote", "comboBox_materials" };
     static readonly string[] AssemblyObjLayout = {
         "flowLayoutPanelMeshFormat", "radioButtonStl", "radioButton3dxml", "radioButtonObj",
-        "label10", "radioButtonFine", "radioButtonCourse", "labelObjQualityNote",
-        "labelObjColorNote", "comboBoxMaterials" };
+        "label10", "radioButtonFine", "radioButtonCourse", "panelObjQualityNote",
+        "panelObjColorNote", "comboBoxMaterials" };
 
     // Self-check: the detector must actually report overlap and clipping.
     public static void LayoutDetectorWorks() {

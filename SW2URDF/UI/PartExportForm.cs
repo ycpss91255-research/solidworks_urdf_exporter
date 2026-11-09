@@ -137,7 +137,7 @@ namespace SW2URDF.UI
             label1.Enabled = stl;
             radioButton_fine.Enabled = stl;
             radioButton_course.Enabled = stl;
-            labelObjQualityNote.Visible = !stl;
+            panelObjQualityNote.Visible = !stl;
 
             // OBJ writes no URDF <material>; color and texture come from the MTL file.
             Control[] colorControls = {
@@ -148,7 +148,7 @@ namespace SW2URDF.UI
             {
                 control.Enabled = stl;
             }
-            labelObjColorNote.Visible = !stl;
+            panelObjColorNote.Visible = !stl;
         }
 
         private void ButtonCancelClick(object sender, EventArgs e)

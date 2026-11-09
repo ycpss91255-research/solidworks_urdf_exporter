@@ -77,6 +77,8 @@
             this.flowLayoutPanelMeshFormat = new System.Windows.Forms.FlowLayoutPanel();
             this.labelObjQualityNote = new System.Windows.Forms.Label();
             this.labelObjColorNote = new System.Windows.Forms.Label();
+            this.panelObjQualityNote = new System.Windows.Forms.Panel();
+            this.panelObjColorNote = new System.Windows.Forms.Panel();
             this.label10 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.textBoxVisualOriginZ = new System.Windows.Forms.TextBox();
@@ -192,6 +194,8 @@
             this.groupBox4.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.flowLayoutPanelMeshFormat.SuspendLayout();
+            this.panelObjQualityNote.SuspendLayout();
+            this.panelObjColorNote.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelLinkProperties
@@ -555,8 +559,8 @@
             // 
             this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.groupBox1);
-            this.groupBox4.Controls.Add(this.labelObjColorNote);
-            this.groupBox4.Controls.Add(this.labelObjQualityNote);
+            this.groupBox4.Controls.Add(this.panelObjColorNote);
+            this.groupBox4.Controls.Add(this.panelObjQualityNote);
             this.groupBox4.Controls.Add(this.radioButtonFine);
             this.groupBox4.Controls.Add(this.radioButtonCourse);
             this.groupBox4.Controls.Add(this.label10);
@@ -640,27 +644,41 @@
             this.radioButtonObj.UseVisualStyleBackColor = true;
             this.radioButtonObj.CheckedChanged += new System.EventHandler(this.RadioButtonObjCheckedChanged);
             //
+            // panelObjQualityNote
+            //
+            this.panelObjQualityNote.Controls.Add(this.labelObjQualityNote);
+            this.panelObjQualityNote.Location = new System.Drawing.Point(184, 238);
+            this.panelObjQualityNote.Name = "panelObjQualityNote";
+            this.panelObjQualityNote.Size = new System.Drawing.Size(190, 30);
+            this.panelObjQualityNote.TabIndex = 77;
+            this.panelObjQualityNote.Visible = false;
+            //
             // labelObjQualityNote
             //
-            this.labelObjQualityNote.AutoSize = true;
-            this.labelObjQualityNote.Location = new System.Drawing.Point(184, 238);
-            this.labelObjQualityNote.MaximumSize = new System.Drawing.Size(190, 0);
+            this.labelObjQualityNote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelObjQualityNote.Location = new System.Drawing.Point(0, 0);
             this.labelObjQualityNote.Name = "labelObjQualityNote";
-            this.labelObjQualityNote.Size = new System.Drawing.Size(150, 13);
-            this.labelObjQualityNote.TabIndex = 75;
+            this.labelObjQualityNote.Size = new System.Drawing.Size(190, 30);
+            this.labelObjQualityNote.TabIndex = 0;
             this.labelObjQualityNote.Text = "OBJ mesh density is determined by SolidWorks.";
-            this.labelObjQualityNote.Visible = false;
+            //
+            // panelObjColorNote
+            //
+            this.panelObjColorNote.Controls.Add(this.labelObjColorNote);
+            this.panelObjColorNote.Location = new System.Drawing.Point(310, 160);
+            this.panelObjColorNote.Name = "panelObjColorNote";
+            this.panelObjColorNote.Size = new System.Drawing.Size(180, 30);
+            this.panelObjColorNote.TabIndex = 76;
+            this.panelObjColorNote.Visible = false;
             //
             // labelObjColorNote
             //
-            this.labelObjColorNote.AutoSize = true;
-            this.labelObjColorNote.Location = new System.Drawing.Point(150, 225);
-            this.labelObjColorNote.MaximumSize = new System.Drawing.Size(220, 0);
+            this.labelObjColorNote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelObjColorNote.Location = new System.Drawing.Point(0, 0);
             this.labelObjColorNote.Name = "labelObjColorNote";
-            this.labelObjColorNote.Size = new System.Drawing.Size(220, 26);
-            this.labelObjColorNote.TabIndex = 76;
+            this.labelObjColorNote.Size = new System.Drawing.Size(180, 30);
+            this.labelObjColorNote.TabIndex = 0;
             this.labelObjColorNote.Text = "OBJ color and texture are defined by the MTL file.";
-            this.labelObjColorNote.Visible = false;
             //
             // radioButtonStl
             //
@@ -1769,6 +1787,8 @@
             this.groupBox1.PerformLayout();
             this.flowLayoutPanelMeshFormat.ResumeLayout(false);
             this.flowLayoutPanelMeshFormat.PerformLayout();
+            this.panelObjQualityNote.ResumeLayout(false);
+            this.panelObjColorNote.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1933,6 +1953,8 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelMeshFormat;
         private System.Windows.Forms.Label labelObjQualityNote;
         private System.Windows.Forms.Label labelObjColorNote;
+        private System.Windows.Forms.Panel panelObjQualityNote;
+        private System.Windows.Forms.Panel panelObjColorNote;
         private System.Windows.Forms.RadioButton radioButtonStl;
     }
 }
