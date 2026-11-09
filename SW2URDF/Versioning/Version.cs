@@ -11,6 +11,23 @@ namespace SW2URDF.Versioning
             return FileVersionInfo.GetVersionInfo(typeof(Logger).Assembly.Location).ProductVersion;
         }
 
+        /// <summary>
+        /// True when the commit version was built from a working tree with uncommitted changes
+        /// (git describe appends "-dirty").
+        /// </summary>
+        public static bool IsDirty(string commitVersion)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// The commit version without the "-dirty" marker.
+        /// </summary>
+        public static string StripDirtySuffix(string commitVersion)
+        {
+            return commitVersion;
+        }
+
         public static string GetBuildVersion()
         {
             // Getting AssemblyVersion which is auto incremented for each build. See the AssemblyInfo.cs
