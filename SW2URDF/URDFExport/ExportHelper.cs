@@ -24,6 +24,7 @@ using MathNet.Numerics.LinearAlgebra;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SW2URDF.ROS;
+using SW2URDF.UI;
 using SW2URDF.URDF;
 using SW2URDF.URDFExport.CSV;
 using SW2URDF.Utilities;
@@ -153,7 +154,7 @@ namespace SW2URDF.URDFExport
 
             //Creating package directories
             logger.Info("Creating package directories with name " + PackageName + " and save path " + SavePath);
-            URDFPackage package = new URDFPackage(PackageName, SavePath);
+            URDFPackage package = new URDFPackage(PackageName, SavePath, UiText.FromSolidWorks(iSwApp));
             package.CreateDirectories();
             URDFRobot.Name = PackageName;
             string windowsURDFFileName = package.WindowsRobotsDirectory + URDFRobot.Name + ".urdf";
@@ -542,7 +543,7 @@ namespace SW2URDF.URDFExport
             LocalizeLink(URDFRobot.BaseLink, GlobalTransform);
 
             //Creating package directories
-            URDFPackage package = new URDFPackage(PackageName, SavePath);
+            URDFPackage package = new URDFPackage(PackageName, SavePath, UiText.FromSolidWorks(iSwApp));
             package.CreateDirectories();
             string meshFileName = package.MeshesDirectory + URDFRobot.BaseLink.Name + ".STL";
             string windowsMeshFileName = package.WindowsMeshesDirectory + URDFRobot.BaseLink.Name + ".STL";
