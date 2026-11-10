@@ -1,0 +1,9 @@
+# sw2urdf materials; link BOX_RED
+newmtl BOX_RED_ff0000
+Ka 1 0 0
+Kd 1 0 0
+Ks 0 0 0
+Ns 216
+d 1
+illum 1
+
