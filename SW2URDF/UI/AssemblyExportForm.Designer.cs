@@ -71,15 +71,10 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.radioButton3dxml = new System.Windows.Forms.RadioButton();
             this.radioButtonStl = new System.Windows.Forms.RadioButton();
-            this.radioButtonFine = new System.Windows.Forms.RadioButton();
-            this.radioButtonCourse = new System.Windows.Forms.RadioButton();
             this.radioButtonObj = new System.Windows.Forms.RadioButton();
             this.flowLayoutPanelMeshFormat = new System.Windows.Forms.FlowLayoutPanel();
-            this.labelObjQualityNote = new System.Windows.Forms.Label();
             this.labelObjColorNote = new System.Windows.Forms.Label();
-            this.panelObjQualityNote = new System.Windows.Forms.Panel();
             this.panelObjColorNote = new System.Windows.Forms.Panel();
-            this.label10 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.textBoxVisualOriginZ = new System.Windows.Forms.TextBox();
             this.textBoxVisualOriginYaw = new System.Windows.Forms.TextBox();
@@ -194,7 +189,6 @@
             this.groupBox4.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.flowLayoutPanelMeshFormat.SuspendLayout();
-            this.panelObjQualityNote.SuspendLayout();
             this.panelObjColorNote.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -560,10 +554,6 @@
             this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.groupBox1);
             this.groupBox4.Controls.Add(this.panelObjColorNote);
-            this.groupBox4.Controls.Add(this.panelObjQualityNote);
-            this.groupBox4.Controls.Add(this.radioButtonFine);
-            this.groupBox4.Controls.Add(this.radioButtonCourse);
-            this.groupBox4.Controls.Add(this.label10);
             this.groupBox4.Controls.Add(this.label19);
             this.groupBox4.Controls.Add(this.textBoxVisualOriginZ);
             this.groupBox4.Controls.Add(this.textBoxVisualOriginYaw);
@@ -601,7 +591,7 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.flowLayoutPanelMeshFormat);
-            this.groupBox1.Location = new System.Drawing.Point(184, 147);
+            this.groupBox1.Location = new System.Drawing.Point(7, 147);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(126, 90);
             this.groupBox1.TabIndex = 74;
@@ -644,24 +634,6 @@
             this.radioButtonObj.UseVisualStyleBackColor = true;
             this.radioButtonObj.CheckedChanged += new System.EventHandler(this.RadioButtonObjCheckedChanged);
             //
-            // panelObjQualityNote
-            //
-            this.panelObjQualityNote.Controls.Add(this.labelObjQualityNote);
-            this.panelObjQualityNote.Location = new System.Drawing.Point(184, 238);
-            this.panelObjQualityNote.Name = "panelObjQualityNote";
-            this.panelObjQualityNote.Size = new System.Drawing.Size(190, 30);
-            this.panelObjQualityNote.TabIndex = 77;
-            this.panelObjQualityNote.Visible = false;
-            //
-            // labelObjQualityNote
-            //
-            this.labelObjQualityNote.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelObjQualityNote.Location = new System.Drawing.Point(0, 0);
-            this.labelObjQualityNote.Name = "labelObjQualityNote";
-            this.labelObjQualityNote.Size = new System.Drawing.Size(190, 30);
-            this.labelObjQualityNote.TabIndex = 0;
-            this.labelObjQualityNote.Text = "OBJ mesh density is determined by SolidWorks.";
-            //
             // panelObjColorNote
             //
             this.panelObjColorNote.Controls.Add(this.labelObjColorNote);
@@ -691,37 +663,6 @@
             this.radioButtonStl.TabStop = true;
             this.radioButtonStl.Text = "STL (grayscale)";
             this.radioButtonStl.UseVisualStyleBackColor = true;
-            // 
-            // radioButtonFine
-            // 
-            this.radioButtonFine.AutoSize = true;
-            this.radioButtonFine.Location = new System.Drawing.Point(101, 171);
-            this.radioButtonFine.Name = "radioButtonFine";
-            this.radioButtonFine.Size = new System.Drawing.Size(45, 16);
-            this.radioButtonFine.TabIndex = 68;
-            this.radioButtonFine.Text = "Fine";
-            this.radioButtonFine.UseVisualStyleBackColor = true;
-            // 
-            // radioButtonCourse
-            // 
-            this.radioButtonCourse.AutoSize = true;
-            this.radioButtonCourse.Checked = true;
-            this.radioButtonCourse.Location = new System.Drawing.Point(20, 171);
-            this.radioButtonCourse.Name = "radioButtonCourse";
-            this.radioButtonCourse.Size = new System.Drawing.Size(59, 16);
-            this.radioButtonCourse.TabIndex = 67;
-            this.radioButtonCourse.TabStop = true;
-            this.radioButtonCourse.Text = "Course";
-            this.radioButtonCourse.UseVisualStyleBackColor = true;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(7, 147);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(66, 12);
-            this.label10.TabIndex = 66;
-            this.label10.Text = "Mesh Detail";
             // 
             // label19
             // 
@@ -776,7 +717,7 @@
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(7, 201);
+            this.label28.Location = new System.Drawing.Point(184, 147);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(77, 12);
             this.label28.TabIndex = 47;
@@ -792,7 +733,7 @@
             // comboBoxMaterials
             // 
             this.comboBoxMaterials.FormattingEnabled = true;
-            this.comboBoxMaterials.Location = new System.Drawing.Point(16, 225);
+            this.comboBoxMaterials.Location = new System.Drawing.Point(184, 171);
             this.comboBoxMaterials.Name = "comboBoxMaterials";
             this.comboBoxMaterials.Size = new System.Drawing.Size(121, 20);
             this.comboBoxMaterials.TabIndex = 48;
@@ -1789,7 +1730,6 @@
             this.groupBox1.PerformLayout();
             this.flowLayoutPanelMeshFormat.ResumeLayout(false);
             this.flowLayoutPanelMeshFormat.PerformLayout();
-            this.panelObjQualityNote.ResumeLayout(false);
             this.panelObjColorNote.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -1836,9 +1776,6 @@
         private System.Windows.Forms.Label label50;
         private System.Windows.Forms.TextBox textBoxMass;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.RadioButton radioButtonFine;
-        private System.Windows.Forms.RadioButton radioButtonCourse;
-        private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.TextBox textBoxVisualOriginZ;
         private System.Windows.Forms.TextBox textBoxVisualOriginYaw;
@@ -1953,9 +1890,7 @@
         private System.Windows.Forms.RadioButton radioButton3dxml;
         private System.Windows.Forms.RadioButton radioButtonObj;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelMeshFormat;
-        private System.Windows.Forms.Label labelObjQualityNote;
         private System.Windows.Forms.Label labelObjColorNote;
-        private System.Windows.Forms.Panel panelObjQualityNote;
         private System.Windows.Forms.Panel panelObjColorNote;
         private System.Windows.Forms.RadioButton radioButtonStl;
     }

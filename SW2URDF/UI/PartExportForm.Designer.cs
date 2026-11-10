@@ -102,14 +102,8 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label15 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.radioButton_fine = new System.Windows.Forms.RadioButton();
-            this.radioButton_course = new System.Windows.Forms.RadioButton();
-            this.label1 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.radioButton4 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.label27 = new System.Windows.Forms.Label();
             this.label35 = new System.Windows.Forms.Label();
             this.label45 = new System.Windows.Forms.Label();
             this.textBox_save_as = new System.Windows.Forms.TextBox();
@@ -118,15 +112,12 @@
             this.checkBox_rotate = new System.Windows.Forms.CheckBox();
             this.objExport = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanelOptions = new System.Windows.Forms.FlowLayoutPanel();
-            this.labelObjQualityNote = new System.Windows.Forms.Label();
             this.labelObjColorNote = new System.Windows.Forms.Label();
-            this.panelObjQualityNote = new System.Windows.Forms.Panel();
             this.panelObjColorNote = new System.Windows.Forms.Panel();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.flowLayoutPanelOptions.SuspendLayout();
-            this.panelObjQualityNote.SuspendLayout();
             this.panelObjColorNote.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -402,7 +393,7 @@
             // 
             // domainUpDown_alpha
             // 
-            this.domainUpDown_alpha.Location = new System.Drawing.Point(424, 131);
+            this.domainUpDown_alpha.Location = new System.Drawing.Point(292, 131);
             this.domainUpDown_alpha.Name = "domainUpDown_alpha";
             this.domainUpDown_alpha.Size = new System.Drawing.Size(60, 20);
             this.domainUpDown_alpha.TabIndex = 57;
@@ -420,7 +411,7 @@
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(384, 133);
+            this.label33.Location = new System.Drawing.Point(252, 133);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(34, 13);
             this.label33.TabIndex = 56;
@@ -438,7 +429,7 @@
             // label32
             // 
             this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(390, 107);
+            this.label32.Location = new System.Drawing.Point(258, 107);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(28, 13);
             this.label32.TabIndex = 55;
@@ -454,7 +445,7 @@
             // label31
             // 
             this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(382, 81);
+            this.label31.Location = new System.Drawing.Point(250, 81);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(36, 13);
             this.label31.TabIndex = 54;
@@ -472,7 +463,7 @@
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(391, 55);
+            this.label30.Location = new System.Drawing.Point(259, 55);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(27, 13);
             this.label30.TabIndex = 53;
@@ -487,7 +478,7 @@
             // 
             // domainUpDown_blue
             // 
-            this.domainUpDown_blue.Location = new System.Drawing.Point(424, 105);
+            this.domainUpDown_blue.Location = new System.Drawing.Point(292, 105);
             this.domainUpDown_blue.Name = "domainUpDown_blue";
             this.domainUpDown_blue.Size = new System.Drawing.Size(60, 20);
             this.domainUpDown_blue.TabIndex = 52;
@@ -502,7 +493,7 @@
             // 
             // domainUpDown_green
             // 
-            this.domainUpDown_green.Location = new System.Drawing.Point(424, 79);
+            this.domainUpDown_green.Location = new System.Drawing.Point(292, 79);
             this.domainUpDown_green.Name = "domainUpDown_green";
             this.domainUpDown_green.Size = new System.Drawing.Size(60, 20);
             this.domainUpDown_green.TabIndex = 51;
@@ -519,7 +510,7 @@
             // 
             // domainUpDown_red
             // 
-            this.domainUpDown_red.Location = new System.Drawing.Point(424, 53);
+            this.domainUpDown_red.Location = new System.Drawing.Point(292, 53);
             this.domainUpDown_red.Name = "domainUpDown_red";
             this.domainUpDown_red.Size = new System.Drawing.Size(60, 20);
             this.domainUpDown_red.TabIndex = 50;
@@ -537,7 +528,7 @@
             // label29
             // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(381, 33);
+            this.label29.Location = new System.Drawing.Point(249, 33);
             this.label29.Name = "label29";
             this.label29.Size = new System.Drawing.Size(69, 13);
             this.label29.TabIndex = 49;
@@ -766,10 +757,6 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.panelObjColorNote);
-            this.groupBox2.Controls.Add(this.panelObjQualityNote);
-            this.groupBox2.Controls.Add(this.radioButton_fine);
-            this.groupBox2.Controls.Add(this.radioButton_course);
-            this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.label19);
             this.groupBox2.Controls.Add(this.textBox_visual_origin_z);
             this.groupBox2.Controls.Add(this.textBox_visual_origin_yaw);
@@ -804,37 +791,6 @@
             this.groupBox2.TabIndex = 62;
             this.groupBox2.TabStop = false;
             // 
-            // radioButton_fine
-            // 
-            this.radioButton_fine.AutoSize = true;
-            this.radioButton_fine.Location = new System.Drawing.Point(256, 94);
-            this.radioButton_fine.Name = "radioButton_fine";
-            this.radioButton_fine.Size = new System.Drawing.Size(45, 17);
-            this.radioButton_fine.TabIndex = 68;
-            this.radioButton_fine.Text = "Fine";
-            this.radioButton_fine.UseVisualStyleBackColor = true;
-            // 
-            // radioButton_course
-            // 
-            this.radioButton_course.AutoSize = true;
-            this.radioButton_course.Checked = true;
-            this.radioButton_course.Location = new System.Drawing.Point(256, 61);
-            this.radioButton_course.Name = "radioButton_course";
-            this.radioButton_course.Size = new System.Drawing.Size(58, 17);
-            this.radioButton_course.TabIndex = 67;
-            this.radioButton_course.TabStop = true;
-            this.radioButton_course.Text = "Course";
-            this.radioButton_course.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(249, 33);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(94, 13);
-            this.label1.TabIndex = 66;
-            this.label1.Text = "Visual Mesh Detail";
-            // 
             // label19
             // 
             this.label19.AutoSize = true;
@@ -847,9 +803,6 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.radioButton4);
-            this.groupBox3.Controls.Add(this.radioButton3);
-            this.groupBox3.Controls.Add(this.label27);
             this.groupBox3.Controls.Add(this.label35);
             this.groupBox3.Controls.Add(this.label40);
             this.groupBox3.Controls.Add(this.textBox_collision_origin_yaw);
@@ -869,40 +822,6 @@
             this.groupBox3.Size = new System.Drawing.Size(543, 141);
             this.groupBox3.TabIndex = 67;
             this.groupBox3.TabStop = false;
-            // 
-            // radioButton4
-            // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(256, 94);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(45, 17);
-            this.radioButton4.TabIndex = 73;
-            this.radioButton4.Text = "Fine";
-            this.radioButton4.UseVisualStyleBackColor = true;
-            this.radioButton4.Visible = false;
-            // 
-            // radioButton3
-            // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Checked = true;
-            this.radioButton3.Location = new System.Drawing.Point(256, 60);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(58, 17);
-            this.radioButton3.TabIndex = 72;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Course";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            this.radioButton3.Visible = false;
-            // 
-            // label27
-            // 
-            this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(249, 32);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(104, 13);
-            this.label27.TabIndex = 71;
-            this.label27.Text = "Collision Mesh Detail";
-            this.label27.Visible = false;
             // 
             // label35
             // 
@@ -976,24 +895,6 @@
             this.flowLayoutPanelOptions.Size = new System.Drawing.Size(396, 23);
             this.flowLayoutPanelOptions.TabIndex = 75;
             //
-            // panelObjQualityNote
-            //
-            this.panelObjQualityNote.Controls.Add(this.labelObjQualityNote);
-            this.panelObjQualityNote.Location = new System.Drawing.Point(249, 114);
-            this.panelObjQualityNote.Name = "panelObjQualityNote";
-            this.panelObjQualityNote.Size = new System.Drawing.Size(125, 54);
-            this.panelObjQualityNote.TabIndex = 77;
-            this.panelObjQualityNote.Visible = false;
-            //
-            // labelObjQualityNote
-            //
-            this.labelObjQualityNote.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelObjQualityNote.Location = new System.Drawing.Point(0, 0);
-            this.labelObjQualityNote.Name = "labelObjQualityNote";
-            this.labelObjQualityNote.Size = new System.Drawing.Size(125, 54);
-            this.labelObjQualityNote.TabIndex = 0;
-            this.labelObjQualityNote.Text = "OBJ mesh density is determined by SolidWorks.";
-            //
             // panelObjColorNote
             //
             this.panelObjColorNote.Controls.Add(this.labelObjColorNote);
@@ -1038,7 +939,6 @@
             this.groupBox3.PerformLayout();
             this.flowLayoutPanelOptions.ResumeLayout(false);
             this.flowLayoutPanelOptions.PerformLayout();
-            this.panelObjQualityNote.ResumeLayout(false);
             this.panelObjColorNote.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -1128,17 +1028,9 @@
         private System.Windows.Forms.TextBox textBox_save_as;
         private System.Windows.Forms.Button button_savename_browse;
         private System.Windows.Forms.SaveFileDialog saveFileDialog_save_as;
-        private System.Windows.Forms.RadioButton radioButton_fine;
-        private System.Windows.Forms.RadioButton radioButton_course;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label27;
-        private System.Windows.Forms.RadioButton radioButton4;
-        private System.Windows.Forms.RadioButton radioButton3;
         private System.Windows.Forms.CheckBox objExport;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelOptions;
-        private System.Windows.Forms.Label labelObjQualityNote;
         private System.Windows.Forms.Label labelObjColorNote;
-        private System.Windows.Forms.Panel panelObjQualityNote;
         private System.Windows.Forms.Panel panelObjColorNote;
         private System.Windows.Forms.CheckBox checkBox_rotate;
     }
