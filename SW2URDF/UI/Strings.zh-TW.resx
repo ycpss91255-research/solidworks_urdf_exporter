@@ -42,9 +42,6 @@
   <data xml:space="preserve" name="collision">
     <value>碰撞</value>
   </data>
-  <data xml:space="preserve" name="collision mesh detail">
-    <value>碰撞網格精細度</value>
-  </data>
   <data xml:space="preserve" name="color">
     <value>顏色</value>
   </data>
@@ -59,9 +56,6 @@
   </data>
   <data xml:space="preserve" name="coordinates">
     <value>座標系</value>
-  </data>
-  <data xml:space="preserve" name="course">
-    <value>粗略</value>
   </data>
   <data xml:space="preserve" name="custom color">
     <value>自訂顏色</value>
@@ -86,9 +80,6 @@
   </data>
   <data xml:space="preserve" name="export part as urdf file">
     <value>將零件匯出為 URDF 檔案</value>
-  </data>
-  <data xml:space="preserve" name="fine">
-    <value>精細</value>
   </data>
   <data xml:space="preserve" name="finish">
     <value>完成</value>
@@ -117,9 +108,6 @@
   <data xml:space="preserve" name="material name">
     <value>材質名稱</value>
   </data>
-  <data xml:space="preserve" name="mesh detail">
-    <value>網格精細度</value>
-  </data>
   <data xml:space="preserve" name="mesh format">
     <value>網格格式</value>
   </data>
@@ -143,9 +131,6 @@
   </data>
   <data xml:space="preserve" name="obj color and texture are defined by the mtl file.">
     <value>OBJ 的顏色與貼圖由 MTL 檔案決定。</value>
-  </data>
-  <data xml:space="preserve" name="obj mesh density is determined by solidworks.">
-    <value>OBJ 的網格密度由 SolidWorks 決定。</value>
   </data>
   <data xml:space="preserve" name="offset (rad)">
     <value>偏移 (rad)</value>
@@ -215,9 +200,6 @@
   </data>
   <data xml:space="preserve" name="visual">
     <value>外觀</value>
-  </data>
-  <data xml:space="preserve" name="visual mesh detail">
-    <value>外觀網格精細度</value>
   </data>
   <data xml:space="preserve" name="visual and collision meshes">
     <value>外觀與碰撞網格</value>

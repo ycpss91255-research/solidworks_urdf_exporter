@@ -33,7 +33,7 @@ function Get-AllControls([System.Windows.Forms.Control]$control) {
 # 1. Forms
 $bannedNames = 'radioButton_fine', 'radioButton_course', 'radioButtonFine', 'radioButtonCourse',
     'panelObjQualityNote', 'labelObjQualityNote'
-$bannedTexts = 'Fine', 'Course', 'Coarse', 'Mesh Detail', 'Visual Mesh Detail',
+$bannedTexts = 'Fine', 'Course', 'Coarse', 'Mesh Detail', 'Visual Mesh Detail', 'Collision Mesh Detail',
     'OBJ mesh density is determined by SolidWorks.'
 foreach ($typeName in 'SW2URDF.UI.PartExportForm', 'SW2URDF.UI.AssemblyExportForm') {
     $type = $assembly.GetType($typeName, $true)

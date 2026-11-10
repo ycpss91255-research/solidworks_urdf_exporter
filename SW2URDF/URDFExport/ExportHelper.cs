@@ -60,7 +60,6 @@ namespace SW2URDF.URDFExport
         private bool mTranslateToPositive;
         private bool mSaveComponentsIntoOneFile;
         private int mSTLUnits;
-        private int mSTLQuality;
         private double mHideTransitionSpeed;
 
         private UserProgressBar progressBar;
@@ -383,7 +382,7 @@ namespace SW2URDF.URDFExport
             CommonSwOperations.ShowComponents(ActiveSWModel, link.SWComponents);
             try
             {
-                SetLinkSpecificSTLPreferences(names["geo"], link.STLQualityFine, ActiveSWModel);
+                SetLinkSpecificSTLPreferences(names["geo"], ActiveSWModel);
                 SaveNative3dxml(ActiveSWModel, source);
             }
             finally { CommonSwOperations.HideComponents(ActiveSWModel, link.SWComponents); }
@@ -419,7 +418,7 @@ namespace SW2URDF.URDFExport
 
             int saveOptions = (int)swSaveAsOptions_e.swSaveAsOptions_Silent |
                 (int)swSaveAsOptions_e.swSaveAsOptions_Copy;
-            SetLinkSpecificSTLPreferences(names["geo"], link.STLQualityFine, ActiveDoc);
+            SetLinkSpecificSTLPreferences(names["geo"], ActiveDoc);
 
             logger.Info("Saving 3dxml to " + windowsMeshFilename);
 
@@ -507,7 +506,7 @@ namespace SW2URDF.URDFExport
 
             int saveOptions = (int)swSaveAsOptions_e.swSaveAsOptions_Silent |
                 (int)swSaveAsOptions_e.swSaveAsOptions_Copy;
-            SetLinkSpecificSTLPreferences(names["geo"], link.STLQualityFine, ActiveDoc);
+            SetLinkSpecificSTLPreferences(names["geo"], ActiveDoc);
 
             logger.Info("Saving STL to " + windowsMeshFilename);
             ActiveDoc.Extension.SaveAs(windowsMeshFilename,
@@ -558,7 +557,7 @@ namespace SW2URDF.URDFExport
             //Customizing STL preferences to how I want them
             SaveUserPreferences();
             SetSTLExportPreferences();
-            SetLinkSpecificSTLPreferences("", URDFRobot.BaseLink.STLQualityFine, ActiveSWModel);
+            SetLinkSpecificSTLPreferences("", ActiveSWModel);
             int errors = 0;
             int warnings = 0;
 
@@ -650,7 +649,6 @@ namespace SW2URDF.URDFExport
             mBinary = iSwApp.GetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLBinaryFormat);
             mTranslateToPositive = iSwApp.GetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLDontTranslateToPositive);
             mSTLUnits = iSwApp.GetUserPreferenceIntegerValue((int)swUserPreferenceIntegerValue_e.swExportStlUnits);
-            mSTLQuality = iSwApp.GetUserPreferenceIntegerValue((int)swUserPreferenceIntegerValue_e.swSTLQuality);
             mshowInfo = iSwApp.GetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLShowInfoOnSave);
             mSTLPreview = iSwApp.GetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLPreview);
             mHideTransitionSpeed = iSwApp.GetUserPreferenceDoubleValue((int)swUserPreferenceDoubleValue_e.swViewTransitionHideShowComponent);
@@ -664,7 +662,6 @@ namespace SW2URDF.URDFExport
             iSwApp.SetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLBinaryFormat, true);
             iSwApp.SetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLDontTranslateToPositive, true);
             iSwApp.SetUserPreferenceIntegerValue((int)swUserPreferenceIntegerValue_e.swExportStlUnits, 2);
-            iSwApp.SetUserPreferenceIntegerValue((int)swUserPreferenceIntegerValue_e.swSTLQuality, (int)swSTLQuality_e.swSTLQuality_Coarse);
             iSwApp.SetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLShowInfoOnSave, false);
             iSwApp.SetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLPreview, false);
             iSwApp.SetUserPreferenceDoubleValue((int)swUserPreferenceDoubleValue_e.swViewTransitionHideShowComponent, 0);
@@ -678,7 +675,6 @@ namespace SW2URDF.URDFExport
             iSwApp.SetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLBinaryFormat, mBinary);
             iSwApp.SetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLDontTranslateToPositive, mTranslateToPositive);
             iSwApp.SetUserPreferenceIntegerValue((int)swUserPreferenceIntegerValue_e.swExportStlUnits, mSTLUnits);
-            iSwApp.SetUserPreferenceIntegerValue((int)swUserPreferenceIntegerValue_e.swSTLQuality, mSTLQuality);
             iSwApp.SetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLShowInfoOnSave, mshowInfo);
             iSwApp.SetUserPreferenceToggle((int)swUserPreferenceToggle_e.swSTLPreview, mSTLPreview);
             iSwApp.SetUserPreferenceDoubleValue((int)swUserPreferenceDoubleValue_e.swViewTransitionHideShowComponent, mHideTransitionSpeed);
@@ -686,18 +682,10 @@ namespace SW2URDF.URDFExport
         }
 
         //If the user selected something specific for a particular link, that is handled here.
-        private void SetLinkSpecificSTLPreferences(string CoordinateSystemName, bool qualityFine, ModelDoc2 doc)
+        private void SetLinkSpecificSTLPreferences(string CoordinateSystemName, ModelDoc2 doc)
         {
             doc.Extension.SetUserPreferenceString((int)swUserPreferenceStringValue_e.swFileSaveAsCoordinateSystem,
                 (int)swUserPreferenceOption_e.swDetailingNoOptionSpecified, CoordinateSystemName);
-            if (qualityFine)
-            {
-                iSwApp.SetUserPreferenceIntegerValue((int)swUserPreferenceIntegerValue_e.swSTLQuality, (int)swSTLQuality_e.swSTLQuality_Fine);
-            }
-            else
-            {
-                iSwApp.SetUserPreferenceIntegerValue((int)swUserPreferenceIntegerValue_e.swSTLQuality, (int)swSTLQuality_e.swSTLQuality_Coarse);
-            }
         }
 
         #endregion STL Preference shuffling

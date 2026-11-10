@@ -42,9 +42,6 @@
   <data xml:space="preserve" name="collision">
     <value>Collision</value>
   </data>
-  <data xml:space="preserve" name="collision mesh detail">
-    <value>Collision Mesh Detail</value>
-  </data>
   <data xml:space="preserve" name="color">
     <value>Color</value>
   </data>
@@ -59,9 +56,6 @@
   </data>
   <data xml:space="preserve" name="coordinates">
     <value>Coordinates</value>
-  </data>
-  <data xml:space="preserve" name="course">
-    <value>Course</value>
   </data>
   <data xml:space="preserve" name="custom color">
     <value>Custom Color</value>
@@ -86,9 +80,6 @@
   </data>
   <data xml:space="preserve" name="export part as urdf file">
     <value>Export part as URDF file</value>
-  </data>
-  <data xml:space="preserve" name="fine">
-    <value>Fine</value>
   </data>
   <data xml:space="preserve" name="finish">
     <value>Finish</value>
@@ -117,9 +108,6 @@
   <data xml:space="preserve" name="material name">
     <value>Material name</value>
   </data>
-  <data xml:space="preserve" name="mesh detail">
-    <value>Mesh Detail</value>
-  </data>
   <data xml:space="preserve" name="mesh format">
     <value>Mesh Format</value>
   </data>
@@ -143,9 +131,6 @@
   </data>
   <data xml:space="preserve" name="obj color and texture are defined by the mtl file.">
     <value>OBJ color and texture are defined by the MTL file.</value>
-  </data>
-  <data xml:space="preserve" name="obj mesh density is determined by solidworks.">
-    <value>OBJ mesh density is determined by SolidWorks.</value>
   </data>
   <data xml:space="preserve" name="offset (rad)">
     <value>Offset (rad)</value>
@@ -215,9 +200,6 @@
   </data>
   <data xml:space="preserve" name="visual">
     <value>Visual</value>
-  </data>
-  <data xml:space="preserve" name="visual mesh detail">
-    <value>Visual Mesh Detail</value>
   </data>
   <data xml:space="preserve" name="visual and collision meshes">
     <value>Visual and Collision Meshes</value>
