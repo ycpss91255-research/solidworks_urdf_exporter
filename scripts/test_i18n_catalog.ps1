@@ -37,6 +37,11 @@ if ($english -and $chinese) {
             if ($a -ne $b) { Fail "placeholders differ for '$k'" }
         }
     }
+    # The English catalog must read exactly like the code it stands in for: the key is the
+    # lowercase caption, and the English value may only differ from it by capitalization.
+    foreach ($k in $english.Keys) {
+        if ($english[$k].ToLowerInvariant() -ne $k) { Fail "English value for '$k' differs from its key: '$($english[$k])'" }
+    }
     # Static captions of both forms must be translated unless they are symbols or protocol names.
     $literal = '"((?:[^"\\]|\\.)*)"'
     $invariant = @('*', '1', 'x', 'y', 'z', 'ixx', 'ixy', 'ixz', 'iyy', 'iyz', 'izz', 'ROS 1', 'ROS 2', 'pos = multiplier * pos_other + offset')
