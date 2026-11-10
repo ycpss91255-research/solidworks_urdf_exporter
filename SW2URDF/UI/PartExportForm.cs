@@ -74,6 +74,7 @@ namespace SW2URDF.UI
             ui = UiText.FromSolidWorks(iSwApp);
             ui.Apply(this);
             AlignFieldLabels();
+            UiLayout.FitButtonHeights(this, UiLayout.ScreenDpi());
             Exporter = new ExportHelper(iSwApp);
         }
 
