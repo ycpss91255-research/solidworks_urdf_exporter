@@ -27,6 +27,12 @@ namespace SW2URDF.UI
             catch (COMException) { return new UiText(null); }
         }
 
+        // Tools-menu registration. The same string is used to add and to remove the item,
+        // because SOLIDWORKS identifies a menu item by its full caption.
+        public string ExportMenuPath { get { return Get("Export as URDF") + "@&Tools"; } }
+        public string ExportAssemblyHint { get { return Get("Export assembly as URDF file"); } }
+        public string ExportPartHint { get { return Get("Export part as URDF file"); } }
+
         public string Get(string english)
         {
             if (string.IsNullOrEmpty(english) || Culture.Name == "en") return english;

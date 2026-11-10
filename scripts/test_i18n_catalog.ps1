@@ -54,7 +54,7 @@ if ($english -and $chinese) {
     $used = New-Object System.Collections.Generic.HashSet[string]
     foreach ($file in Get-ChildItem -Path (Join-Path $Root 'SW2URDF') -Recurse -Filter *.cs) {
         $text = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8
-        foreach ($m in [regex]::Matches($text, '\bui\.Get\(' + $literal + '\)')) {
+        foreach ($m in [regex]::Matches($text, '(?:\bui\.|(?<![\w.]))Get\(' + $literal + '\)')) {
             $key = $m.Groups[1].Value.Replace('\"', '"').Replace('\n', "`n").Replace('\r', "`r").Replace('\\', '\').ToLowerInvariant()
             [void]$used.Add($key)
             if (-not $chinese.Contains($key)) { Fail "$($file.Name) uses untranslated '$($m.Groups[1].Value)'" }
