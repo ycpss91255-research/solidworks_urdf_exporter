@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: obj-example-export  Build Version: 1.6.9810.32936
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="3_DOF_ARM_description_obj">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.00249115384615384 2.34558007901714E-18 0.00305587412587413"
+        rpy="0 0 0" />
+      <mass
+        value="0.0510508806208341" />
+      <inertia
+        ixx="3.5234044049786E-05"
+        ixy="6.98466777397284E-37"
+        ixz="-2.22339710804804E-37"
+        iyy="3.5234044049786E-05"
+        iyz="-5.44519126841819E-22"
+        izz="6.24882413753095E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://3_DOF_ARM_description_obj/meshes/base_link.obj" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://3_DOF_ARM_description_obj/meshes/base_link.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="prox_link">
+    <inertial>
+      <origin
+        xyz="6.94771684018738E-10 -0.0881460587278585 2.58403335187674E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.132570921155528" />
+      <inertia
+        ixx="0.000425622211946537"
+        ixy="7.66166107697545E-12"
+        ixz="1.12207653870009E-10"
+        iyy="6.78913907046572E-05"
+        iyz="2.10847230654448E-12"
+        izz="0.000427554426874909" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="-1.08036576479824E-19 3.24109729439473E-19 -0.00249115384615384"
+        rpy="-3.14159265358979 -1.5707963267949 0" />
+      <geometry>
+        <mesh
+          filename="package://3_DOF_ARM_description_obj/meshes/prox_link.obj" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin
+        xyz="-1.08036576479824E-19 3.24109729439473E-19 -0.00249115384615384"
+        rpy="-3.14159265358979 -1.5707963267949 0" />
+      <geometry>
+        <mesh
+          filename="package://3_DOF_ARM_description_obj/meshes/prox_link.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="prox_joint"
+    type="continuous">
+    <origin
+      xyz="0.00249115384615384 0 0"
+      rpy="-1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="prox_link" />
+    <axis
+      xyz="0 1 0" />
+    <safety_controller
+      k_velocity="0" />
+  </joint>
+  <link
+    name="dist_Link">
+    <inertial>
+      <origin
+        xyz="6.9477172498596E-10 -0.101063661551862 -2.58403354269632E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.132570921155528" />
+      <inertia
+        ixx="0.000425622211946537"
+        ixy="-7.66166113626829E-12"
+        ixz="-1.12207653887645E-10"
+        iyy="6.78913907046571E-05"
+        iyz="2.10847236627372E-12"
+        izz="0.000427554426874909" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="-1.52534141417452E-19 0.00249115384615383 0.18920972027972"
+        rpy="-1.5707963267949 0 -1.5707963267949" />
+      <geometry>
+        <mesh
+          filename="package://3_DOF_ARM_description_obj/meshes/dist_Link.obj" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin
+        xyz="-1.52534141417452E-19 0.00249115384615383 0.18920972027972"
+        rpy="-1.5707963267949 0 -1.5707963267949" />
+      <geometry>
+        <mesh
+          filename="package://3_DOF_ARM_description_obj/meshes/dist_Link.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="dist_joint"
+    type="continuous">
+    <origin
+      xyz="0 -0.18920972027972 0"
+      rpy="-1.5707963267949 0 0" />
+    <parent
+      link="prox_link" />
+    <child
+      link="dist_Link" />
+    <axis
+      xyz="-1 0 0" />
+    <safety_controller
+      k_velocity="0" />
+  </joint>
+  <link
+    name="effector_link">
+    <inertial>
+      <origin
+        xyz="7.89598164219583E-17 -1.94289029309402E-16 0.0118918918918916"
+        rpy="0 0 0" />
+      <mass
+        value="0.0290597320457048" />
+      <inertia
+        ixx="4.42470815817501E-06"
+        ixy="1.74592709332674E-21"
+        ixz="-1.05648570847946E-20"
+        iyy="4.424708158175E-06"
+        iyz="4.84580112853628E-20"
+        izz="5.90275807178375E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="-1.41875192845225E-33 0.18920972027972 -0.182491153846154"
+        rpy="-3.14159265358979 -1.5707963267949 0" />
+      <geometry>
+        <mesh
+          filename="package://3_DOF_ARM_description_obj/meshes/effector_link.obj" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin
+        xyz="-1.41875192845225E-33 0.18920972027972 -0.182491153846154"
+        rpy="-3.14159265358979 -1.5707963267949 0" />
+      <geometry>
+        <mesh
+          filename="package://3_DOF_ARM_description_obj/meshes/effector_link.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="effector_joint"
+    type="continuous">
+    <origin
+      xyz="0 -0.18 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="dist_Link" />
+    <child
+      link="effector_link" />
+    <axis
+      xyz="0 0 -1" />
+    <safety_controller
+      k_velocity="0" />
+  </joint>
+</robot>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: obj-example-export  Build Version: 1.6.9810.32936
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="BOX_RED">
+  <link
+    name="BOX_RED">
+    <inertial>
+      <origin
+        xyz="0 -0.025 1.53075794227797E-18"
+        rpy="0 0 0" />
+      <mass
+        value="0.125" />
+      <inertia
+        ixx="5.20833333333333E-05"
+        ixy="0"
+        ixz="0"
+        iyy="5.20833333333333E-05"
+        iyz="7.52316384526264E-37"
+        izz="5.20833333333333E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://BOX_RED_description_obj/meshes/BOX_RED.obj" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://BOX_RED_description_obj/meshes/BOX_RED.obj" />
+      </geometry>
+    </collision>
+  </link>
+</robot>
