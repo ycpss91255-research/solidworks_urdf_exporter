@@ -442,4 +442,109 @@
   <data xml:space="preserve" name="converting 3dxml to obj + mtl...">
     <value>Converting 3DXML to OBJ + MTL...</value>
   </data>
+  <data xml:space="preserve" name="preview and export...">
+    <value>Preview and Export...</value>
+  </data>
+  <data xml:space="preserve" name="preview the generated urdf and export to a urdf package">
+    <value>Preview the generated URDF and export to a URDF package</value>
+  </data>
+  <data xml:space="preserve" name="add child link">
+    <value>Add Child Link</value>
+  </data>
+  <data xml:space="preserve" name="remove">
+    <value>Remove</value>
+  </data>
+  <data xml:space="preserve" name="automatically generate">
+    <value>Automatically Generate</value>
+  </data>
+  <data xml:space="preserve" name="automatically detect">
+    <value>Automatically Detect</value>
+  </data>
+  <data xml:space="preserve" name="none">
+    <value>None</value>
+  </data>
+  <data xml:space="preserve" name="email your maintainer with the log file found at {0}">
+    <value>Email your maintainer with the log file found at {0}</value>
+  </data>
+  <data xml:space="preserve" name="there was a problem setting up the property manager:">
+    <value>There was a problem setting up the property manager:</value>
+  </data>
+  <data xml:space="preserve" name="there was a problem with the configuration property manager:">
+    <value>There was a problem with the configuration property manager:</value>
+  </data>
+  <data xml:space="preserve" name="there was a problem closing the property manager:">
+    <value>There was a problem closing the property manager:</value>
+  </data>
+  <data xml:space="preserve" name="there was a problem with the property manager:">
+    <value>There was a problem with the property manager:</value>
+  </data>
+  <data xml:space="preserve" name="model documents could not be obtained for the following components. please resolve them:">
+    <value>Model documents could not be obtained for the following components. Please resolve them:</value>
+  </data>
+  <data xml:space="preserve" name="resolving components failed. in order to export to urdf, this tool needs all components to be resolved. try resolving lightweight components manually before attempting to export again">
+    <value>Resolving components failed. In order to export to URDF, this tool needs all components to be resolved. Try resolving lightweight components manually before attempting to export again</value>
+  </data>
+  <data xml:space="preserve" name="in order to export to urdf, this tool needs all components to be resolved. you can resolve them manually or try exporting again">
+    <value>In order to export to URDF, this tool needs all components to be resolved. You can resolve them manually or try exporting again</value>
+  </data>
+  <data xml:space="preserve" name="merging the loaded csv configuration with the assembly&apos;s configuration failed. check your csv file. if you continue to run into errors, delete the configuration in the assembly and load a proper csv.">
+    <value>Merging the loaded CSV configuration with the assembly&apos;s configuration failed. Check your CSV file. If you continue to run into errors, delete the configuration in the assembly and load a proper CSV.</value>
+  </data>
+  <data xml:space="preserve" name="this model has not been fully exported and saved. merging may result in an incomplete urdf, would you like to continue?">
+    <value>This model has not been fully exported and saved. Merging may result in an incomplete URDF, would you like to continue?</value>
+  </data>
+  <data xml:space="preserve" name="continue with incomplete export?">
+    <value>Continue with incomplete export?</value>
+  </data>
+  <data xml:space="preserve" name="csv (.csv)|*.csv|all files (*.*)|*.*">
+    <value>CSV (.csv)|*.csv|All files (*.*)|*.*</value>
+  </data>
+  <data xml:space="preserve" name="an error occurred loading an existing configuration. either resolve the issue or delete the configuration from the feature manager">
+    <value>An error occurred loading an existing configuration. Either resolve the issue or delete the configuration from the feature manager</value>
+  </data>
+  <data xml:space="preserve" name="your configuration has not been fully exported. this feature may not work correctly">
+    <value>Your configuration has not been fully exported. This feature may not work correctly</value>
+  </data>
+  <data xml:space="preserve" name="the following nodes are incomplete. you need to fix them before continuing.">
+    <value>The following nodes are incomplete. You need to fix them before continuing.</value>
+  </data>
+  <data xml:space="preserve" name="links with children cannot be empty. select its associated components">
+    <value>Links with children cannot be empty. Select its associated components</value>
+  </data>
+  <data xml:space="preserve" name="the origin reference coordinate system cannot be automatically generated without components. either select an origin or at least one component.">
+    <value>The origin reference coordinate system cannot be automatically generated without components. Either select an origin or at least one component.</value>
+  </data>
+  <data xml:space="preserve" name="the reference axis cannot be automatically generated without components. either select an axis or at least one component.">
+    <value>The reference axis cannot be automatically generated without components. Either select an axis or at least one component.</value>
+  </data>
+  <data xml:space="preserve" name="the joint type cannot be automatically detected without components. either select a joint type or at least one component.">
+    <value>The joint type cannot be automatically detected without components. Either select a joint type or at least one component.</value>
+  </data>
+  <data xml:space="preserve" name="link name is empty. fill in a unique link name">
+    <value>Link name is empty. Fill in a unique link name</value>
+  </data>
+  <data xml:space="preserve" name="joint name is empty. fill in a unique joint name">
+    <value>Joint name is empty. Fill in a unique joint name</value>
+  </data>
+  <data xml:space="preserve" name="please fix these errors before proceeding.">
+    <value>Please fix these errors before proceeding.</value>
+  </data>
+  <data xml:space="preserve" name="the following links have link names that conflict:">
+    <value>The following links have LINK names that conflict:</value>
+  </data>
+  <data xml:space="preserve" name="the following links have joint names that conflict:">
+    <value>The following links have JOINT names that conflict:</value>
+  </data>
+  <data xml:space="preserve" name="the sw to urdf exporter requires saving and/or rebuilding before continuing">
+    <value>The SW to URDF exporter requires saving and/or rebuilding before continuing</value>
+  </data>
+  <data xml:space="preserve" name="save and rebuild document?">
+    <value>Save and rebuild document?</value>
+  </data>
+  <data xml:space="preserve" name="the sw to urdf exporter requires saving before continuing">
+    <value>The SW to URDF exporter requires saving before continuing</value>
+  </data>
+  <data xml:space="preserve" name="an exception occurred setting up the export form, please email your maintainer with the log file found at {0}">
+    <value>An exception occurred setting up the export form, please email your maintainer with the log file found at {0}</value>
+  </data>
 </root>
