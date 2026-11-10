@@ -222,7 +222,8 @@ namespace SW2URDF.URDFExport
                 node.Link.Name + " from " + model.GetPathName());
 
             node.Link.SWComponents = LoadSWComponents(model, node.Link.SWComponentPIDs);
-            if (node.Link.SWComponents.Count != node.Link.SWComponentPIDs.Count)
+            if (MissingComponentPolicy.IsLinkIncomplete(
+                node.Link.SWComponentPIDs.Count, node.Link.SWComponents.Count))
             {
                 problemLinks.Add(node.Link.Name);
                 logger.Error("Link " + node.Link.Name + " did not fully load all components");
