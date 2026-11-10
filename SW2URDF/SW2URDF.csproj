@@ -325,11 +325,15 @@
     <Compile Include="Test\SW2URDFTest.cs" />
     <Compile Include="Test\SWTestFixture.cs" />
     <Compile Include="Test\TestCommon.cs" />
+    <Compile Include="Test\TestConfigurationFormat.cs" />
     <Compile Include="Test\TestCSVImportExport.cs" />
     <Compile Include="Test\TestExportHelper.cs" />
     <Compile Include="Test\TestLogger.cs" />
     <Compile Include="Test\TestMathOps.cs" />
     <Compile Include="Test\TestObjConverter.cs" />
+    <Compile Include="Test\TestOrphanAttributes.cs" />
+    <Compile Include="Test\TestPerConfiguration.cs" />
+    <Compile Include="Test\TestMissingComponentPolicy.cs" />
     <Compile Include="Test\TestPropertyManager.cs" />
     <Compile Include="Test\TestROSFIles.cs" />
     <Compile Include="Test\SolidWorksBinding.cs" />
@@ -376,6 +380,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="URDFExport\CommonSwOperations.cs" />
+    <Compile Include="URDFExport\OrphanAttributes.cs" />
+    <Compile Include="URDFExport\ConfigurationFormat.cs" />
+    <Compile Include="URDFExport\MissingComponentPolicy.cs" />
     <Compile Include="URDFExport\ExportPropertyManagerExtension.cs" />
     <Compile Include="Utilities\MathOPS.cs" />
     <Compile Include="SW\EventHandling.cs" />
@@ -418,6 +425,9 @@
     <Compile Include="URDF\URDFElement.cs" />
     <Compile Include="URDF\URDFWriter.cs" />
     <Compile Include="URDF\Visual.cs" />
+    <Compile Include="UI\UiText.cs" />
+    <EmbeddedResource Include="UI\Strings.resx" />
+    <EmbeddedResource Include="UI\Strings.zh-TW.resx" />
     <Compile Include="Versioning\Version.cs" />
     <Compile Include="Versioning\VersionInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

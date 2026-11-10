@@ -40,6 +40,7 @@ namespace SW2URDF.UI
         private static readonly log4net.ILog logger = Logger.GetLogger();
 
         public ExportHelper Exporter;
+        private readonly UiText ui;
         public bool AutoUpdatingForm;
         public AttributeDef saveConfigurationAttributeDef;
 
@@ -50,6 +51,60 @@ namespace SW2URDF.UI
         private readonly Control[] linkBoxes;
         private readonly LinkNode BaseNode;
 
+        private void AlignFieldLabels()
+        {
+            label63.Left = textBoxJointName.Left;
+            label62.Left = comboBoxJointType.Left;
+            UiText.AlignLabel(label14, textBoxIxx);
+            UiText.AlignLabel(label11, textBoxIxz);
+            UiText.AlignLabel(label13, textBoxInertialOriginX);
+            UiText.AlignLabel(label46, textBoxInertialOriginYaw);
+            UiText.AlignLabel(label49, textBoxIyy);
+            UiText.AlignLabel(label45, textBoxInertialOriginPitch);
+            UiText.AlignLabel(label16, textBoxInertialOriginRoll);
+            UiText.AlignLabel(label17, textBoxInertialOriginY);
+            UiText.AlignLabel(label48, textBoxIyz);
+            UiText.AlignLabel(label47, textBoxInertialOriginZ);
+            UiText.AlignLabel(label50, textBoxIxy);
+            UiText.AlignLabel(label18, textBoxIzz);
+            UiText.AlignLabel(label12, textBoxMass);
+            UiText.AlignLabel(label24, textBoxVisualOriginZ);
+            UiText.AlignLabel(label20, textBoxVisualOriginYaw);
+            UiText.AlignLabel(label21, textBoxVisualOriginPitch);
+            UiText.AlignLabel(label22, textBoxVisualOriginRoll);
+            UiText.AlignLabel(label33, domainUpDownAlpha);
+            UiText.AlignLabel(label30, domainUpDownRed);
+            UiText.AlignLabel(label31, domainUpDownGreen);
+            UiText.AlignLabel(label26, textBoxVisualOriginX);
+            UiText.AlignLabel(label32, domainUpDownBlue);
+            UiText.AlignLabel(label25, textBoxVisualOriginY);
+            UiText.AlignLabel(labelKVelocity, textBoxKVelocity);
+            UiText.AlignLabel(labelSoftLower, textBoxSoftLower);
+            UiText.AlignLabel(labelSoftUpper, textBoxSoftUpper);
+            UiText.AlignLabel(labelKPosition, textBoxKPosition);
+            UiText.AlignLabel(labelFriction, textBoxFriction);
+            UiText.AlignLabel(labelDamping, textBoxDamping);
+            UiText.AlignLabel(label7CalibrationRising, textBoxCalibrationRising);
+            UiText.AlignLabel(label73, textBoxCalibrationFalling);
+            UiText.AlignLabel(labelVelocity, textBoxLimitVelocity);
+            UiText.AlignLabel(labelLowerLimit, textBoxLimitLower);
+            UiText.AlignLabel(labelLimitUpper, textBoxLimitUpper);
+            UiText.AlignLabel(labelEffort, textBoxLimitEffort);
+            UiText.AlignLabel(label58, textBoxAxisX);
+            UiText.AlignLabel(label59, textBoxAxisY);
+            UiText.AlignLabel(label61, textBoxAxisZ);
+            UiText.AlignLabel(label52, textBoxJointX);
+            UiText.AlignLabel(label56, textBoxJointYaw);
+            UiText.AlignLabel(label55, textBoxJointPitch);
+            UiText.AlignLabel(label51, textBoxJointRoll);
+            UiText.AlignLabel(label53, textBoxJointY);
+            UiText.AlignLabel(label57, textBoxJointZ);
+            UiText.AlignLabel(label67, comboBoxAxis);
+            UiText.AlignLabel(label66, comboBoxOrigin);
+            UiText.AlignLabel(MimicMultiplierLabel, textBoxMimicMultiplier);
+            UiText.AlignLabel(MimicOffsetLabel, textBoxMimicOffset);
+        }
+
         public AssemblyExportForm(SldWorks SwApp, LinkNode node, ExportHelper exporter)
         {
             Application.ThreadException +=
@@ -57,6 +112,9 @@ namespace SW2URDF.UI
             AppDomain.CurrentDomain.UnhandledException +=
                 new UnhandledExceptionEventHandler(UnhandledException);
             InitializeComponent();
+            ui = UiText.FromSolidWorks(SwApp);
+            ui.Apply(this);
+            AlignFieldLabels();
             swApp = SwApp;
             BaseNode = node;
             ActiveSWModel = swApp.ActiveDoc;
@@ -145,6 +203,32 @@ namespace SW2URDF.UI
             FillJointTree();
         }
 
+        private void RadioButtonObjCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMeshQualityControls();
+        }
+
+        // The OBJ path is exported through 3DXML, so the STL Fine/Coarse
+        // preference has no effect on it.
+        private void UpdateMeshQualityControls()
+        {
+            bool stl = !radioButtonObj.Checked;
+            radioButtonFine.Enabled = stl;
+            radioButtonCourse.Enabled = stl;
+            panelObjQualityNote.Visible = !stl;
+
+            // OBJ writes no URDF <material>; color and texture come from the MTL file.
+            Control[] colorControls = {
+                label28, label29, label30, label31, label32, label33, label34,
+                comboBoxMaterials, domainUpDownRed, domainUpDownGreen, domainUpDownBlue,
+                domainUpDownAlpha, textBoxTexture, buttonTextureBrowse };
+            foreach (Control control in colorControls)
+            {
+                control.Enabled = stl;
+            }
+            panelObjColorNote.Visible = !stl;
+        }
+
         private void ButtonJointNextClick(object sender, EventArgs e)
         {
             if (!(previouslySelectedNode == null || previouslySelectedNode.Link.Joint == null))
@@ -158,7 +242,7 @@ namespace SW2URDF.UI
             {
                 string message = "The following joints are missing required fields, please " +
                     "address them before continuing\r\n\r\n" + errors;
-                MessageBox.Show(message, "URDF Joint Errors");
+                MessageBox.Show(message, ui.Get("URDF Joint Errors"));
                 return;
             }
 
@@ -270,7 +354,7 @@ namespace SW2URDF.UI
 
                 string message = "The following links contained errors in either their link or joint " +
                     "properties. Please address before continuing\r\n\r\n" + errors;
-                MessageBox.Show(message, "URDF Errors");
+                MessageBox.Show(message, ui.Get("URDF Errors"));
                 return;
             }
 
@@ -283,7 +367,7 @@ namespace SW2URDF.UI
                 string message = "The following links contained issues that may cause problems. " +
                 "Do you wish to proceed?\r\n\r\n" + warnings;
                 DialogResult result =
-                    MessageBox.Show(message, "URDF Warnings", MessageBoxButtons.YesNo);
+                    MessageBox.Show(message, ui.Get("URDF Warnings"), MessageBoxButtons.YesNo);
 
                 if (result == DialogResult.No)
                 {
