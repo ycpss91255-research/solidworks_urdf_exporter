@@ -61,13 +61,20 @@ function Test-TextClipped([System.Windows.Forms.Control]$c) {
 function Test-Container([System.Windows.Forms.Control]$parent, [string]$path, [bool]$all, $problems) {
     $kids = @($parent.Controls | Where-Object { $all -or (Test-Shown $_) })
     $client = $parent.ClientSize
-    if ($parent -is [System.Windows.Forms.GroupBox]) { $client = $parent.DisplayRectangle.Size }
     foreach ($c in $kids) {
         $b = Get-Box $c
         if (-not $parent.AutoScroll -and ($b.Right -gt $client.Width + 1 -or $b.Bottom -gt $client.Height + 1 -or $b.Left -lt -1 -or $b.Top -lt -1)) {
             [void]$problems.Add("outside ${path}: $($c.Name) $b in $client")
         }
         if (Test-TextClipped $c) { [void]$problems.Add("text clipped ${path}: $($c.Name) '$($c.Text)' $b") }
+        # Fonts must follow the form font (system UI font, display scaling) so text sizes stay
+        # proportional to the scaled layout: same family, size within 0.9x-1.3x (bold headings).
+        if ($script:baseFont -and -not [string]::IsNullOrEmpty($c.Text) -and ($c -is [System.Windows.Forms.Label] -or $c -is [System.Windows.Forms.ButtonBase] -or $c -is [System.Windows.Forms.GroupBox])) {
+            $ratio = $c.Font.SizeInPoints / $script:baseFont.SizeInPoints
+            if ($c.Font.FontFamily.Name -ne $script:baseFont.FontFamily.Name -or $ratio -lt 0.9 -or $ratio -gt 1.3) {
+                [void]$problems.Add("font ${path}: $($c.Name) $($c.Font.Name) $($c.Font.SizeInPoints)pt vs form $($script:baseFont.Name) $($script:baseFont.SizeInPoints)pt")
+            }
+        }
     }
     for ($i = 0; $i -lt $kids.Count; $i++) {
         for ($j = $i + 1; $j -lt $kids.Count; $j++) {
@@ -91,7 +98,7 @@ function Get-Pages($form) {
     $panel = $form.Controls.Find('panelLinkProperties', $false)
     if ($panel.Count -eq 1) {
         $pages += ,@('joint page', $form, $panel[0])
-        $pages += ,@('link page', $panel[0], $null)
+        $pages += ,@('link page', $panel[0], $panel[0])
     } else {
         $pages += ,@('form', $form, $null)
     }
@@ -110,28 +117,28 @@ foreach ($typeName in $formTypes) {
     foreach ($f in $fonts) {
         foreach ($scale in $scales) {
             $font = New-Object System.Drawing.Font($f[0], [single]($f[1] * $scale), [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Point)
+            $script:baseFont = $font
             $form = New-Form $type $font
             try {
+                $form.StartPosition = 'Manual'; $form.Location = New-Object System.Drawing.Point(-32000, -32000)
+                $form.ShowInTaskbar = $false; $form.Show(); [System.Windows.Forms.Application]::DoEvents()
                 foreach ($page in (Get-Pages $form)) {
                     $problems = New-Object System.Collections.ArrayList
-                    $hidden = $page[2]
-                    if ($page[1] -eq $form -and $hidden) {
-                        # Joint page: every form-level control except the link page panel.
-                        $hidden.Visible = $false
-                    }
+                    $panel = $page[2]
+                    if ($page[0] -eq 'joint page') { $panel.Visible = $false }
+                    if ($page[0] -eq 'link page') { $panel.Visible = $true }
+                    [System.Windows.Forms.Application]::DoEvents()
                     Test-Container $page[1] ($page[0]) $ShowAll.IsPresent $problems
                     $label = "$($type.Name) [$($f[0]) $($f[1])pt x$scale] $($page[0])"
                     foreach ($p in $problems) { [void]$report.Add("$label : $p") }
                     $total += $problems.Count
-                }
-                if ($ScreenshotDirectory) {
-                    $form.StartPosition = 'Manual'; $form.Location = New-Object System.Drawing.Point(-32000, -32000)
-                    $form.ShowInTaskbar = $false; $form.Show(); [System.Windows.Forms.Application]::DoEvents()
-                    $bmp = New-Object System.Drawing.Bitmap($form.Width, $form.Height)
-                    $form.DrawToBitmap($bmp, (New-Object System.Drawing.Rectangle(0, 0, $bmp.Width, $bmp.Height)))
-                    $name = ("{0}_{1}_{2}" -f $type.Name, ($f[0] -replace ' ', ''), $scale)
-                    $bmp.Save((Join-Path $ScreenshotDirectory "$name.png"), [System.Drawing.Imaging.ImageFormat]::Png)
-                    $bmp.Dispose()
+                    if ($ScreenshotDirectory) {
+                        $bmp = New-Object System.Drawing.Bitmap($form.Width, $form.Height)
+                        $form.DrawToBitmap($bmp, (New-Object System.Drawing.Rectangle(0, 0, $bmp.Width, $bmp.Height)))
+                        $name = ("{0}_{1}_{2}_{3}" -f $type.Name, ($f[0] -replace ' ', ''), $scale, ($page[0] -replace ' ', ''))
+                        $bmp.Save((Join-Path $ScreenshotDirectory "$name.png"), [System.Drawing.Imaging.ImageFormat]::Png)
+                        $bmp.Dispose()
+                    }
                 }
             } finally { $form.Dispose(); $font.Dispose() }
         }
