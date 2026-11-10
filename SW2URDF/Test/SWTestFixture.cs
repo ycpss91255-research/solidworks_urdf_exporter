@@ -16,7 +16,7 @@ namespace SW2URDF.Test
         {
             if (!Initialized)
             {
-                SwApp = (SldWorks)Activator.CreateInstance(Type.GetTypeFromProgID("SldWorks.Application"));
+                SwApp = SolidWorksBinding.GetApplication();
                 SwApp.Visible = true;
                 Initialized = true;
             }
