@@ -31,6 +31,10 @@ function New-Form([Type]$type, [System.Drawing.Font]$font) {
     $events = [System.ComponentModel.Component].GetProperty('Events', $flags).GetValue($form, @())
     $loadKey = [System.Windows.Forms.Form].GetField('EVENT_LOAD', [Reflection.BindingFlags]'Static,NonPublic').GetValue($null)
     $events.RemoveHandler($loadKey, $events[$loadKey])
+    # The constructors also grow too-short push buttons (UiLayout); check that state at 150% DPI.
+    $layoutType = $assembly.GetType('SW2URDF.UI.UiLayout')
+    $fit = if ($layoutType) { $layoutType.GetMethod('FitButtonHeights', [Reflection.BindingFlags]'Static,NonPublic,Public') }
+    if ($fit) { [void]$fit.Invoke($null, @($form, [single]144)) }
     return $form
 }
 
