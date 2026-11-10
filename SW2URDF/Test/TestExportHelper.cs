@@ -74,16 +74,6 @@ namespace SW2URDF.Test
             return Path.Combine(saveDirectory, helper.PackageName);
         }
 
-        private static int CountStlTriangles(string path)
-        {
-            byte[] bytes = File.ReadAllBytes(path);
-            if (bytes.Length >= 84 && bytes.Length == 84 + 50L * BitConverter.ToUInt32(bytes, 80))
-            {
-                return (int)BitConverter.ToUInt32(bytes, 80);
-            }
-            return Regex.Matches(System.Text.Encoding.ASCII.GetString(bytes), "facet normal").Count;
-        }
-
         private static string[] ObjLines(string path, string prefix)
         {
             return File.ReadAllLines(path).Where(l => l.StartsWith(prefix + " ")).ToArray();
@@ -135,28 +125,213 @@ namespace SW2URDF.Test
                 try { Directory.Delete(temp, true); } catch (IOException) { }
             }
         }
+        // The STL and OBJ exports tessellate differently, so triangle counts are not comparable. Judge both
+        // meshes against reality instead: each must enclose the exact volume of the link within 0.5 % and the
+        // two bounding boxes must agree.
+        private static List<double[]> ReadStlTriangles(string path)
+        {
+            byte[] bytes = File.ReadAllBytes(path);
+            List<double[]> triangles = new List<double[]>();
+            Assert.True(bytes.Length >= 84 && bytes.Length == 84 + 50L * BitConverter.ToUInt32(bytes, 80),
+                "Expected a binary STL: " + path);
+            int count = (int)BitConverter.ToUInt32(bytes, 80);
+            for (int i = 0; i < count; i++)
+            {
+                int offset = 84 + 50 * i + 12; // skip the normal
+                double[] t = new double[9];
+                for (int k = 0; k < 9; k++)
+                {
+                    t[k] = BitConverter.ToSingle(bytes, offset + 4 * k);
+                }
+                triangles.Add(t);
+            }
+            return triangles;
+        }
 
+        private static List<double[]> ReadObjTriangles(string path)
+        {
+            List<double[]> vertices = new List<double[]>();
+            List<double[]> triangles = new List<double[]>();
+            foreach (string line in File.ReadAllLines(path))
+            {
+                string[] p = line.Split(' ');
+                if (p[0] == "v")
+                {
+                    vertices.Add(p.Skip(1).Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray());
+                }
+                else if (p[0] == "f")
+                {
+                    int[] index = p.Skip(1).Select(x => int.Parse(x.Split('/')[0], System.Globalization.CultureInfo.InvariantCulture) - 1).ToArray();
+                    Assert.Equal(3, index.Length);
+                    triangles.Add(index.SelectMany(i => vertices[i]).ToArray());
+                }
+            }
+            return triangles;
+        }
 
-        // Open question for the maintainers: the STL and the 3DXML (OBJ source) paths tessellate
-        // differently, so this may legitimately differ. Kept separate so the other OBJ checks stay meaningful.
+        // Applies the visual origin (xyz, rpy as Rz*Ry*Rx) of the named link to mesh triangles.
+        private static List<double[]> ApplyVisualOrigin(List<double[]> triangles, XDocument urdf, string linkName)
+        {
+            XElement origin = urdf.Descendants("link").Single(l => (string)l.Attribute("name") == linkName)
+                .Element("visual")?.Element("origin");
+            if (origin == null)
+            {
+                return triangles;
+            }
+            Func<string, double[]> read = a => ((string)origin.Attribute(a) ?? "0 0 0").Split(' ', '\t')
+                .Where(s => s.Length > 0).Select(s => double.Parse(s, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+            double[] xyz = read("xyz");
+            double[] rpy = read("rpy");
+            double cr = Math.Cos(rpy[0]), sr = Math.Sin(rpy[0]);
+            double cp = Math.Cos(rpy[1]), sp = Math.Sin(rpy[1]);
+            double cy = Math.Cos(rpy[2]), sy = Math.Sin(rpy[2]);
+            double[,] r =
+            {
+                { cy * cp, cy * sp * sr - sy * cr, cy * sp * cr + sy * sr },
+                { sy * cp, sy * sp * sr + cy * cr, sy * sp * cr - cy * sr },
+                { -sp, cp * sr, cp * cr },
+            };
+            return triangles.Select(t =>
+            {
+                double[] m = new double[9];
+                for (int v = 0; v < 3; v++)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        m[3 * v + i] = xyz[i] + r[i, 0] * t[3 * v] + r[i, 1] * t[3 * v + 1] + r[i, 2] * t[3 * v + 2];
+                    }
+                }
+                return m;
+            }).ToList();
+        }
+
+        // Signed tetrahedron sum over a closed triangle mesh, absolute value.
+        private static double MeshVolume(List<double[]> triangles)
+        {
+            double sum = 0;
+            foreach (double[] t in triangles)
+            {
+                sum += t[0] * (t[4] * t[8] - t[5] * t[7])
+                     - t[1] * (t[3] * t[8] - t[5] * t[6])
+                     + t[2] * (t[3] * t[7] - t[4] * t[6]);
+            }
+            return Math.Abs(sum / 6.0);
+        }
+
+        private static double[] BoundingBox(List<double[]> triangles)
+        {
+            double[] box = { double.MaxValue, double.MaxValue, double.MaxValue, double.MinValue, double.MinValue, double.MinValue };
+            foreach (double[] t in triangles)
+            {
+                for (int k = 0; k < 9; k++)
+                {
+                    box[k % 3] = Math.Min(box[k % 3], t[k]);
+                    box[3 + k % 3] = Math.Max(box[3 + k % 3], t[k]);
+                }
+            }
+            return box;
+        }
+
+        // Exact volume (m3) of the solid bodies of the components, in the pose and configuration they have in
+        // the assembly. Sub-assemblies without bodies of their own are searched recursively.
+        private static double ExactVolume(IEnumerable<Component2> components)
+        {
+            double volume = 0;
+            foreach (Component2 component in components)
+            {
+                object[] bodies = (object[])component.GetBodies3((int)swBodyType_e.swSolidBody, out object _);
+                if (bodies != null && bodies.Length > 0)
+                {
+                    foreach (Body2 body in bodies)
+                    {
+                        volume += ((double[])body.GetMassProperties(1))[3];
+                    }
+                }
+                else
+                {
+                    object[] children = (object[])component.GetChildren();
+                    if (children != null)
+                    {
+                        volume += ExactVolume(children.Cast<Component2>());
+                    }
+                }
+            }
+            return volume;
+        }
+
+        private static void CollectLinks(Link link, List<Link> links)
+        {
+            links.Add(link);
+            foreach (Link child in link.Children)
+            {
+                CollectLinks(child, links);
+            }
+        }
+
         [Theory]
         [InlineData("3_DOF_ARM")]
-        public void TestExportRobotObjTriangleCountMatchesStl(string modelName)
+        public void TestExportRobotObjMatchesStlAndExactVolume(string modelName)
         {
             string temp = CreateRandomTempDirectory();
             try
             {
-                string objPackage = ExportRobotTo(modelName, MeshExportFormat.OBJ, temp, out int _);
-                string stlPackage = ExportRobotTo(modelName, MeshExportFormat.STL, temp, out int _);
-                string[] objFiles = Directory.GetFiles(Path.Combine(objPackage, "meshes"), "*.obj");
-                Assert.NotEmpty(objFiles);
-                foreach (string obj in objFiles)
+                Mock<IMessageBox> messageBoxMock = new Mock<IMessageBox>();
+                messageBoxMock.Setup(m => m.Show(It.IsAny<string>())).Returns(MessageBoxResult.OK);
+                URDFPackage.MessageBox = messageBoxMock.Object;
+                ModelDoc2 doc = OpenSWDocument(modelName);
+                LinkNode baseNode = ConfigurationSerialization.LoadBaseNodeFromModel(doc, out bool error);
+                Assert.False(error);
+                CommonSwOperations.LoadSWComponents(doc, baseNode, new List<string>());
+
+                Dictionary<string, double> exact = new Dictionary<string, double>();
+                ExportHelper helper = new ExportHelper(SwApp);
+                helper.SavePath = temp;
+                helper.CreateRobotFromTreeView(baseNode);
+                List<Link> links = new List<Link>();
+                CollectLinks(helper.URDFRobot.BaseLink, links);
+                foreach (Link link in links)
                 {
-                    string linkName = Path.GetFileNameWithoutExtension(obj);
-                    string stl = Path.Combine(stlPackage, "meshes", linkName + ".STL");
-                    Assert.True(File.Exists(stl), "Missing STL for " + linkName);
-                    Assert.True(CountStlTriangles(stl) > 0, "Empty STL for " + linkName);
-                    Assert.Equal(CountStlTriangles(stl), ObjLines(obj, "f").Length);
+                    Assert.NotEmpty(link.SWComponents);
+                    exact[link.Name] = ExactVolume(link.SWComponents);
+                }
+
+                // The OBJ keeps assembly coordinates and puts the link frame into the URDF visual origin, so each
+                // format goes into its own package and is compared after applying that origin
+                helper.PackageName = "fidelity_stl";
+                helper.ExportRobot(true, MeshExportFormat.STL);
+                helper.PackageName = "fidelity_obj";
+                helper.ExportRobot(true, MeshExportFormat.OBJ);
+                Assert.True(SwApp.CloseAllDocuments(true));
+
+                string stlMeshes = Path.Combine(temp, "fidelity_stl", "meshes");
+                string objMeshes = Path.Combine(temp, "fidelity_obj", "meshes");
+                XDocument stlUrdf = XDocument.Load(Directory.GetFiles(Path.Combine(temp, "fidelity_stl", "urdf"), "*.urdf").Single());
+                XDocument objUrdf = XDocument.Load(Directory.GetFiles(Path.Combine(temp, "fidelity_obj", "urdf"), "*.urdf").Single());
+                Assert.Equal(links.Count, exact.Count);
+                foreach (KeyValuePair<string, double> entry in exact)
+                {
+                    string name = entry.Key.Replace('/', '_');
+                    // Express both meshes in the link frame: the visual origin in the URDF maps mesh to link coordinates
+                    List<double[]> stl = ApplyVisualOrigin(ReadStlTriangles(Path.Combine(stlMeshes, name + ".STL")), stlUrdf, entry.Key);
+                    List<double[]> obj = ApplyVisualOrigin(ReadObjTriangles(Path.Combine(objMeshes, name + ".obj")), objUrdf, entry.Key);
+                    Assert.NotEmpty(stl);
+                    Assert.NotEmpty(obj);
+                    Assert.True(entry.Value > 0, "No exact volume for " + name);
+                    double stlVolume = MeshVolume(stl);
+                    double objVolume = MeshVolume(obj);
+                    string volumes = name + ": exact " + entry.Value + " STL " + stlVolume + " OBJ " + objVolume + " m3";
+                    Assert.True(Math.Abs(stlVolume / entry.Value - 1) < 0.005, "STL volume off by more than 0.5 %. " + volumes);
+                    Assert.True(Math.Abs(objVolume / entry.Value - 1) < 0.005, "OBJ volume off by more than 0.5 %. " + volumes);
+
+                    double[] stlBox = BoundingBox(stl);
+                    double[] objBox = BoundingBox(obj);
+                    for (int k = 0; k < 6; k++)
+                    {
+                        // Both meshes are inscribed in curved surfaces, so allow 1 % of the largest extent for chord error
+                        double tolerance = 0.01 * Math.Max(stlBox[3] - stlBox[0], Math.Max(stlBox[4] - stlBox[1], stlBox[5] - stlBox[2]));
+                        Assert.True(Math.Abs(stlBox[k] - objBox[k]) < tolerance,
+                            name + " bounding box differs at index " + k + ": STL " + stlBox[k] + " OBJ " + objBox[k]);
+                    }
                 }
             }
             finally
