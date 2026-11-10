@@ -173,8 +173,7 @@ namespace SW2URDF.URDFExport
             {
                 //If the page is not created
                 logger.Error("An error occurred while attempting to create the PropertyManager Page\nError: " + longerrors);
-                MessageBox.Show("There was a problem setting up the property manager: " +
-                    "\nEmail your maintainer with the log file found at " + Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem setting up the property manager:"), null));
             }
 
             #endregion Create and instantiate components of PM page
@@ -239,8 +238,8 @@ namespace SW2URDF.URDFExport
                         string componentNames = string.Join("\r\n", unresolvedComponents);
                         logger.Error("SolidWorks told us the resolve succeeded, but ModelDocs" +
                             " could not be obtained for: " + componentNames);
-                        MessageBox.Show("Model Documents could not be obtained for the following" +
-                            " components. Plesae resolve them:\r\n" + componentNames);
+                        MessageBox.Show(ui.Get("Model documents could not be obtained for the following components. Please resolve them:") +
+                            "\r\n" + componentNames);
                         return;
                     }
 
@@ -261,16 +260,12 @@ namespace SW2URDF.URDFExport
                     result == (int)swComponentResolveStatus_e.swResolveNotPerformed)
                 {
                     logger.Warn("Resolving components failed. Warning user to do so on their own");
-                    MessageBox.Show("Resolving components failed. In order to export to URDF, " +
-                        " this tool needs all components to be resolved. Try resolving " +
-                        "lightweight components manually before attempting to export again");
+                    MessageBox.Show(ui.Get("Resolving components failed. In order to export to URDF, this tool needs all components to be resolved. Try resolving lightweight components manually before attempting to export again"));
                 }
                 else if (result == (int)swComponentResolveStatus_e.swResolveAbortedByUser)
                 {
                     logger.Warn("Components were not resolved by user");
-                    MessageBox.Show("In order to export to URDF, this tool needs all " +
-                        "components to be resolved. You can resolve them manually or try " +
-                        "exporting again");
+                    MessageBox.Show(ui.Get("In order to export to URDF, this tool needs all components to be resolved. You can resolve them manually or try exporting again"));
                 }
             }
         }
@@ -285,9 +280,7 @@ namespace SW2URDF.URDFExport
         {
             if (!e.Success)
             {
-                MessageBox.Show("Merging the loaded CSV configuration with the assembly's configuration " +
-                    "failed. Check your CSV file. If you continue to run into errors, delete the " +
-                    "configuration in the assembly and load a proper CSV.");
+                MessageBox.Show(ui.Get("Merging the loaded CSV configuration with the assembly's configuration failed. Check your CSV file. If you continue to run into errors, delete the configuration in the assembly and load a proper CSV."));
                 return;
             }
 
@@ -346,8 +339,7 @@ namespace SW2URDF.URDFExport
             {
                 logger.Warn("Loading a configuration with an incomplete export");
                 if (MessageBox.Show(
-                    "This model has not been fully exported and saved. Merging may result in an incomplete URDF, " +
-                    "would you like to continue?", "Continue with incomplete export?", MessageBoxButtons.YesNo) == 
+                    ui.Get("This model has not been fully exported and saved. Merging may result in an incomplete URDF, would you like to continue?"), ui.Get("Continue with incomplete export?"), MessageBoxButtons.YesNo) == 
                         DialogResult.No) {
                     return;
                 }
@@ -355,7 +347,7 @@ namespace SW2URDF.URDFExport
 
             OpenFileDialog loadFileDialog = new OpenFileDialog
             {
-                Filter = "CSV (.csv)|*.csv|All files (*.*)|*.*",
+                Filter = ui.Get("CSV (.csv)|*.csv|All files (*.*)|*.*"),
                 Multiselect = false,
                 ValidateNames = true,
                 CheckPathExists = true
@@ -414,8 +406,7 @@ namespace SW2URDF.URDFExport
             catch (Exception e)
             {
                 logger.Error("Exception caught handling button press " + Id, e);
-                MessageBox.Show("There was a problem with the configuration property manager: \n\"" +
-                    e.Message + "\"\nEmail your maintainer with the log file found at " + Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the configuration property manager:"), e.Message));
             }
         }
 
@@ -440,8 +431,7 @@ namespace SW2URDF.URDFExport
             catch (Exception e)
             {
                 logger.Error("Exception caught on close ", e);
-                MessageBox.Show("There was a problem closing the property manager: \n\"" +
-                    e.Message + "\"\nEmail your maintainer with the log file found at " + Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem closing the property manager:"), e.Message));
             }
         }
 
@@ -529,9 +519,7 @@ namespace SW2URDF.URDFExport
             catch (Exception ex)
             {
                 logger.Error("Exception caught on tree view AfterSelect ", ex);
-                MessageBox.Show("There was a problem with the property manager: \n\"" +
-                    ex.Message + "\"\nEmail your maintainer with the log file found at " +
-                    Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the property manager:"), ex.Message));
             }
         }
 
@@ -567,9 +555,7 @@ namespace SW2URDF.URDFExport
             catch (Exception ex)
             {
                 logger.Error("Exception caught on tree view add child ", ex);
-                MessageBox.Show("There was a problem with the property manager: \n\"" +
-                    ex.Message + "\"\nEmail your maintainer with the log file found at " +
-                    Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the property manager:"), ex.Message));
             }
         }
 
@@ -584,9 +570,7 @@ namespace SW2URDF.URDFExport
             catch (Exception ex)
             {
                 logger.Error("Exception caught on tree view remove child ", ex);
-                MessageBox.Show("There was a problem with the property manager: \n\"" +
-                    ex.Message + "\"\nEmail your maintainer with the log file found at " +
-                    Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the property manager:"), ex.Message));
             }
         }
 
@@ -605,9 +589,7 @@ namespace SW2URDF.URDFExport
             catch (Exception ex)
             {
                 logger.Error("Exception caught on tree view rename child ", ex);
-                MessageBox.Show("There was a problem with the property manager: \n\"" +
-                    ex.Message + "\"\nEmail your maintainer with the log file found at " +
-                    Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the property manager:"), ex.Message));
             }
         }
 
@@ -620,9 +602,7 @@ namespace SW2URDF.URDFExport
             catch (Exception ex)
             {
                 logger.Error("Exception caught on tree view Drag ", ex);
-                MessageBox.Show("There was a problem with the property manager: \n\"" +
-                    ex.Message + "\"\nEmail your maintainer with the log file found at " +
-                    Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the property manager:"), ex.Message));
             }
         }
 
@@ -640,9 +620,7 @@ namespace SW2URDF.URDFExport
             catch (Exception ex)
             {
                 logger.Error("Exception caught on tree view Drag Over ", ex);
-                MessageBox.Show("There was a problem with the property manager: \n\"" +
-                    ex.Message + "\"\nEmail your maintainer with the log file found at " +
-                    Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the property manager:"), ex.Message));
             }
         }
 
@@ -660,9 +638,7 @@ namespace SW2URDF.URDFExport
             catch (Exception ex)
             {
                 logger.Error("Exception caught on tree view DragEnter ", ex);
-                MessageBox.Show("There was a problem with the property manager: \n\"" +
-                    ex.Message + "\"\nEmail your maintainer with the log file found at " +
-                    Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the property manager:"), ex.Message));
             }
         }
 
@@ -699,9 +675,7 @@ namespace SW2URDF.URDFExport
             catch (Exception ex)
             {
                 logger.Error("Exception caught on tree view Drag Drop ", ex);
-                MessageBox.Show("There was a problem with the property manager: \n\"" +
-                    ex.Message + "\"\nEmail your maintainer with the log file found at " +
-                    Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the property manager:"), ex.Message));
             }
         }
 
@@ -849,7 +823,7 @@ namespace SW2URDF.URDFExport
             PMComboBoxJointType.Style =
                 (int)swPropMgrPageComboBoxStyle_e.swPropMgrPageComboBoxStyle_EditBoxReadOnly;
             PMComboBoxJointType.AddItems(new string[] {
-                "Automatically Detect", "continuous", "revolute", "prismatic", "fixed" });
+                ui.ComboDisplay("Automatically Detect"), "continuous", "revolute", "prismatic", "fixed" });
 
             //Create the selection box label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
@@ -962,7 +936,7 @@ namespace SW2URDF.URDFExport
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
             PMButtonExport = PMGroup.AddControl2(ButtonExportID,
                 (short)swPropertyManagerPageControlType_e.swControlType_Button,
-                "Preview and Export...", 0, (int)options, "Preview the generated URDF and export to a URDF package");
+                ui.Get("Preview and Export..."), 0, (int)options, ui.Get("Preview the generated URDF and export to a URDF package"));
             (PMButtonExport as IPropertyManagerPageControl).Width = 200;
 
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_WindowFromHandle;
@@ -992,10 +966,10 @@ namespace SW2URDF.URDFExport
             ToolStripMenuItem addChild = new ToolStripMenuItem();
             ToolStripMenuItem removeChild = new ToolStripMenuItem();
             //ToolStripMenuItem renameChild = new ToolStripMenuItem();
-            addChild.Text = "Add Child Link";
+            addChild.Text = ui.Get("Add Child Link");
             addChild.Click += new EventHandler(AddChildClick);
 
-            removeChild.Text = "Remove";
+            removeChild.Text = ui.Get("Remove");
             removeChild.Click += new EventHandler(RemoveChildClick);
             //renameChild.Text = "Rename";
             //renameChild.Click += new System.EventHandler(this.renameChild_Click);

@@ -41,6 +41,32 @@ namespace SW2URDF.UI
             return Resources.GetString(english.ToLowerInvariant(), Culture) ?? english;
         }
 
+        // PropertyManager combo boxes show these protocol values, and the selected item text is
+        // stored in the configuration and compared by the exporter. Only the shown text is
+        // translated; ComboValue maps it back so the stored value is always the English one.
+        private static readonly string[] ProtocolValues =
+            { "Automatically Generate", "Automatically Detect", "None" };
+
+        public string ComboDisplay(string value)
+        {
+            return Array.IndexOf(ProtocolValues, value) >= 0 ? Get(value) : value;
+        }
+
+        public string ComboValue(string shown)
+        {
+            foreach (string value in ProtocolValues)
+            {
+                if (shown == Get(value)) return value;
+            }
+            return shown;
+        }
+
+        // Standard "something went wrong" message box text. detail may be null.
+        public string ProblemMessage(string headline, string detail)
+        {
+            return headline + (detail == null ? "\n" : "\n\"" + detail + "\"\n") +
+                string.Format(Get("Email your maintainer with the log file found at {0}"), SW2URDF.Utilities.Logger.GetFileName());
+        }
         // Designer coordinates assume English caption widths. Measure the translated
         // label after font scaling and line it up with the field it describes.
         internal static void AlignLabel(Label label, Control field)
