@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Xml.Serialization;
 
@@ -305,6 +306,11 @@ namespace SW2URDF.URDFExport
                     windowsMeshFileName += ".STL";
                     break;
 
+                case MeshExportFormat.OBJ:
+                    meshFilename += ".obj";
+                    windowsMeshFileName += ".obj";
+                    break;
+
                 case MeshExportFormat.THREEDXML:
                     meshFilename += ".3dxml";
                     windowsMeshFileName += ".3dxml";
@@ -324,6 +330,10 @@ namespace SW2URDF.URDFExport
                         SaveSTL(link, windowsMeshFileName);
                         break;
 
+                    case MeshExportFormat.OBJ:
+                        SaveObj(link, windowsMeshFileName);
+                        break;
+
                     case MeshExportFormat.THREEDXML:
                         Save3dxml(link, windowsMeshFileName);
                         break;
@@ -335,6 +345,59 @@ namespace SW2URDF.URDFExport
             }
             link.Visual.Geometry.Mesh.Filename = meshFilename;
             link.Collision.Geometry.Mesh.Filename = meshFilename;
+        }
+
+        /// <summary>Cancels an OBJ conversion that is in progress (for example from a progress dialog).</summary>
+        public CancellationToken CancellationToken { get; set; }
+
+        private void ConvertObj(string source, string target, string linkName)
+        {
+            ObjConversionRunner.Run(source, target, linkName, CancellationToken);
+        }
+
+        private void SaveObj(Link link, string target)
+        {
+            string source = Path.ChangeExtension(target, ".3dxml");
+            SaveObjSource(link, source);
+            ConvertObj(source, target, link.Name);
+        }
+
+        // Native 3DXML export of one link, the input of the OBJ conversion. Unlike STL, the 3DXML
+        // keeps the global vertices, so the link frame is applied to the mesh origins instead.
+        private void SaveObjSource(Link link, string source)
+        {
+            string coordsysName = link.Joint.CoordinateSystemName;
+            Dictionary<string, string> names = GetComponentRefGeoNames(coordsysName);
+
+            MathTransform frame = GetCoordinateSystemTransform(coordsysName);
+            if (frame == null) throw new InvalidOperationException("Missing OBJ link frame: " + coordsysName);
+            Matrix<double> inverse = MathOps.GetTransformation(frame).Inverse();
+            foreach (Origin origin in new[] { link.Visual.Origin, link.Collision.Origin })
+            {
+                Matrix<double> local = MathOps.GetTransformation(origin.GetXYZ(), origin.GetRPY()) * inverse;
+                origin.SetXYZ(MathOps.GetXYZ(local));
+                origin.SetRPY(MathOps.GetRPY(local));
+            }
+
+            CommonSwOperations.ShowComponents(ActiveSWModel, link.SWComponents);
+            try
+            {
+                SetLinkSpecificSTLPreferences(names["geo"], link.STLQualityFine, ActiveSWModel);
+                SaveNative3dxml(ActiveSWModel, source);
+            }
+            finally { CommonSwOperations.HideComponents(ActiveSWModel, link.SWComponents); }
+        }
+
+        private static void SaveNative3dxml(ModelDoc2 model, string source)
+        {
+            int errors = 0;
+            int warnings = 0;
+            if (File.Exists(source)) File.Delete(source);
+            bool saved = model.Extension.SaveAs(source, (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
+                (int)swSaveAsOptions_e.swSaveAsOptions_Silent | (int)swSaveAsOptions_e.swSaveAsOptions_Copy,
+                null, ref errors, ref warnings);
+            if (!saved || errors != 0 || !File.Exists(source))
+                throw new IOException("Native 3DXML export failed (" + errors + "): " + source);
         }
 
         private void Save3dxml(Link link, string windowsMeshFilename)
@@ -466,6 +529,11 @@ namespace SW2URDF.URDFExport
 
         public void ExportLink(bool zIsUp)
         {
+            ExportLink(zIsUp, MeshExportFormat.STL);
+        }
+
+        public void ExportLink(bool zIsUp, MeshExportFormat meshFormat)
+        {
             CreateBaseRefOrigin(zIsUp);
             MathTransform coordSysTransform =
                 ActiveSWModel.Extension.GetCoordinateSystemTransformByName("Origin_global");
@@ -493,10 +561,24 @@ namespace SW2URDF.URDFExport
             int errors = 0;
             int warnings = 0;
 
-            //Saving part as STL mesh
-
-            ActiveSWModel.Extension.SaveAs(windowsMeshFileName, (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
-                (int)swSaveAsOptions_e.swSaveAsOptions_Silent, null, ref errors, ref warnings);
+            try
+            {
+                if (meshFormat == MeshExportFormat.OBJ)
+                {
+                    meshFileName = Path.ChangeExtension(meshFileName, ".obj");
+                    windowsMeshFileName = Path.ChangeExtension(windowsMeshFileName, ".obj");
+                    string source = Path.ChangeExtension(windowsMeshFileName, ".3dxml");
+                    SaveNative3dxml(ActiveSWModel, source);
+                    ConvertObj(source, windowsMeshFileName, URDFRobot.BaseLink.Name);
+                }
+                else
+                {
+                    //Saving part as STL mesh
+                    ActiveSWModel.Extension.SaveAs(windowsMeshFileName, (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
+                        (int)swSaveAsOptions_e.swSaveAsOptions_Silent, null, ref errors, ref warnings);
+                }
+            }
+            finally { ResetUserPreferences(); }
             URDFRobot.BaseLink.Visual.Geometry.Mesh.Filename = meshFileName;
             URDFRobot.BaseLink.Collision.Geometry.Mesh.Filename = meshFileName;
 
@@ -513,8 +595,6 @@ namespace SW2URDF.URDFExport
             URDFWriter uWriter = new URDFWriter(windowsURDFFileName);
             //mRobot.addLink(mLink);
             URDFRobot.WriteURDF(uWriter.writer);
-
-            ResetUserPreferences();
         }
 
         //Writes an empty header to the STL to get rid of the BS that SolidWorks adds to a binary STL file

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015 Stephen Brawner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1429,6 +1429,7 @@ namespace SW2URDF.URDFExport
     public enum MeshExportFormat
     {
         STL,
-        THREEDXML
+        THREEDXML,
+        OBJ
     }
 }
