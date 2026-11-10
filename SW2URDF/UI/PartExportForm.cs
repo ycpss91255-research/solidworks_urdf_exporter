@@ -31,10 +31,49 @@ namespace SW2URDF.UI
     public partial class PartExportForm : Form
     {
         public ExportHelper Exporter;
+        private readonly UiText ui;
+
+        private void AlignFieldLabels()
+        {
+            UiText.AlignLabel(label9, textBox_inertial_origin_x);
+            UiText.AlignLabel(label10, textBox_inertial_origin_y);
+            UiText.AlignLabel(label11, textBox_inertial_origin_z);
+            UiText.AlignLabel(label2, textBox_mass);
+            UiText.AlignLabel(label3, textBox_ixx);
+            UiText.AlignLabel(label4, textBox_ixy);
+            UiText.AlignLabel(label5, textBox_ixz);
+            UiText.AlignLabel(label6, textBox_iyy);
+            UiText.AlignLabel(label7, textBox_iyz);
+            UiText.AlignLabel(label8, textBox_izz);
+            UiText.AlignLabel(label18, textBox_inertial_origin_yaw);
+            UiText.AlignLabel(label17, textBox_inertial_origin_pitch);
+            UiText.AlignLabel(label16, textBox_inertial_origin_roll);
+            UiText.AlignLabel(label33, domainUpDown_alpha);
+            UiText.AlignLabel(label24, textBox_visual_origin_z);
+            UiText.AlignLabel(label25, textBox_visual_origin_y);
+            UiText.AlignLabel(label32, domainUpDown_blue);
+            UiText.AlignLabel(label26, textBox_visual_origin_x);
+            UiText.AlignLabel(label31, domainUpDown_green);
+            UiText.AlignLabel(label30, domainUpDown_red);
+            UiText.AlignLabel(label28, comboBox_materials);
+            UiText.AlignLabel(label22, textBox_visual_origin_roll);
+            UiText.AlignLabel(label21, textBox_visual_origin_pitch);
+            UiText.AlignLabel(label20, textBox_visual_origin_yaw);
+            UiText.AlignLabel(label39, textBox_collision_origin_z);
+            UiText.AlignLabel(label38, textBox_collision_origin_y);
+            UiText.AlignLabel(label37, textBox_collision_origin_x);
+            UiText.AlignLabel(label41, textBox_collision_origin_roll);
+            UiText.AlignLabel(label42, textBox_collision_origin_pitch);
+            UiText.AlignLabel(label43, textBox_collision_origin_yaw);
+            UiText.AlignLabel(label45, textBox_save_as);
+        }
 
         public PartExportForm(SldWorks iSwApp)
         {
             InitializeComponent();
+            ui = UiText.FromSolidWorks(iSwApp);
+            ui.Apply(this);
+            AlignFieldLabels();
             Exporter = new ExportHelper(iSwApp);
         }
 
@@ -122,6 +161,33 @@ namespace SW2URDF.UI
 
             Exporter.ExportLink(checkBox_rotate.Checked, objExport.Checked ? MeshExportFormat.OBJ : MeshExportFormat.STL);
             Close();
+        }
+
+        private void ObjExportCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMeshQualityControls();
+        }
+
+        // The OBJ path is exported through 3DXML, so the STL Fine/Coarse
+        // preference has no effect on it.
+        private void UpdateMeshQualityControls()
+        {
+            bool stl = !objExport.Checked;
+            label1.Enabled = stl;
+            radioButton_fine.Enabled = stl;
+            radioButton_course.Enabled = stl;
+            panelObjQualityNote.Visible = !stl;
+
+            // OBJ writes no URDF <material>; color and texture come from the MTL file.
+            Control[] colorControls = {
+                label28, label29, label30, label31, label32, label33, label34,
+                comboBox_materials, domainUpDown_red, domainUpDown_green, domainUpDown_blue,
+                domainUpDown_alpha, textBox_texture, button_texturebrowse };
+            foreach (Control control in colorControls)
+            {
+                control.Enabled = stl;
+            }
+            panelObjColorNote.Visible = !stl;
         }
 
         private void ButtonCancelClick(object sender, EventArgs e)

@@ -1,4 +1,4 @@
-namespace SW2URDF.UI
+﻿namespace SW2URDF.UI
 {
     partial class AssemblyExportForm
     {
@@ -73,6 +73,12 @@ namespace SW2URDF.UI
             this.radioButtonStl = new System.Windows.Forms.RadioButton();
             this.radioButtonFine = new System.Windows.Forms.RadioButton();
             this.radioButtonCourse = new System.Windows.Forms.RadioButton();
+            this.radioButtonObj = new System.Windows.Forms.RadioButton();
+            this.flowLayoutPanelMeshFormat = new System.Windows.Forms.FlowLayoutPanel();
+            this.labelObjQualityNote = new System.Windows.Forms.Label();
+            this.labelObjColorNote = new System.Windows.Forms.Label();
+            this.panelObjQualityNote = new System.Windows.Forms.Panel();
+            this.panelObjColorNote = new System.Windows.Forms.Panel();
             this.label10 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.textBoxVisualOriginZ = new System.Windows.Forms.TextBox();
@@ -187,6 +193,9 @@ namespace SW2URDF.UI
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.flowLayoutPanelMeshFormat.SuspendLayout();
+            this.panelObjQualityNote.SuspendLayout();
+            this.panelObjColorNote.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelLinkProperties
@@ -231,7 +240,7 @@ namespace SW2URDF.UI
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1.21F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label5.Location = new System.Drawing.Point(12, 8);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(193, 17);
@@ -303,7 +312,7 @@ namespace SW2URDF.UI
             this.groupBox5.Controls.Add(this.textBoxIzz);
             this.groupBox5.Controls.Add(this.label50);
             this.groupBox5.Controls.Add(this.textBoxMass);
-            this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox5.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.groupBox5.Location = new System.Drawing.Point(494, 80);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(568, 180);
@@ -313,7 +322,7 @@ namespace SW2URDF.UI
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label15.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label15.Location = new System.Drawing.Point(6, 0);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(46, 13);
@@ -462,7 +471,7 @@ namespace SW2URDF.UI
             this.label44.Name = "label44";
             this.label44.Size = new System.Drawing.Size(144, 13);
             this.label44.TabIndex = 23;
-            this.label44.Text = "Moment of Inertia (Kg * m^2)";
+            this.label44.Text = "Moment of Inertia (kg * m^2)";
             // 
             // label45
             // 
@@ -550,6 +559,8 @@ namespace SW2URDF.UI
             // 
             this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.groupBox1);
+            this.groupBox4.Controls.Add(this.panelObjColorNote);
+            this.groupBox4.Controls.Add(this.panelObjQualityNote);
             this.groupBox4.Controls.Add(this.radioButtonFine);
             this.groupBox4.Controls.Add(this.radioButtonCourse);
             this.groupBox4.Controls.Add(this.label10);
@@ -589,16 +600,10 @@ namespace SW2URDF.UI
             // 
             // groupBox1
             // 
-            this.radioButtonObj = new System.Windows.Forms.RadioButton();
-            this.radioButtonObj.AutoSize = true;
-            this.radioButtonObj.Location = new System.Drawing.Point(11, 76);
-            this.radioButtonObj.Text = "OBJ + MTL";
-            this.groupBox1.Controls.Add(this.radioButtonObj);
-            this.groupBox1.Controls.Add(this.radioButton3dxml);
-            this.groupBox1.Controls.Add(this.radioButtonStl);
+            this.groupBox1.Controls.Add(this.flowLayoutPanelMeshFormat);
             this.groupBox1.Location = new System.Drawing.Point(184, 147);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(122, 104);
+            this.groupBox1.Size = new System.Drawing.Size(122, 90);
             this.groupBox1.TabIndex = 74;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Mesh Format";
@@ -606,7 +611,7 @@ namespace SW2URDF.UI
             // radioButton3dxml
             // 
             this.radioButton3dxml.AutoSize = true;
-            this.radioButton3dxml.Location = new System.Drawing.Point(11, 54);
+            this.radioButton3dxml.Location = new System.Drawing.Point(3, 26);
             this.radioButton3dxml.Name = "radioButton3dxml";
             this.radioButton3dxml.Size = new System.Drawing.Size(90, 16);
             this.radioButton3dxml.TabIndex = 1;
@@ -614,11 +619,72 @@ namespace SW2URDF.UI
             this.radioButton3dxml.Text = "3dxml (color)";
             this.radioButton3dxml.UseVisualStyleBackColor = true;
             // 
+            // flowLayoutPanelMeshFormat
+            //
+            this.flowLayoutPanelMeshFormat.AutoSize = true;
+            this.flowLayoutPanelMeshFormat.Controls.Add(this.radioButtonStl);
+            this.flowLayoutPanelMeshFormat.Controls.Add(this.radioButton3dxml);
+            this.flowLayoutPanelMeshFormat.Controls.Add(this.radioButtonObj);
+            this.flowLayoutPanelMeshFormat.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowLayoutPanelMeshFormat.Location = new System.Drawing.Point(8, 16);
+            this.flowLayoutPanelMeshFormat.Name = "flowLayoutPanelMeshFormat";
+            this.flowLayoutPanelMeshFormat.Size = new System.Drawing.Size(110, 69);
+            this.flowLayoutPanelMeshFormat.TabIndex = 0;
+            this.flowLayoutPanelMeshFormat.WrapContents = false;
+            //
+            // radioButtonObj
+            //
+            this.radioButtonObj.AutoSize = true;
+            this.radioButtonObj.Location = new System.Drawing.Point(3, 49);
+            this.radioButtonObj.Name = "radioButtonObj";
+            this.radioButtonObj.Size = new System.Drawing.Size(73, 17);
+            this.radioButtonObj.TabIndex = 2;
+            this.radioButtonObj.TabStop = true;
+            this.radioButtonObj.Text = "OBJ + MTL";
+            this.radioButtonObj.UseVisualStyleBackColor = true;
+            this.radioButtonObj.CheckedChanged += new System.EventHandler(this.RadioButtonObjCheckedChanged);
+            //
+            // panelObjQualityNote
+            //
+            this.panelObjQualityNote.Controls.Add(this.labelObjQualityNote);
+            this.panelObjQualityNote.Location = new System.Drawing.Point(184, 238);
+            this.panelObjQualityNote.Name = "panelObjQualityNote";
+            this.panelObjQualityNote.Size = new System.Drawing.Size(190, 30);
+            this.panelObjQualityNote.TabIndex = 77;
+            this.panelObjQualityNote.Visible = false;
+            //
+            // labelObjQualityNote
+            //
+            this.labelObjQualityNote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelObjQualityNote.Location = new System.Drawing.Point(0, 0);
+            this.labelObjQualityNote.Name = "labelObjQualityNote";
+            this.labelObjQualityNote.Size = new System.Drawing.Size(190, 30);
+            this.labelObjQualityNote.TabIndex = 0;
+            this.labelObjQualityNote.Text = "OBJ mesh density is determined by SolidWorks.";
+            //
+            // panelObjColorNote
+            //
+            this.panelObjColorNote.Controls.Add(this.labelObjColorNote);
+            this.panelObjColorNote.Location = new System.Drawing.Point(310, 160);
+            this.panelObjColorNote.Name = "panelObjColorNote";
+            this.panelObjColorNote.Size = new System.Drawing.Size(180, 30);
+            this.panelObjColorNote.TabIndex = 76;
+            this.panelObjColorNote.Visible = false;
+            //
+            // labelObjColorNote
+            //
+            this.labelObjColorNote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelObjColorNote.Location = new System.Drawing.Point(0, 0);
+            this.labelObjColorNote.Name = "labelObjColorNote";
+            this.labelObjColorNote.Size = new System.Drawing.Size(180, 30);
+            this.labelObjColorNote.TabIndex = 0;
+            this.labelObjColorNote.Text = "OBJ color and texture are defined by the MTL file.";
+            //
             // radioButtonStl
-            // 
+            //
             this.radioButtonStl.AutoSize = true;
             this.radioButtonStl.Checked = true;
-            this.radioButtonStl.Location = new System.Drawing.Point(11, 24);
+            this.radioButtonStl.Location = new System.Drawing.Point(3, 3);
             this.radioButtonStl.Name = "radioButtonStl";
             this.radioButtonStl.Size = new System.Drawing.Size(104, 16);
             this.radioButtonStl.TabIndex = 0;
@@ -660,7 +726,7 @@ namespace SW2URDF.UI
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label19.Location = new System.Drawing.Point(3, 0);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(164, 13);
@@ -929,7 +995,7 @@ namespace SW2URDF.UI
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1.21F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label7.Location = new System.Drawing.Point(12, 8);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(198, 17);
@@ -980,7 +1046,7 @@ namespace SW2URDF.UI
             // labelSoftLower
             // 
             this.labelSoftLower.AutoSize = true;
-            this.labelSoftLower.Location = new System.Drawing.Point(854, 427);
+            this.labelSoftLower.Location = new System.Drawing.Point(846, 427);
             this.labelSoftLower.Name = "labelSoftLower";
             this.labelSoftLower.Size = new System.Drawing.Size(110, 12);
             this.labelSoftLower.TabIndex = 214;
@@ -1005,7 +1071,7 @@ namespace SW2URDF.UI
             // label80
             // 
             this.label80.AutoSize = true;
-            this.label80.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label80.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label80.Location = new System.Drawing.Point(952, 398);
             this.label80.Name = "label80";
             this.label80.Size = new System.Drawing.Size(101, 13);
@@ -1054,7 +1120,7 @@ namespace SW2URDF.UI
             // labelDamping
             // 
             this.labelDamping.AutoSize = true;
-            this.labelDamping.Location = new System.Drawing.Point(642, 451);
+            this.labelDamping.Location = new System.Drawing.Point(634, 451);
             this.labelDamping.Name = "labelDamping";
             this.labelDamping.Size = new System.Drawing.Size(133, 12);
             this.labelDamping.TabIndex = 209;
@@ -1063,7 +1129,7 @@ namespace SW2URDF.UI
             // label76
             // 
             this.label76.AutoSize = true;
-            this.label76.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label76.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label76.Location = new System.Drawing.Point(764, 394);
             this.label76.Name = "label76";
             this.label76.Size = new System.Drawing.Size(61, 13);
@@ -1105,7 +1171,7 @@ namespace SW2URDF.UI
             // label74
             // 
             this.label74.AutoSize = true;
-            this.label74.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label74.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label74.Location = new System.Drawing.Point(528, 394);
             this.label74.Name = "label74";
             this.label74.Size = new System.Drawing.Size(67, 13);
@@ -1163,7 +1229,7 @@ namespace SW2URDF.UI
             // label68
             // 
             this.label68.AutoSize = true;
-            this.label68.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label68.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label68.Location = new System.Drawing.Point(952, 248);
             this.label68.Name = "label68";
             this.label68.Size = new System.Drawing.Size(33, 13);
@@ -1189,7 +1255,7 @@ namespace SW2URDF.UI
             // label65
             // 
             this.label65.AutoSize = true;
-            this.label65.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label65.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label65.Location = new System.Drawing.Point(519, 98);
             this.label65.Name = "label65";
             this.label65.Size = new System.Drawing.Size(56, 13);
@@ -1199,7 +1265,7 @@ namespace SW2URDF.UI
             // label64
             // 
             this.label64.AutoSize = true;
-            this.label64.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label64.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label64.Location = new System.Drawing.Point(512, 74);
             this.label64.Name = "label64";
             this.label64.Size = new System.Drawing.Size(64, 13);
@@ -1209,7 +1275,7 @@ namespace SW2URDF.UI
             // label63
             // 
             this.label63.AutoSize = true;
-            this.label63.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label63.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label63.Location = new System.Drawing.Point(513, 120);
             this.label63.Name = "label63";
             this.label63.Size = new System.Drawing.Size(60, 13);
@@ -1226,7 +1292,7 @@ namespace SW2URDF.UI
             // label62
             // 
             this.label62.AutoSize = true;
-            this.label62.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label62.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label62.Location = new System.Drawing.Point(854, 122);
             this.label62.Name = "label62";
             this.label62.Size = new System.Drawing.Size(56, 13);
@@ -1283,7 +1349,7 @@ namespace SW2URDF.UI
             // label60
             // 
             this.label60.AutoSize = true;
-            this.label60.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label60.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label60.Location = new System.Drawing.Point(764, 248);
             this.label60.Name = "label60";
             this.label60.Size = new System.Drawing.Size(30, 13);
@@ -1371,7 +1437,7 @@ namespace SW2URDF.UI
             // label54
             // 
             this.label54.AutoSize = true;
-            this.label54.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label54.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label54.Location = new System.Drawing.Point(528, 248);
             this.label54.Name = "label54";
             this.label54.Size = new System.Drawing.Size(40, 13);
@@ -1430,9 +1496,9 @@ namespace SW2URDF.UI
             // 
             // treeViewJointTree
             // 
-            this.treeViewJointTree.Location = new System.Drawing.Point(12, 74);
+            this.treeViewJointTree.Location = new System.Drawing.Point(12, 82);
             this.treeViewJointTree.Name = "treeViewJointTree";
-            this.treeViewJointTree.Size = new System.Drawing.Size(462, 525);
+            this.treeViewJointTree.Size = new System.Drawing.Size(462, 517);
             this.treeViewJointTree.TabIndex = 163;
             this.treeViewJointTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewJointtreeAfterSelect);
             // 
@@ -1475,9 +1541,11 @@ namespace SW2URDF.UI
             // 
             // label69
             // 
+            this.label69.AutoSize = true;
             this.label69.Location = new System.Drawing.Point(22, 31);
+            this.label69.MaximumSize = new System.Drawing.Size(440, 0);
             this.label69.Name = "label69";
-            this.label69.Size = new System.Drawing.Size(451, 50);
+            this.label69.Size = new System.Drawing.Size(437, 39);
             this.label69.TabIndex = 228;
             this.label69.Text = "Customize the joint properties. If you want to adjust the coordinate systems and " +
     "axes in the model, click cancel and restart the export. The tool will recognize " +
@@ -1486,7 +1554,7 @@ namespace SW2URDF.UI
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(521, 603);
+            this.label4.Location = new System.Drawing.Point(521, 598);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(263, 12);
             this.label4.TabIndex = 230;
@@ -1495,8 +1563,8 @@ namespace SW2URDF.UI
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(562, 248);
+            this.label1.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 0.945F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
+            this.label1.Location = new System.Drawing.Point(570, 248);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(12, 13);
@@ -1506,8 +1574,8 @@ namespace SW2URDF.UI
             // AxisRequiredLabel
             // 
             this.AxisRequiredLabel.AutoSize = true;
-            this.AxisRequiredLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AxisRequiredLabel.Location = new System.Drawing.Point(788, 248);
+            this.AxisRequiredLabel.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 0.945F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
+            this.AxisRequiredLabel.Location = new System.Drawing.Point(796, 248);
             this.AxisRequiredLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.AxisRequiredLabel.Name = "AxisRequiredLabel";
             this.AxisRequiredLabel.Size = new System.Drawing.Size(12, 13);
@@ -1517,7 +1585,7 @@ namespace SW2URDF.UI
             // LimitRequiredLabel
             // 
             this.LimitRequiredLabel.AutoSize = true;
-            this.LimitRequiredLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LimitRequiredLabel.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 0.945F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.LimitRequiredLabel.Location = new System.Drawing.Point(980, 247);
             this.LimitRequiredLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.LimitRequiredLabel.Name = "LimitRequiredLabel";
@@ -1561,7 +1629,7 @@ namespace SW2URDF.UI
             // MimicJointLabel
             // 
             this.MimicJointLabel.AutoSize = true;
-            this.MimicJointLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MimicJointLabel.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 0.945F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.MimicJointLabel.Location = new System.Drawing.Point(530, 558);
             this.MimicJointLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.MimicJointLabel.Name = "MimicJointLabel";
@@ -1613,7 +1681,7 @@ namespace SW2URDF.UI
             // MimicEquationLabel
             // 
             this.MimicEquationLabel.AutoSize = true;
-            this.MimicEquationLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MimicEquationLabel.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 0.945F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.MimicEquationLabel.Location = new System.Drawing.Point(846, 574);
             this.MimicEquationLabel.Name = "MimicEquationLabel";
             this.MimicEquationLabel.Size = new System.Drawing.Size(171, 13);
@@ -1719,6 +1787,10 @@ namespace SW2URDF.UI
             this.groupBox4.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.flowLayoutPanelMeshFormat.ResumeLayout(false);
+            this.flowLayoutPanelMeshFormat.PerformLayout();
+            this.panelObjQualityNote.ResumeLayout(false);
+            this.panelObjColorNote.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1880,6 +1952,11 @@ namespace SW2URDF.UI
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton radioButton3dxml;
         private System.Windows.Forms.RadioButton radioButtonObj;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelMeshFormat;
+        private System.Windows.Forms.Label labelObjQualityNote;
+        private System.Windows.Forms.Label labelObjColorNote;
+        private System.Windows.Forms.Panel panelObjQualityNote;
+        private System.Windows.Forms.Panel panelObjColorNote;
         private System.Windows.Forms.RadioButton radioButtonStl;
     }
 }

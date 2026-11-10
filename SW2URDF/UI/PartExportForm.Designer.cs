@@ -116,9 +116,18 @@
             this.button_savename_browse = new System.Windows.Forms.Button();
             this.saveFileDialog_save_as = new System.Windows.Forms.SaveFileDialog();
             this.checkBox_rotate = new System.Windows.Forms.CheckBox();
+            this.objExport = new System.Windows.Forms.CheckBox();
+            this.flowLayoutPanelOptions = new System.Windows.Forms.FlowLayoutPanel();
+            this.labelObjQualityNote = new System.Windows.Forms.Label();
+            this.labelObjColorNote = new System.Windows.Forms.Label();
+            this.panelObjQualityNote = new System.Windows.Forms.Panel();
+            this.panelObjColorNote = new System.Windows.Forms.Panel();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.flowLayoutPanelOptions.SuspendLayout();
+            this.panelObjQualityNote.SuspendLayout();
+            this.panelObjColorNote.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox_inertial_origin_x
@@ -288,7 +297,7 @@
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(144, 13);
             this.label12.TabIndex = 23;
-            this.label12.Text = "Moment of Inertia (Kg * m^2)";
+            this.label12.Text = "Moment of Inertia (kg * m^2)";
             // 
             // label13
             // 
@@ -359,7 +368,7 @@
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(9, 179);
+            this.label34.Location = new System.Drawing.Point(9, 176);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(43, 13);
             this.label34.TabIndex = 60;
@@ -367,7 +376,7 @@
             // 
             // button_texturebrowse
             // 
-            this.button_texturebrowse.Location = new System.Drawing.Point(398, 192);
+            this.button_texturebrowse.Location = new System.Drawing.Point(398, 196);
             this.button_texturebrowse.Name = "button_texturebrowse";
             this.button_texturebrowse.Size = new System.Drawing.Size(75, 23);
             this.button_texturebrowse.TabIndex = 59;
@@ -377,7 +386,7 @@
             // 
             // textBox_texture
             // 
-            this.textBox_texture.Location = new System.Drawing.Point(17, 195);
+            this.textBox_texture.Location = new System.Drawing.Point(17, 199);
             this.textBox_texture.Name = "textBox_texture";
             this.textBox_texture.Size = new System.Drawing.Size(352, 20);
             this.textBox_texture.TabIndex = 58;
@@ -737,7 +746,7 @@
             this.groupBox1.Controls.Add(this.textBox_izz);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.textBox_mass);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.groupBox1.Location = new System.Drawing.Point(12, 96);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(543, 185);
@@ -747,7 +756,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label15.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label15.Location = new System.Drawing.Point(6, 0);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(46, 13);
@@ -756,6 +765,8 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.panelObjColorNote);
+            this.groupBox2.Controls.Add(this.panelObjQualityNote);
             this.groupBox2.Controls.Add(this.radioButton_fine);
             this.groupBox2.Controls.Add(this.radioButton_course);
             this.groupBox2.Controls.Add(this.label1);
@@ -827,7 +838,7 @@
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label19.Location = new System.Drawing.Point(3, 0);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(41, 13);
@@ -896,7 +907,7 @@
             // label35
             // 
             this.label35.AutoSize = true;
-            this.label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label35.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label35.Location = new System.Drawing.Point(3, 0);
             this.label35.Name = "label35";
             this.label35.Size = new System.Drawing.Size(54, 13);
@@ -937,24 +948,76 @@
             this.checkBox_rotate.AutoSize = true;
             this.checkBox_rotate.Checked = true;
             this.checkBox_rotate.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_rotate.Location = new System.Drawing.Point(12, 73);
+            this.checkBox_rotate.Location = new System.Drawing.Point(3, 3);
             this.checkBox_rotate.Name = "checkBox_rotate";
             this.checkBox_rotate.Size = new System.Drawing.Size(226, 17);
             this.checkBox_rotate.TabIndex = 74;
             this.checkBox_rotate.Text = "Rotate global origin to make Z-axis vertical";
             this.checkBox_rotate.UseVisualStyleBackColor = true;
+            //
+            // objExport
+            //
+            this.objExport.AutoSize = true;
+            this.objExport.Location = new System.Drawing.Point(235, 3);
+            this.objExport.Name = "objExport";
+            this.objExport.Size = new System.Drawing.Size(158, 17);
+            this.objExport.TabIndex = 1;
+            this.objExport.Text = "OBJ + MTL (native colors)";
+            this.objExport.UseVisualStyleBackColor = true;
+            this.objExport.CheckedChanged += new System.EventHandler(this.ObjExportCheckedChanged);
+            //
+            // flowLayoutPanelOptions
+            //
+            this.flowLayoutPanelOptions.AutoSize = true;
+            this.flowLayoutPanelOptions.Controls.Add(this.checkBox_rotate);
+            this.flowLayoutPanelOptions.Controls.Add(this.objExport);
+            this.flowLayoutPanelOptions.Location = new System.Drawing.Point(9, 70);
+            this.flowLayoutPanelOptions.Name = "flowLayoutPanelOptions";
+            this.flowLayoutPanelOptions.Size = new System.Drawing.Size(396, 23);
+            this.flowLayoutPanelOptions.TabIndex = 75;
+            //
+            // panelObjQualityNote
+            //
+            this.panelObjQualityNote.Controls.Add(this.labelObjQualityNote);
+            this.panelObjQualityNote.Location = new System.Drawing.Point(249, 114);
+            this.panelObjQualityNote.Name = "panelObjQualityNote";
+            this.panelObjQualityNote.Size = new System.Drawing.Size(125, 54);
+            this.panelObjQualityNote.TabIndex = 77;
+            this.panelObjQualityNote.Visible = false;
+            //
+            // labelObjQualityNote
+            //
+            this.labelObjQualityNote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelObjQualityNote.Location = new System.Drawing.Point(0, 0);
+            this.labelObjQualityNote.Name = "labelObjQualityNote";
+            this.labelObjQualityNote.Size = new System.Drawing.Size(125, 54);
+            this.labelObjQualityNote.TabIndex = 0;
+            this.labelObjQualityNote.Text = "OBJ mesh density is determined by SolidWorks.";
+            //
+            // panelObjColorNote
+            //
+            this.panelObjColorNote.Controls.Add(this.labelObjColorNote);
+            this.panelObjColorNote.Location = new System.Drawing.Point(70, 177);
+            this.panelObjColorNote.Name = "panelObjColorNote";
+            this.panelObjColorNote.Size = new System.Drawing.Size(300, 18);
+            this.panelObjColorNote.TabIndex = 76;
+            this.panelObjColorNote.Visible = false;
+            //
+            // labelObjColorNote
+            //
+            this.labelObjColorNote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelObjColorNote.Location = new System.Drawing.Point(0, 0);
+            this.labelObjColorNote.Name = "labelObjColorNote";
+            this.labelObjColorNote.Size = new System.Drawing.Size(300, 18);
+            this.labelObjColorNote.TabIndex = 0;
+            this.labelObjColorNote.Text = "OBJ color and texture are defined by the MTL file.";
             // 
             // PartExportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(569, 735);
-            this.objExport = new System.Windows.Forms.CheckBox();
-            this.objExport.Text = "OBJ + MTL (native colors)";
-            this.objExport.AutoSize = true;
-            this.objExport.Location = new System.Drawing.Point(120, 707);
-            this.Controls.Add(this.objExport);
-            this.Controls.Add(this.checkBox_rotate);
+            this.ClientSize = new System.Drawing.Size(569, 705);
+            this.Controls.Add(this.flowLayoutPanelOptions);
             this.Controls.Add(this.button_savename_browse);
             this.Controls.Add(this.textBox_save_as);
             this.Controls.Add(this.label45);
@@ -973,6 +1036,10 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.flowLayoutPanelOptions.ResumeLayout(false);
+            this.flowLayoutPanelOptions.PerformLayout();
+            this.panelObjQualityNote.ResumeLayout(false);
+            this.panelObjColorNote.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1068,6 +1135,11 @@
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.RadioButton radioButton3;
         private System.Windows.Forms.CheckBox objExport;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelOptions;
+        private System.Windows.Forms.Label labelObjQualityNote;
+        private System.Windows.Forms.Label labelObjColorNote;
+        private System.Windows.Forms.Panel panelObjQualityNote;
+        private System.Windows.Forms.Panel panelObjColorNote;
         private System.Windows.Forms.CheckBox checkBox_rotate;
     }
 }

@@ -513,6 +513,39 @@ namespace SW2URDF.URDFExport
             return true;
         }
 
+        private string GetActiveConfigurationName()
+        {
+            try
+            {
+                return ActiveSWModel.ConfigurationManager?.ActiveConfiguration?.Name;
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not read the active configuration name", e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Asks before exporting links that are missing SolidWorks components, so a partial robot
+        /// is never produced silently.
+        /// </summary>
+        /// <returns>True when the export may proceed</returns>
+        private bool ConfirmExportWithMissingComponents()
+        {
+            string msg = MissingComponentPolicy.BuildMessage(
+                linksMissingComponents, GetActiveConfigurationName(), true);
+            if (msg == null)
+            {
+                return true;
+            }
+            bool proceed = MessageBox.Show(msg, "Components are missing",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2) == DialogResult.Yes;
+            logger.Warn("Export with missing components " + (proceed ? "confirmed" : "cancelled"));
+            return proceed;
+        }
+
         private void SetConfigTree(LinkNode baseNode)
         {
             if (baseNode == null)
@@ -525,11 +558,13 @@ namespace SW2URDF.URDFExport
                 List<string> problemLinks = new List<string>();
                 CommonSwOperations.LoadSWComponents(ActiveSWModel, baseNode, problemLinks);
 
-                if (problemLinks.Count > 0)
+                linksMissingComponents = problemLinks;
+                string msg = MissingComponentPolicy.BuildMessage(
+                    problemLinks, GetActiveConfigurationName(), false);
+                if (msg != null)
                 {
-                    string msg = "The following links had issues loading their associated SolidWorks components. " +
-                        "Please inspect before exporting\r\n\r\n" +
-                        string.Join(", ", problemLinks);
+                    logger.Warn("Links missing components in the active configuration: " +
+                        string.Join(", ", problemLinks));
                     MessageBox.Show(msg);
                 }
             }
