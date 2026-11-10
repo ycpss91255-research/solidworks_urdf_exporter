@@ -64,6 +64,16 @@ if ($english -and $chinese) {
             [void]$used.Add($key)
             if (-not $chinese.Contains($key)) { Fail "$($file.Name) uses untranslated '$($m.Groups[1].Value)'" }
         }
+        # Combo-box protocol values are shown through ComboDisplay, not Get("..."), so their
+        # catalog entries are referenced from UiText.ProtocolValues.
+        if ($file.Name -eq 'UiText.cs') {
+            $block = [regex]::Match($text, 'ProtocolValues\s*=\s*\{([^}]*)\}')
+            foreach ($m in [regex]::Matches($block.Groups[1].Value, $literal)) {
+                $key = $m.Groups[1].Value.ToLowerInvariant()
+                [void]$used.Add($key)
+                if (-not $chinese.Contains($key)) { Fail "UiText protocol value '$($m.Groups[1].Value)' is untranslated" }
+            }
+        }
         if ($file.Name -match '^(Assembly|Part)ExportForm\.Designer\.cs$') {
             foreach ($m in [regex]::Matches($text, '\bText\s*=\s*(' + $literal + '(?:\s*\+\s*' + $literal + ')*)')) {
                 $caption = (([regex]::Matches($m.Groups[1].Value, $literal) | ForEach-Object { $_.Groups[1].Value }) -join '').Replace("\'", "'")

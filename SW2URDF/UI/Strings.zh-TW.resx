@@ -442,4 +442,109 @@
   <data xml:space="preserve" name="converting 3dxml to obj + mtl...">
     <value>正在將 3DXML 轉換為 OBJ + MTL...</value>
   </data>
+  <data xml:space="preserve" name="preview and export...">
+    <value>預覽並匯出…</value>
+  </data>
+  <data xml:space="preserve" name="preview the generated urdf and export to a urdf package">
+    <value>預覽產生的 URDF 並匯出為 URDF 套件</value>
+  </data>
+  <data xml:space="preserve" name="add child link">
+    <value>新增子連桿</value>
+  </data>
+  <data xml:space="preserve" name="remove">
+    <value>移除</value>
+  </data>
+  <data xml:space="preserve" name="automatically generate">
+    <value>自動產生</value>
+  </data>
+  <data xml:space="preserve" name="automatically detect">
+    <value>自動偵測</value>
+  </data>
+  <data xml:space="preserve" name="none">
+    <value>無</value>
+  </data>
+  <data xml:space="preserve" name="email your maintainer with the log file found at {0}">
+    <value>請將位於 {0} 的記錄檔寄給維護人員</value>
+  </data>
+  <data xml:space="preserve" name="there was a problem setting up the property manager:">
+    <value>設定屬性管理員時發生問題：</value>
+  </data>
+  <data xml:space="preserve" name="there was a problem with the configuration property manager:">
+    <value>設定用的屬性管理員發生問題：</value>
+  </data>
+  <data xml:space="preserve" name="there was a problem closing the property manager:">
+    <value>關閉屬性管理員時發生問題：</value>
+  </data>
+  <data xml:space="preserve" name="there was a problem with the property manager:">
+    <value>屬性管理員發生問題：</value>
+  </data>
+  <data xml:space="preserve" name="model documents could not be obtained for the following components. please resolve them:">
+    <value>無法取得下列元件的模型文件，請先解析這些元件：</value>
+  </data>
+  <data xml:space="preserve" name="resolving components failed. in order to export to urdf, this tool needs all components to be resolved. try resolving lightweight components manually before attempting to export again">
+    <value>解析元件失敗。匯出 URDF 需要所有元件都已解析。請先手動解析輕量化元件，再重新匯出。</value>
+  </data>
+  <data xml:space="preserve" name="in order to export to urdf, this tool needs all components to be resolved. you can resolve them manually or try exporting again">
+    <value>匯出 URDF 需要所有元件都已解析。您可以手動解析，或重新嘗試匯出。</value>
+  </data>
+  <data xml:space="preserve" name="merging the loaded csv configuration with the assembly&apos;s configuration failed. check your csv file. if you continue to run into errors, delete the configuration in the assembly and load a proper csv.">
+    <value>將載入的 CSV 設定與組合件的設定合併失敗。請檢查 CSV 檔案。若仍持續發生錯誤，請刪除組合件中的設定，再載入正確的 CSV。</value>
+  </data>
+  <data xml:space="preserve" name="this model has not been fully exported and saved. merging may result in an incomplete urdf, would you like to continue?">
+    <value>此模型尚未完整匯出並儲存，合併可能產生不完整的 URDF，是否繼續？</value>
+  </data>
+  <data xml:space="preserve" name="continue with incomplete export?">
+    <value>要在匯出不完整的情況下繼續嗎？</value>
+  </data>
+  <data xml:space="preserve" name="csv (.csv)|*.csv|all files (*.*)|*.*">
+    <value>CSV (.csv)|*.csv|所有檔案 (*.*)|*.*</value>
+  </data>
+  <data xml:space="preserve" name="an error occurred loading an existing configuration. either resolve the issue or delete the configuration from the feature manager">
+    <value>載入既有設定時發生錯誤。請排除問題，或從特徵管理員刪除該設定。</value>
+  </data>
+  <data xml:space="preserve" name="your configuration has not been fully exported. this feature may not work correctly">
+    <value>您的設定尚未完整匯出，此功能可能無法正常運作</value>
+  </data>
+  <data xml:space="preserve" name="the following nodes are incomplete. you need to fix them before continuing.">
+    <value>下列節點尚未完成，請先修正才能繼續。</value>
+  </data>
+  <data xml:space="preserve" name="links with children cannot be empty. select its associated components">
+    <value>含有子連桿的連桿不可為空，請選取其對應的元件</value>
+  </data>
+  <data xml:space="preserve" name="the origin reference coordinate system cannot be automatically generated without components. either select an origin or at least one component.">
+    <value>未選取元件時無法自動產生原點參考座標系統，請選取原點或至少一個元件。</value>
+  </data>
+  <data xml:space="preserve" name="the reference axis cannot be automatically generated without components. either select an axis or at least one component.">
+    <value>未選取元件時無法自動產生參考軸，請選取軸或至少一個元件。</value>
+  </data>
+  <data xml:space="preserve" name="the joint type cannot be automatically detected without components. either select a joint type or at least one component.">
+    <value>未選取元件時無法自動偵測關節類型，請選取關節類型或至少一個元件。</value>
+  </data>
+  <data xml:space="preserve" name="link name is empty. fill in a unique link name">
+    <value>連桿名稱為空，請填入唯一的連桿名稱</value>
+  </data>
+  <data xml:space="preserve" name="joint name is empty. fill in a unique joint name">
+    <value>關節名稱為空，請填入唯一的關節名稱</value>
+  </data>
+  <data xml:space="preserve" name="please fix these errors before proceeding.">
+    <value>請先修正這些錯誤再繼續。</value>
+  </data>
+  <data xml:space="preserve" name="the following links have link names that conflict:">
+    <value>下列連桿的連桿名稱重複：</value>
+  </data>
+  <data xml:space="preserve" name="the following links have joint names that conflict:">
+    <value>下列連桿的關節名稱重複：</value>
+  </data>
+  <data xml:space="preserve" name="the sw to urdf exporter requires saving and/or rebuilding before continuing">
+    <value>SW 轉 URDF 匯出工具需要先儲存及／或重建才能繼續</value>
+  </data>
+  <data xml:space="preserve" name="save and rebuild document?">
+    <value>要儲存並重建文件嗎？</value>
+  </data>
+  <data xml:space="preserve" name="the sw to urdf exporter requires saving before continuing">
+    <value>SW 轉 URDF 匯出工具需要先儲存才能繼續</value>
+  </data>
+  <data xml:space="preserve" name="an exception occurred setting up the export form, please email your maintainer with the log file found at {0}">
+    <value>設定匯出表單時發生例外，請將位於 {0} 的記錄檔寄給維護人員</value>
+  </data>
 </root>
