@@ -50,6 +50,12 @@ namespace SW2URDF.URDFExport
 
         public ExportHelper Exporter;
         public LinkNode previouslySelectedNode;
+
+        /// <summary>
+        /// Links that could not load all their SolidWorks components when the configuration
+        /// was loaded. Exporting them needs an explicit confirmation.
+        /// </summary>
+        private List<string> linksMissingComponents = new List<string>();
         public Link previouslySelectedLink;
         public List<Link> linksToVisit;
         public LinkNode rightClickedNode;
@@ -207,6 +213,11 @@ namespace SW2URDF.URDFExport
             // Only if everything is A-OK, then do we proceed.
             if (CheckIfNamesAreUnique((LinkNode)Tree.Nodes[0]) && CheckNodesComplete(Tree))
             {
+                if (!ConfirmExportWithMissingComponents())
+                {
+                    return;
+                }
+
                 //It saves automatically when sending Okay as true;
                 PMPage.Close(true); 
                 AssemblyDoc assy = (AssemblyDoc)ActiveSWModel;

@@ -29,24 +29,32 @@ namespace SW2URDF.URDFExport
         /// <summary>
         /// Current Serialization version
         /// </summary>
-        private const double SerializationVersion = 1.4;
-
-        /// <summary>
-        /// Previous versions of serialization were set at 1 in the SW Document. This is
-        /// used to denote the version at which the serialization scheme was modified.
-        /// </summary>
-        private const double MinDataContractVersion = 1.3;
+        private const double SerializationVersion = ConfigurationFormat.CurrentVersion;
 
         /// <summary>
         /// The name given to the URDF configuration in the ModelDoc Feature tree. This is displayed to the
         /// user
         /// </summary>
-        public const string UrdfConfigurationSwAttributeName= "URDF Export Configuration (v1.4)";
+        public const string UrdfConfigurationSwAttributeName = ConfigurationFormat.SharedAttributeName;
 
-        public static List<string> PREVIOUS_URDF_CONFIGURATION_NAMES = new List<string>() {
-            "URDF Export Configuration (v1.3)",
-            "URDF Export Configuration"
-            };
+        /// <summary>
+        /// Definition name of the per-SolidWorks-configuration attribute. One instance is stored per
+        /// SolidWorks configuration and is named after that configuration. The serialization format
+        /// is the same as the shared attribute (<see cref="SerializationVersion"/>), only the
+        /// storage location differs. Note: if a SolidWorks configuration is renamed its attribute no
+        /// longer matches and the exporter falls back to the shared attribute until the
+        /// configuration is saved again (the stale attribute is harmless and can be deleted).
+        /// </summary>
+        private const string ConfigurationAttributeDefinitionName = "URDF Export Configuration Data";
+
+        /// <summary>
+        /// Feature tree folder that groups the per-configuration attributes. It cannot contain a
+        /// '.' because SolidWorks rejects such folder names, so it carries no version.
+        /// </summary>
+        public const string ConfigurationAttributeFolderName = "URDF Export Configuration";
+
+        public static List<string> PREVIOUS_URDF_CONFIGURATION_NAMES =
+            new List<string>(ConfigurationFormat.PreviousSharedAttributeNames);
 
         #region Public Methods
 
@@ -57,10 +65,12 @@ namespace SW2URDF.URDFExport
         /// <returns>TreeView LinkNode loaded from configuration</returns>
         public static LinkNode LoadBaseNodeFromModel(ModelDoc2 model, out bool error)
         {
+            LogOrphanConfigurationAttributes(model);
             string data = GetConfigTreeData(model, out double configVersion);
 
             LinkNode basenode;
-            if (configVersion > SerializationVersion)
+            ConfigurationFormatKind kind = ConfigurationFormat.Classify(configVersion);
+            if (kind == ConfigurationFormatKind.TooNew)
             {
                 MessageBox.Show("The configuration saved in this model is newer than what this " +
                     "exporter supports " + string.Format("({0} > {1})", configVersion, SerializationVersion) +
@@ -69,7 +79,7 @@ namespace SW2URDF.URDFExport
                 return null;
             }
 
-            if (configVersion >= MinDataContractVersion)
+            if (kind == ConfigurationFormatKind.DataContract)
             {
                 basenode = DeserializeFromString(data);
             }
@@ -93,12 +103,11 @@ namespace SW2URDF.URDFExport
         public static void SaveConfigTreeXML(SldWorks swApp, ModelDoc2 model, LinkNode BaseNode, bool warnUser)
         {
             string oldData = GetConfigTreeData(model, out double version);
-            if (oldData.Length > 0 && version < SerializationVersion)
+            if (oldData.Length > 0 && ConfigurationFormat.NeedsUpgrade(version))
             {
                 MessageBox.Show("You have a URDF configuration with an outdated save format. It will automatically be " +
-                    "upgraded to the latest version and saved to the configuration named \"" +
-                    UrdfConfigurationSwAttributeName + "\". " +
-                    "Old configurations can be deleted at your convenience.");
+                    "upgraded to the latest version and saved for the active SolidWorks configuration. " +
+                    "The old data is left in place and can be deleted at your convenience.");
                 warnUser = false;
             }
 
@@ -108,7 +117,7 @@ namespace SW2URDF.URDFExport
                 MessageBox.Show("Serializing this link failed. Please email your maintainer with your SW assembly.");
                 return;
             }
-            if (oldData != newData)
+            if (oldData != newData || !HasConfigurationAttribute(model))
             {
                 if (!warnUser ||
                     (warnUser &&
@@ -259,6 +268,22 @@ namespace SW2URDF.URDFExport
             string data = "";
             version = 0.0;
 
+            // Prefer the attribute stored for the active SolidWorks configuration
+            Feature configFeature = FindConfigurationAttributeFeature(model, GetActiveConfigurationName(model));
+            if (configFeature != null)
+            {
+                SolidWorks.Interop.sldworks.Attribute configAtt =
+                    (SolidWorks.Interop.sldworks.Attribute)configFeature.GetSpecificFeature2();
+                string configData = configAtt.GetParameter("data").GetStringValue();
+                if (!string.IsNullOrEmpty(configData))
+                {
+                    logger.Info("URDF Configuration found for the active SolidWorks configuration\n" + configData);
+                    version = configAtt.GetParameter("exporterVersion").GetDoubleValue();
+                    return configData;
+                }
+            }
+
+            // Otherwise fall back to the shared attribute, so older models keep working unchanged.
             // Check for most recent serialization version
             SolidWorks.Interop.sldworks.Attribute swAtt =
                 FindSWSaveAttribute(model, UrdfConfigurationSwAttributeName);
@@ -326,6 +351,176 @@ namespace SW2URDF.URDFExport
         }
 
         /// <summary>
+        /// Detection only (issue #11): logs per-configuration attributes that match no
+        /// configuration. Nothing is changed and loading is never blocked.
+        /// </summary>
+        private static void LogOrphanConfigurationAttributes(ModelDoc2 model)
+        {
+            try
+            {
+                List<string> attributeNames = new List<string>();
+                foreach (Feature feature in GetConfigurationAttributeFeatures(model))
+                {
+                    SolidWorks.Interop.sldworks.Attribute att =
+                        (SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2();
+                    // Instances of the shared attribute definitions also carry data/exporterVersion
+                    if (att.GetName() != null && !IsSharedAttributeName(att.GetName()))
+                    {
+                        attributeNames.Add(att.GetName());
+                    }
+                }
+                string[] configNames = model.GetConfigurationNames() as string[];
+                List<string> orphans = OrphanAttributes.FindOrphans(attributeNames, configNames);
+                string message = OrphanAttributes.BuildLogMessage(
+                    orphans, OrphanAttributes.FindConfigurationsWithoutAttribute(attributeNames, configNames));
+                if (message != null)
+                {
+                    logger.Warn(message);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Checking for orphan URDF configuration attributes failed", e);
+            }
+        }
+
+        private static bool IsSharedAttributeName(string name)
+        {
+            return name == ConfigurationFormat.SharedAttributeName ||
+                ConfigurationFormat.PreviousSharedAttributeNames.Contains(name);
+        }
+
+        private static string GetActiveConfigurationName(ModelDoc2 model)
+        {
+            try
+            {
+                Configuration configuration = model.ConfigurationManager?.ActiveConfiguration;
+                string name = configuration?.Name;
+                return string.IsNullOrEmpty(name) ? null : name;
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not read the active configuration name", e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Walks the whole feature chain (which also reaches features inside tree folders) and
+        /// returns the per-configuration attribute features: Attribute features that have both a
+        /// "data" and an "exporterVersion" parameter.
+        /// </summary>
+        private static List<Feature> GetConfigurationAttributeFeatures(ModelDoc2 model)
+        {
+            List<Feature> result = new List<Feature>();
+            Feature feature = model.FirstFeature() as Feature;
+            while (feature != null)
+            {
+                if (feature.GetTypeName2() == "Attribute")
+                {
+                    SolidWorks.Interop.sldworks.Attribute att =
+                        feature.GetSpecificFeature2() as SolidWorks.Interop.sldworks.Attribute;
+                    if (att != null && att.GetParameter("data") != null &&
+                        att.GetParameter("exporterVersion") != null)
+                    {
+                        result.Add(feature);
+                    }
+                }
+                feature = feature.GetNextFeature() as Feature;
+            }
+            return result;
+        }
+
+        private static Feature FindConfigurationAttributeFeature(ModelDoc2 model, string configurationName)
+        {
+            if (string.IsNullOrEmpty(configurationName))
+            {
+                return null;
+            }
+            foreach (Feature feature in GetConfigurationAttributeFeatures(model))
+            {
+                SolidWorks.Interop.sldworks.Attribute att =
+                    (SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2();
+                if (att.GetName() == configurationName)
+                {
+                    return feature;
+                }
+            }
+            return null;
+        }
+
+        private static bool HasConfigurationAttribute(ModelDoc2 model)
+        {
+            string name = GetActiveConfigurationName(model);
+            return name != null && FindConfigurationAttributeFeature(model, name) != null;
+        }
+
+        /// <summary>
+        /// Appearance only: put all per-configuration attributes in one feature tree folder.
+        /// SolidWorks cannot move a feature into an existing folder, so the old folder is deleted
+        /// (deleting a folder keeps its contents) and recreated around all attributes. Failures are
+        /// logged and never interrupt saving.
+        /// </summary>
+        private static void TryGroupConfigurationAttributes(ModelDoc2 model)
+        {
+            try
+            {
+                string[] configNames = (string[])model.GetConfigurationNames();
+                List<Feature> attributes = new List<Feature>();
+                foreach (Feature feature in GetConfigurationAttributeFeatures(model))
+                {
+                    SolidWorks.Interop.sldworks.Attribute att =
+                        (SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2();
+                    if (Array.IndexOf(configNames, att.GetName()) >= 0)
+                    {
+                        attributes.Add(feature);
+                    }
+                }
+                if (attributes.Count == 0)
+                {
+                    return;
+                }
+
+                model.ClearSelection2(true);
+                Feature folder = model.FirstFeature() as Feature;
+                while (folder != null)
+                {
+                    if (folder.GetTypeName2() == "FtrFolder" && folder.Name == ConfigurationAttributeFolderName)
+                    {
+                        folder.Select2(false, 0);
+                        // 0 = delete only the folder, its contents are kept
+                        model.Extension.DeleteSelection2(0);
+                        break;
+                    }
+                    folder = folder.GetNextFeature() as Feature;
+                }
+
+                model.ClearSelection2(true);
+                bool append = false;
+                foreach (Feature feature in attributes)
+                {
+                    feature.Select2(append, 0);
+                    append = true;
+                }
+                Feature newFolder = model.FeatureManager.InsertFeatureTreeFolder2(
+                    (int)swFeatureTreeFolderType_e.swFeatureTreeFolder_Containing) as Feature;
+                if (newFolder != null)
+                {
+                    newFolder.Name = ConfigurationAttributeFolderName;
+                }
+                else
+                {
+                    logger.Warn("Could not create the URDF configuration feature tree folder");
+                }
+                model.ClearSelection2(true);
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Grouping the URDF configuration attributes into a folder failed", e);
+            }
+        }
+
+        /// <summary>
         /// Builds a SW Attribute for saving our serialized data
         /// </summary>
         /// <param name="swApp">SolidWorks Application to build Feature Definition</param>
@@ -374,9 +569,39 @@ namespace SW2URDF.URDFExport
         private static void SaveDataToModelDoc(SldWorks swApp, ModelDoc2 model,
             string data)
         {
+            string configurationName = GetActiveConfigurationName(model);
             int ConfigurationOptions = (int)swInConfigurationOpts_e.swAllConfiguration;
-            SolidWorks.Interop.sldworks.Attribute saveExporterAttribute =
-                CreateSWSaveAttribute(swApp, model, UrdfConfigurationSwAttributeName);
+            bool created = false;
+            SolidWorks.Interop.sldworks.Attribute saveExporterAttribute;
+            if (configurationName == null)
+            {
+                // No usable active configuration: keep the shared attribute behavior
+                saveExporterAttribute =
+                    CreateSWSaveAttribute(swApp, model, UrdfConfigurationSwAttributeName);
+            }
+            else
+            {
+                ConfigurationOptions = (int)swInConfigurationOpts_e.swThisConfiguration;
+                Feature existing = FindConfigurationAttributeFeature(model, configurationName);
+                if (existing != null)
+                {
+                    saveExporterAttribute =
+                        (SolidWorks.Interop.sldworks.Attribute)existing.GetSpecificFeature2();
+                }
+                else
+                {
+                    saveExporterAttribute = CreateConfigurationAttribute(swApp, model, configurationName);
+                    created = true;
+                }
+            }
+
+            if (saveExporterAttribute == null)
+            {
+                logger.Error("SolidWorks did not create the URDF configuration attribute" +
+                    (configurationName == null ? "" : " for configuration \"" + configurationName + "\""));
+                MessageBox.Show("The URDF configuration could not be saved to this model.");
+                return;
+            }
 
             Parameter param = saveExporterAttribute.GetParameter("data");
             param.SetStringValue2(data, ConfigurationOptions, "");
@@ -386,6 +611,31 @@ namespace SW2URDF.URDFExport
             param.SetStringValue2(DateTime.Now.ToString(), ConfigurationOptions, "");
             param = saveExporterAttribute.GetParameter("exporterVersion");
             param.SetDoubleValue2(SerializationVersion, ConfigurationOptions, "");
+
+            if (created)
+            {
+                TryGroupConfigurationAttributes(model);
+            }
+        }
+
+        private static SolidWorks.Interop.sldworks.Attribute
+            CreateConfigurationAttribute(SldWorks swApp, ModelDoc2 model, string configurationName)
+        {
+            int Options = 0;
+            AttributeDef attributeDef = swApp.DefineAttribute(ConfigurationAttributeDefinitionName);
+            attributeDef.AddParameter(
+                "data", (int)swParamType_e.swParamTypeString, 0, Options);
+            attributeDef.AddParameter(
+                "name", (int)swParamType_e.swParamTypeString, 0, Options);
+            attributeDef.AddParameter(
+                "date", (int)swParamType_e.swParamTypeString, 0, Options);
+            attributeDef.AddParameter(
+                "exporterVersion", (int)swParamType_e.swParamTypeDouble, SerializationVersion, Options);
+            attributeDef.Register();
+
+            return attributeDef.CreateInstance5(
+                model, null, configurationName, Options,
+                (int)swInConfigurationOpts_e.swThisConfiguration);
         }
 
         #endregion Private Methods
