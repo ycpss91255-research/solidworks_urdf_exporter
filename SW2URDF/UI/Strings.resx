@@ -126,14 +126,26 @@
   <data xml:space="preserve" name="mimic other joint">
     <value>Mimic Other Joint</value>
   </data>
-  <data xml:space="preserve" name="moment of inertia (kg * m^-2)">
-    <value>Moment of Inertia (Kg * m^-2)</value>
+  <data xml:space="preserve" name="moment of inertia (kg * m^2)">
+    <value>Moment of Inertia (kg * m^2)</value>
   </data>
   <data xml:space="preserve" name="multiplier">
     <value>Multiplier</value>
   </data>
   <data xml:space="preserve" name="next">
     <value>Next</value>
+  </data>
+  <data xml:space="preserve" name="obj + mtl">
+    <value>OBJ + MTL</value>
+  </data>
+  <data xml:space="preserve" name="obj + mtl (native colors)">
+    <value>OBJ + MTL (native colors)</value>
+  </data>
+  <data xml:space="preserve" name="obj color and texture are defined by the mtl file.">
+    <value>OBJ color and texture are defined by the MTL file.</value>
+  </data>
+  <data xml:space="preserve" name="obj mesh density is determined by solidworks.">
+    <value>OBJ mesh density is determined by SolidWorks.</value>
   </data>
   <data xml:space="preserve" name="offset (rad)">
     <value>Offset (rad)</value>
@@ -408,5 +420,44 @@
   <data xml:space="preserve" name="creating urdf package &quot;{0}&quot; at:&#10;{1}">
     <value>Creating URDF Package "{0}" at:
 {1}</value>
+  </data>
+  <data xml:space="preserve" name="the following links are missing solidworks components in the active configuration &quot;{0}&quot; (for example because the configuration suppresses a part):">
+    <value>The following links are missing SolidWorks components in the active configuration &quot;{0}&quot; (for example because the configuration suppresses a part):</value>
+  </data>
+  <data xml:space="preserve" name="the following links are missing solidworks components (for example because the configuration suppresses a part):">
+    <value>The following links are missing SolidWorks components (for example because the configuration suppresses a part):</value>
+  </data>
+  <data xml:space="preserve" name="the exported robot will be incomplete (missing geometry, mass and inertia). export anyway?">
+    <value>The exported robot will be incomplete (missing geometry, mass and inertia). Export anyway?</value>
+  </data>
+  <data xml:space="preserve" name="please inspect these links before exporting, or switch to the configuration this urdf configuration was saved from.">
+    <value>Please inspect these links before exporting, or switch to the configuration this URDF configuration was saved from.</value>
+  </data>
+  <data xml:space="preserve" name="components are missing">
+    <value>Components are missing</value>
+  </data>
+  <data xml:space="preserve" name="the configuration saved in this model is newer than what this exporter supports ({0} &gt; {1}). please update your exporter version">
+    <value>The configuration saved in this model is newer than what this exporter supports ({0} &gt; {1}). Please update your exporter version</value>
+  </data>
+  <data xml:space="preserve" name="you have a urdf configuration with an outdated save format. it will automatically be upgraded to the latest version and saved for the active solidworks configuration. the old data is left in place and can be deleted at your convenience.">
+    <value>You have a URDF configuration with an outdated save format. It will automatically be upgraded to the latest version and saved for the active SolidWorks configuration. The old data is left in place and can be deleted at your convenience.</value>
+  </data>
+  <data xml:space="preserve" name="serializing this link failed. please email your maintainer with your sw assembly.">
+    <value>Serializing this link failed. Please email your maintainer with your SW assembly.</value>
+  </data>
+  <data xml:space="preserve" name="the configuration has changed, would you like to save?">
+    <value>The configuration has changed, would you like to save?</value>
+  </data>
+  <data xml:space="preserve" name="save export configuration">
+    <value>Save Export Configuration</value>
+  </data>
+  <data xml:space="preserve" name="the urdf configuration could not be saved to this model.">
+    <value>The URDF configuration could not be saved to this model.</value>
+  </data>
+  <data xml:space="preserve" name="converting mesh to obj">
+    <value>Converting mesh to OBJ</value>
+  </data>
+  <data xml:space="preserve" name="converting 3dxml to obj + mtl...">
+    <value>Converting 3DXML to OBJ + MTL...</value>
   </data>
 </root>

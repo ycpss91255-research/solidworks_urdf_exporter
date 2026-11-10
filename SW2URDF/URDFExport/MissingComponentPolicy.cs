@@ -1,3 +1,4 @@
+using SW2URDF.UI;
 using System.Collections.Generic;
 using System.Text;
 
@@ -34,32 +35,37 @@ namespace SW2URDF.URDFExport
         /// <param name="configurationName">Active SolidWorks configuration, may be null</param>
         /// <param name="exporting">True when asking to continue an export, false when
         /// just reporting the problem while loading</param>
+        /// <param name="ui">Display language; English when null</param>
         public static string BuildMessage(
-            IList<string> problemLinks, string configurationName, bool exporting)
+            IList<string> problemLinks, string configurationName, bool exporting, UiText ui = null)
         {
             if (!MustConfirmExport(problemLinks))
             {
                 return null;
             }
 
+            ui = ui ?? new UiText(null);
             StringBuilder message = new StringBuilder();
-            message.Append("The following links are missing SolidWorks components");
             if (!string.IsNullOrEmpty(configurationName))
             {
-                message.Append(" in the active configuration \"" + configurationName + "\"");
+                message.Append(string.Format(
+                    ui.Get("The following links are missing SolidWorks components in the active configuration \"{0}\" (for example because the configuration suppresses a part):"),
+                    configurationName));
             }
-            message.Append(" (for example because the configuration suppresses a part):\r\n\r\n");
+            else
+            {
+                message.Append(ui.Get("The following links are missing SolidWorks components (for example because the configuration suppresses a part):"));
+            }
+            message.Append("\r\n\r\n");
             message.Append(string.Join(", ", problemLinks));
             message.Append("\r\n\r\n");
             if (exporting)
             {
-                message.Append("The exported robot will be incomplete (missing geometry, mass and " +
-                    "inertia). Export anyway?");
+                message.Append(ui.Get("The exported robot will be incomplete (missing geometry, mass and inertia). Export anyway?"));
             }
             else
             {
-                message.Append("Please inspect these links before exporting, or switch to the " +
-                    "configuration this URDF configuration was saved from.");
+                message.Append(ui.Get("Please inspect these links before exporting, or switch to the configuration this URDF configuration was saved from."));
             }
             return message.ToString();
         }

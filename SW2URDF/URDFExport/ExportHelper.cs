@@ -353,7 +353,7 @@ namespace SW2URDF.URDFExport
 
         private void ConvertObj(string source, string target, string linkName)
         {
-            ObjConversionRunner.Run(source, target, linkName, CancellationToken);
+            ObjConversionRunner.Run(source, target, linkName, CancellationToken, UiText.FromSolidWorks(iSwApp));
         }
 
         private void SaveObj(Link link, string target)
