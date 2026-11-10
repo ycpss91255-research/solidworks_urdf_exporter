@@ -145,6 +145,32 @@ namespace SW2URDF.UI
             FillJointTree();
         }
 
+        private void RadioButtonObjCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMeshQualityControls();
+        }
+
+        // The OBJ path is exported through 3DXML, so the STL Fine/Coarse
+        // preference has no effect on it.
+        private void UpdateMeshQualityControls()
+        {
+            bool stl = !radioButtonObj.Checked;
+            radioButtonFine.Enabled = stl;
+            radioButtonCourse.Enabled = stl;
+            panelObjQualityNote.Visible = !stl;
+
+            // OBJ writes no URDF <material>; color and texture come from the MTL file.
+            Control[] colorControls = {
+                label28, label29, label30, label31, label32, label33, label34,
+                comboBoxMaterials, domainUpDownRed, domainUpDownGreen, domainUpDownBlue,
+                domainUpDownAlpha, textBoxTexture, buttonTextureBrowse };
+            foreach (Control control in colorControls)
+            {
+                control.Enabled = stl;
+            }
+            panelObjColorNote.Visible = !stl;
+        }
+
         private void ButtonJointNextClick(object sender, EventArgs e)
         {
             if (!(previouslySelectedNode == null || previouslySelectedNode.Link.Joint == null))

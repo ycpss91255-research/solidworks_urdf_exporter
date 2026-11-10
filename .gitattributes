@@ -1,0 +1,11 @@
+# Let Git detect text files and keep line endings stable. Files already stored
+# with CRLF in the index are left as they are (no mass renormalization).
+* text=auto
+
+# Source files keep their UTF-8 BOM; do not strip it when editing.
+*.cs text diff=csharp
+*.png binary
+*.stl binary
+*.3dxml binary
+*.SLDPRT binary
+*.SLDASM binary
