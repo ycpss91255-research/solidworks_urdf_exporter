@@ -53,6 +53,8 @@ namespace SW2URDF.Test
             return Path.GetDirectoryName(GetProjectDirectory());
         }
 
+        public const string ExamplesDirectoryEnvironmentVariable = "SW2URDF_EXAMPLES_DIR";
+
         public static string GetExamplesDirectory()
         {
             return Path.Combine(GetSolutionDirectory(), "examples");
