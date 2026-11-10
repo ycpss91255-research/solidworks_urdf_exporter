@@ -40,7 +40,7 @@ namespace SW2URDF.URDFExport
         public void SaveConfigTree(ModelDoc2 model, LinkNode BaseNode, bool warnUser)
         {
             CommonSwOperations.RetrieveSWComponentPIDs(model, BaseNode);
-            ConfigurationSerialization.SaveConfigTreeXML(swApp, model, BaseNode, warnUser);
+            ConfigurationSerialization.SaveConfigTreeXML(swApp, model, BaseNode, warnUser, ui);
         }
 
         //As nodes are created and destroyed, this menu gets called a lot. It basically just
@@ -491,7 +491,7 @@ namespace SW2URDF.URDFExport
         /// <returns>bool representing success of load. If false, PMPage should not open</returns>
         public bool LoadConfigTree()
         {
-            LinkNode baseNode = ConfigurationSerialization.LoadBaseNodeFromModel(ActiveSWModel, out bool abortProcess);
+            LinkNode baseNode = ConfigurationSerialization.LoadBaseNodeFromModel(ActiveSWModel, out bool abortProcess, ui);
 
             if (abortProcess)
             {
@@ -534,12 +534,12 @@ namespace SW2URDF.URDFExport
         private bool ConfirmExportWithMissingComponents()
         {
             string msg = MissingComponentPolicy.BuildMessage(
-                linksMissingComponents, GetActiveConfigurationName(), true);
+                linksMissingComponents, GetActiveConfigurationName(), true, ui);
             if (msg == null)
             {
                 return true;
             }
-            bool proceed = MessageBox.Show(msg, "Components are missing",
+            bool proceed = MessageBox.Show(msg, ui.Get("Components are missing"),
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
                 MessageBoxDefaultButton.Button2) == DialogResult.Yes;
             logger.Warn("Export with missing components " + (proceed ? "confirmed" : "cancelled"));
@@ -560,7 +560,7 @@ namespace SW2URDF.URDFExport
 
                 linksMissingComponents = problemLinks;
                 string msg = MissingComponentPolicy.BuildMessage(
-                    problemLinks, GetActiveConfigurationName(), false);
+                    problemLinks, GetActiveConfigurationName(), false, ui);
                 if (msg != null)
                 {
                     logger.Warn("Links missing components in the active configuration: " +

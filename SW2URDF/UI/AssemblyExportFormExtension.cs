@@ -443,7 +443,7 @@ namespace SW2URDF.UI
         public void SaveConfigTree(ModelDoc2 model, LinkNode BaseNode, bool warnUser)
         {
             CommonSwOperations.RetrieveSWComponentPIDs(model, BaseNode);
-            ConfigurationSerialization.SaveConfigTreeXML(swApp, model, BaseNode, warnUser);
+            ConfigurationSerialization.SaveConfigTreeXML(swApp, model, BaseNode, warnUser, ui);
         }
 
         public void ChangeAllNodeFont(LinkNode node, Font font)
