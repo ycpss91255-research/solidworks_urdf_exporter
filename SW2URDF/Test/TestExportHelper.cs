@@ -62,6 +62,10 @@ namespace SW2URDF.Test
             helper.PackageName = modelName + "_" + format;
             LinkNode baseNode = ConfigurationSerialization.LoadBaseNodeFromModel(doc, out bool error);
             Assert.False(error);
+            // The saved tree only holds component ids; resolve them to the open components for the export
+            List<string> missing = new List<string>();
+            CommonSwOperations.LoadSWComponents(doc, baseNode, missing);
+            Assert.Empty(missing);
             helper.CreateRobotFromTreeView(baseNode);
             helper.ExportRobot(true, format);
             linkCount = CommonSwOperations.GetCount(helper.URDFRobot.BaseLink);
@@ -92,9 +96,7 @@ namespace SW2URDF.Test
             try
             {
                 string objPackage = ExportRobotTo(modelName, MeshExportFormat.OBJ, temp, out int objLinks);
-                string stlPackage = ExportRobotTo(modelName, MeshExportFormat.STL, temp, out int stlLinks);
                 Assert.Equal(expNumLinks, objLinks);
-                Assert.Equal(stlLinks, objLinks);
 
                 string[] objFiles = Directory.GetFiles(Path.Combine(objPackage, "meshes"), "*.obj");
                 Assert.Equal(expNumLinks, objFiles.Length);
@@ -104,11 +106,6 @@ namespace SW2URDF.Test
                     string mtl = Path.ChangeExtension(obj, ".mtl");
                     Assert.True(File.Exists(mtl), "Missing MTL for " + linkName);
                     Assert.Single(ObjLines(obj, "mtllib"));
-
-                    // Same triangles as the STL export of the same link
-                    string stl = Path.Combine(stlPackage, "meshes", linkName + ".STL");
-                    Assert.True(File.Exists(stl), "Missing STL for " + linkName);
-                    Assert.Equal(CountStlTriangles(stl), ObjLines(obj, "f").Length);
 
                     // Materials are used, defined, named after the link and have the explicit fields
                     string prefix = ObjConverter.SanitizeName(linkName, "mesh") + "_";
@@ -138,6 +135,34 @@ namespace SW2URDF.Test
             }
         }
 
+
+        // Open question for the maintainers: the STL and the 3DXML (OBJ source) paths tessellate
+        // differently, so this may legitimately differ. Kept separate so the other OBJ checks stay meaningful.
+        [Theory]
+        [InlineData("3_DOF_ARM")]
+        public void TestExportRobotObjTriangleCountMatchesStl(string modelName)
+        {
+            string temp = CreateRandomTempDirectory();
+            try
+            {
+                string objPackage = ExportRobotTo(modelName, MeshExportFormat.OBJ, temp, out int _);
+                string stlPackage = ExportRobotTo(modelName, MeshExportFormat.STL, temp, out int _);
+                string[] objFiles = Directory.GetFiles(Path.Combine(objPackage, "meshes"), "*.obj");
+                Assert.NotEmpty(objFiles);
+                foreach (string obj in objFiles)
+                {
+                    string linkName = Path.GetFileNameWithoutExtension(obj);
+                    string stl = Path.Combine(stlPackage, "meshes", linkName + ".STL");
+                    Assert.True(File.Exists(stl), "Missing STL for " + linkName);
+                    Assert.True(CountStlTriangles(stl) > 0, "Empty STL for " + linkName);
+                    Assert.Equal(CountStlTriangles(stl), ObjLines(obj, "f").Length);
+                }
+            }
+            finally
+            {
+                try { Directory.Delete(temp, true); } catch (IOException) { }
+            }
+        }
         [Theory]
         [InlineData("3_DOF_ARM")]
         public void TestExportRobotObjIsReproducible(string modelName)
