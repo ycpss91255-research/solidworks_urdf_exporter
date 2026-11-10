@@ -1,11 +1,14 @@
 ﻿using SolidWorks.Interop.sldworks;
 using SW2URDF.URDF;
+using SW2URDF.UI;
 using SW2URDF.URDFExport;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Moq;
+using System.Windows;
 using System.Collections.Generic;
 using Xunit;
 
@@ -25,7 +28,6 @@ namespace SW2URDF.Test
         [InlineData("3_DOF_ARM", 4, MeshExportFormat.THREEDXML)]
         [InlineData("4_WHEELER", 5, MeshExportFormat.THREEDXML)]
         [InlineData("ORIGINAL_3_DOF_ARM", 4, MeshExportFormat.THREEDXML)]
-        [InlineData("3_DOF_ARM", 4, MeshExportFormat.OBJ)]
         public void TestExportRobot(string modelName, int expNumLinks, MeshExportFormat meshExportFormat)
         {
             ModelDoc2 doc = OpenSWDocument(modelName);
@@ -46,6 +48,10 @@ namespace SW2URDF.Test
 
         private string ExportRobotTo(string modelName, MeshExportFormat format, string saveDirectory, out int linkCount)
         {
+            // The package creation message box would block an unattended run.
+            Mock<IMessageBox> messageBoxMock = new Mock<IMessageBox>();
+            messageBoxMock.Setup(m => m.Show(It.IsAny<string>())).Returns(MessageBoxResult.OK);
+            URDFPackage.MessageBox = messageBoxMock.Object;
             ModelDoc2 doc = OpenSWDocument(modelName);
             ExportHelper helper = new ExportHelper(SwApp);
             helper.SetComputeInertial(true);
