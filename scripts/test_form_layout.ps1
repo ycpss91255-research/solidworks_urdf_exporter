@@ -78,10 +78,13 @@ function Test-Container([System.Windows.Forms.Control]$parent, [string]$path, [b
     }
     for ($i = 0; $i -lt $kids.Count; $i++) {
         for ($j = $i + 1; $j -lt $kids.Count; $j++) {
+            # A label paints an opaque background over its whole bounds, so its empty remainder
+            # may touch a neighbour but must not cover the neighbour's text or box.
             $a = Get-Box $kids[$i]; $b = Get-Box $kids[$j]
-            $x = [System.Drawing.Rectangle]::Intersect($a, $b)
-            if ($x.Width -gt 1 -and $x.Height -gt 1) {
-                [void]$problems.Add("overlap ${path}: $($kids[$i].Name) $a x $($kids[$j].Name) $b")
+            $x1 = [System.Drawing.Rectangle]::Intersect($a, $kids[$j].Bounds)
+            $x2 = [System.Drawing.Rectangle]::Intersect($kids[$i].Bounds, $b)
+            if (($x1.Width -gt 1 -and $x1.Height -gt 1) -or ($x2.Width -gt 1 -and $x2.Height -gt 1)) {
+                [void]$problems.Add("overlap ${path}: $($kids[$i].Name) $($kids[$i].Bounds) x $($kids[$j].Name) $($kids[$j].Bounds)")
             }
         }
     }
