@@ -1,11 +1,63 @@
-# Let Git detect text files and keep line endings stable. Files already stored
-# with CRLF in the index are left as they are (no mass renormalization).
+# Line endings: text files are stored with LF in the repository.
+# Windows project files are checked out with CRLF so they match what Visual
+# Studio and SolidWorks tooling write; everything else is LF everywhere.
+# After changing these rules run: git add --renormalize .
 * text=auto
 
-# Source files keep their UTF-8 BOM; do not strip it when editing.
-*.cs text diff=csharp
-*.png binary
-*.stl binary
-*.3dxml binary
-*.SLDPRT binary
-*.SLDASM binary
+# Windows project / source files: CRLF in the working tree.
+*.sln          text eol=crlf
+*.csproj       text eol=crlf
+*.user         text eol=crlf
+*.ruleset      text eol=crlf
+*.datasource   text eol=crlf
+*.cs           text eol=crlf diff=csharp
+*.resx         text eol=crlf
+*.config       text eol=crlf
+*.xaml         text eol=crlf
+*.ps1          text eol=crlf
+*.cmd          text eol=crlf
+*.bat          text eol=crlf
+*.iss          text eol=crlf
+
+# Unix-style text: LF everywhere.
+*.sh           text eol=lf
+*.py           text eol=lf
+*.mjs          text eol=lf
+*.json         text eol=lf
+*.md           text eol=lf
+.gitattributes text eol=lf
+.gitignore     text eol=lf
+LICENSE        text eol=lf
+
+# ROS / example data: LF everywhere (OBJ and MTL were already LF).
+*.obj          text eol=lf
+*.mtl          text eol=lf
+*.urdf         text eol=lf
+*.csv          text eol=lf
+*.yaml         text eol=lf
+*.launch       text eol=lf
+*.xml          text eol=lf
+CMakeLists.txt text eol=lf
+*.txt          text eol=lf
+
+# Binary files: never convert.
+*.png          binary
+*.bmp          binary
+*.jpg          binary
+*.jpeg         binary
+*.ico          binary
+*.zip          binary
+*.dll          binary
+*.exe          binary
+*.pdb          binary
+*.stl          binary
+*.STL          binary
+*.3dxml        binary
+*.prtprp       binary
+*.asmprp       binary
+*.SLDPRT       binary
+*.SLDASM       binary
+*.SLDDRW       binary
+*.sldprt       binary
+*.sldasm       binary
+*.slddrw       binary
