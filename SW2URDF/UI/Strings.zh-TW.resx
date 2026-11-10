@@ -111,9 +111,6 @@
   <data xml:space="preserve" name="limit">
     <value>限制</value>
   </data>
-  <data xml:space="preserve" name="link frame">
-    <value>連桿座標系</value>
-  </data>
   <data xml:space="preserve" name="mass (kg)">
     <value>質量 (kg)</value>
   </data>
@@ -129,7 +126,7 @@
   <data xml:space="preserve" name="mimic other joint">
     <value>跟隨其他關節</value>
   </data>
-  <data xml:space="preserve" name="moment of inertia (kg * m^2)">
+  <data xml:space="preserve" name="moment of inertia (kg * m^-2)">
     <value>慣性矩 (kg·m²)</value>
   </data>
   <data xml:space="preserve" name="multiplier">
@@ -150,12 +147,6 @@
   <data xml:space="preserve" name="origin (m)">
     <value>原點 (m)</value>
   </data>
-  <data xml:space="preserve" name="package name">
-    <value>套件名稱</value>
-  </data>
-  <data xml:space="preserve" name="package name must be nonempty and valid as a filename.">
-    <value>套件名稱不得為空，且必須是有效的檔案名稱。</value>
-  </data>
   <data xml:space="preserve" name="parent link:">
     <value>父連桿：</value>
   </data>
@@ -167,9 +158,6 @@
   </data>
   <data xml:space="preserve" name="previous">
     <value>上一步</value>
-  </data>
-  <data xml:space="preserve" name="ros version">
-    <value>ROS 版本</value>
   </data>
   <data xml:space="preserve" name="red">
     <value>紅</value>
@@ -201,29 +189,14 @@
   <data xml:space="preserve" name="texture (replaces color)">
     <value>貼圖（取代顏色）</value>
   </data>
-  <data xml:space="preserve" name="urdf / robot name">
-    <value>URDF／機器人名稱</value>
-  </data>
   <data xml:space="preserve" name="urdf errors">
     <value>URDF 錯誤</value>
   </data>
   <data xml:space="preserve" name="urdf joint errors">
     <value>URDF 關節錯誤</value>
   </data>
-  <data xml:space="preserve" name="urdf name">
-    <value>URDF 名稱</value>
-  </data>
-  <data xml:space="preserve" name="urdf names">
-    <value>URDF 名稱</value>
-  </data>
   <data xml:space="preserve" name="urdf warnings">
     <value>URDF 警告</value>
-  </data>
-  <data xml:space="preserve" name="urdf name must be nonempty and valid as a filename.">
-    <value>URDF 名稱不得為空，且必須是有效的檔案名稱。</value>
-  </data>
-  <data xml:space="preserve" name="urdf robot name must be nonempty and valid as a filename.">
-    <value>URDF 機器人名稱不得為空，且必須是有效的檔案名稱。</value>
   </data>
   <data xml:space="preserve" name="use this page to make any changes to the links' properties">
     <value>在此頁修改連桿屬性</value>
@@ -275,9 +248,6 @@
   </data>
   <data xml:space="preserve" name="velocity (m/s)">
     <value>速度 (m/s)</value>
-  </data>
-  <data xml:space="preserve" name="urdf robot name">
-    <value>URDF／機器人名稱</value>
   </data>
   <data xml:space="preserve" name="urdf exporter">
     <value>URDF 匯出工具</value>
@@ -375,20 +345,8 @@
   <data xml:space="preserve" name="external values have been loaded. check this box to recompute the joint limits">
     <value>已載入外部數值。勾選以重新計算關節限制。</value>
   </data>
-  <data xml:space="preserve" name="search nested components">
-    <value>搜尋巢狀元件</value>
-  </data>
-  <data xml:space="preserve" name="filter reference geometry by name:">
-    <value>依名稱篩選參考幾何：</value>
-  </data>
   <data xml:space="preserve" name="link tree">
     <value>連桿樹</value>
-  </data>
-  <data xml:space="preserve" name="list coordinate systems and axes found inside sub-assemblies and parts, not just the top level assembly and its immediate components.">
-    <value>列出子組合件與零件內的座標系和軸，包含巢狀元件。</value>
-  </data>
-  <data xml:space="preserve" name="optional: only list coordinate systems / axes whose name contains this text (case-insensitive). leave blank to list everything.">
-    <value>選填：只列出名稱包含此文字的座標系或軸（不區分大小寫）。留白表示全部。</value>
   </data>
   <data xml:space="preserve" name="customize the joint properties. if you want to adjust the coordinate systems and axes in the model, click cancel and restart the export. the tool will recognize your changes on the next run.">
     <value>若要修改座標系或軸，請先取消匯出。修改後重新匯出即可套用變更。</value>
@@ -399,104 +357,26 @@
   <data xml:space="preserve" name="lower (m)">
     <value>下限 (m)</value>
   </data>
-  <data xml:space="preserve" name="lower (n)">
-    <value>下限 (N)</value>
-  </data>
-  <data xml:space="preserve" name="lower (n-m)">
-    <value>下限 (N-m)</value>
-  </data>
-  <data xml:space="preserve" name="lower (rad/s)">
-    <value>下限 (rad/s)</value>
-  </data>
-  <data xml:space="preserve" name="lower (m/s)">
-    <value>下限 (m/s)</value>
-  </data>
-  <data xml:space="preserve" name="lower (n-m-s/rad)">
-    <value>下限 (N-m-s/rad)</value>
-  </data>
-  <data xml:space="preserve" name="lower (n-s/m)">
-    <value>下限 (N-s/m)</value>
-  </data>
   <data xml:space="preserve" name="upper">
     <value>上限</value>
   </data>
   <data xml:space="preserve" name="upper (m)">
     <value>上限 (m)</value>
   </data>
-  <data xml:space="preserve" name="upper (n)">
-    <value>上限 (N)</value>
-  </data>
-  <data xml:space="preserve" name="upper (n-m)">
-    <value>上限 (N-m)</value>
-  </data>
-  <data xml:space="preserve" name="upper (rad/s)">
-    <value>上限 (rad/s)</value>
-  </data>
-  <data xml:space="preserve" name="upper (m/s)">
-    <value>上限 (m/s)</value>
-  </data>
-  <data xml:space="preserve" name="upper (n-m-s/rad)">
-    <value>上限 (N-m-s/rad)</value>
-  </data>
-  <data xml:space="preserve" name="upper (n-s/m)">
-    <value>上限 (N-s/m)</value>
-  </data>
   <data xml:space="preserve" name="effort">
     <value>作用力</value>
-  </data>
-  <data xml:space="preserve" name="effort (m)">
-    <value>作用力 (m)</value>
-  </data>
-  <data xml:space="preserve" name="effort (rad)">
-    <value>作用力 (rad)</value>
   </data>
   <data xml:space="preserve" name="effort (n)">
     <value>作用力 (N)</value>
   </data>
-  <data xml:space="preserve" name="effort (rad/s)">
-    <value>作用力 (rad/s)</value>
-  </data>
-  <data xml:space="preserve" name="effort (m/s)">
-    <value>作用力 (m/s)</value>
-  </data>
-  <data xml:space="preserve" name="effort (n-m-s/rad)">
-    <value>作用力 (N-m-s/rad)</value>
-  </data>
-  <data xml:space="preserve" name="effort (n-s/m)">
-    <value>作用力 (N-s/m)</value>
-  </data>
   <data xml:space="preserve" name="velocity">
     <value>速度</value>
-  </data>
-  <data xml:space="preserve" name="velocity (m)">
-    <value>速度 (m)</value>
-  </data>
-  <data xml:space="preserve" name="velocity (rad)">
-    <value>速度 (rad)</value>
-  </data>
-  <data xml:space="preserve" name="velocity (n)">
-    <value>速度 (N)</value>
-  </data>
-  <data xml:space="preserve" name="velocity (n-m)">
-    <value>速度 (N-m)</value>
   </data>
   <data xml:space="preserve" name="velocity (rad/s)">
     <value>速度 (rad/s)</value>
   </data>
-  <data xml:space="preserve" name="velocity (n-m-s/rad)">
-    <value>速度 (N-m-s/rad)</value>
-  </data>
-  <data xml:space="preserve" name="velocity (n-s/m)">
-    <value>速度 (N-s/m)</value>
-  </data>
   <data xml:space="preserve" name="friction">
     <value>摩擦</value>
-  </data>
-  <data xml:space="preserve" name="friction (m)">
-    <value>摩擦 (m)</value>
-  </data>
-  <data xml:space="preserve" name="friction (rad)">
-    <value>摩擦 (rad)</value>
   </data>
   <data xml:space="preserve" name="friction (n)">
     <value>摩擦 (N)</value>
@@ -504,38 +384,8 @@
   <data xml:space="preserve" name="friction (n-m)">
     <value>摩擦 (N-m)</value>
   </data>
-  <data xml:space="preserve" name="friction (rad/s)">
-    <value>摩擦 (rad/s)</value>
-  </data>
-  <data xml:space="preserve" name="friction (m/s)">
-    <value>摩擦 (m/s)</value>
-  </data>
-  <data xml:space="preserve" name="friction (n-m-s/rad)">
-    <value>摩擦 (N-m-s/rad)</value>
-  </data>
-  <data xml:space="preserve" name="friction (n-s/m)">
-    <value>摩擦 (N-s/m)</value>
-  </data>
   <data xml:space="preserve" name="damping">
     <value>阻尼</value>
-  </data>
-  <data xml:space="preserve" name="damping (m)">
-    <value>阻尼 (m)</value>
-  </data>
-  <data xml:space="preserve" name="damping (rad)">
-    <value>阻尼 (rad)</value>
-  </data>
-  <data xml:space="preserve" name="damping (n)">
-    <value>阻尼 (N)</value>
-  </data>
-  <data xml:space="preserve" name="damping (n-m)">
-    <value>阻尼 (N-m)</value>
-  </data>
-  <data xml:space="preserve" name="damping (rad/s)">
-    <value>阻尼 (rad/s)</value>
-  </data>
-  <data xml:space="preserve" name="damping (m/s)">
-    <value>阻尼 (m/s)</value>
   </data>
   <data xml:space="preserve" name="damping (n-m-s/rad)">
     <value>阻尼 (N-m-s/rad)</value>
@@ -549,47 +399,11 @@
   <data xml:space="preserve" name="soft lower limit (m)">
     <value>軟下限 (m)</value>
   </data>
-  <data xml:space="preserve" name="soft lower limit (n)">
-    <value>軟下限 (N)</value>
-  </data>
-  <data xml:space="preserve" name="soft lower limit (n-m)">
-    <value>軟下限 (N-m)</value>
-  </data>
-  <data xml:space="preserve" name="soft lower limit (rad/s)">
-    <value>軟下限 (rad/s)</value>
-  </data>
-  <data xml:space="preserve" name="soft lower limit (m/s)">
-    <value>軟下限 (m/s)</value>
-  </data>
-  <data xml:space="preserve" name="soft lower limit (n-m-s/rad)">
-    <value>軟下限 (N-m-s/rad)</value>
-  </data>
-  <data xml:space="preserve" name="soft lower limit (n-s/m)">
-    <value>軟下限 (N-s/m)</value>
-  </data>
   <data xml:space="preserve" name="soft upper limit">
     <value>軟上限</value>
   </data>
   <data xml:space="preserve" name="soft upper limit (m)">
     <value>軟上限 (m)</value>
-  </data>
-  <data xml:space="preserve" name="soft upper limit (n)">
-    <value>軟上限 (N)</value>
-  </data>
-  <data xml:space="preserve" name="soft upper limit (n-m)">
-    <value>軟上限 (N-m)</value>
-  </data>
-  <data xml:space="preserve" name="soft upper limit (rad/s)">
-    <value>軟上限 (rad/s)</value>
-  </data>
-  <data xml:space="preserve" name="soft upper limit (m/s)">
-    <value>軟上限 (m/s)</value>
-  </data>
-  <data xml:space="preserve" name="soft upper limit (n-m-s/rad)">
-    <value>軟上限 (N-m-s/rad)</value>
-  </data>
-  <data xml:space="preserve" name="soft upper limit (n-s/m)">
-    <value>軟上限 (N-s/m)</value>
   </data>
   <data xml:space="preserve" name="creating urdf package &quot;{0}&quot; at:&#10;{1}">
     <value>建立 URDF 套件「{0}」於：
