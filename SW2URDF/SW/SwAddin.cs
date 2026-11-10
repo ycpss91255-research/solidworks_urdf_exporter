@@ -307,8 +307,8 @@ namespace SW2URDF.SW
                 logger.Info("A rebuild is required");
             }
             if (saveAndRebuild ||
-                MessageBox.Show("The SW to URDF exporter requires saving and/or rebuilding before continuing",
-                "Save and rebuild document?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                MessageBox.Show(ui.Get("The SW to URDF exporter requires saving and/or rebuilding before continuing"),
+                ui.Get("Save and rebuild document?"), MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 int options = (int)swSaveAsOptions_e.swSaveAsOptions_SaveReferenced |
                         (int)swSaveAsOptions_e.swSaveAsOptions_Silent;
@@ -329,9 +329,7 @@ namespace SW2URDF.SW
             catch (Exception e)
             {
                 logger.Error("An exception was caught when trying to setup the assembly exporter", e);
-                MessageBox.Show("There was a problem setting up the property manager: \n\"" +
-                    e.Message + "\"\nEmail your maintainer with the log file found at " +
-                    Logger.GetFileName());
+                MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem setting up the property manager:"), e.Message));
             }
         }
 
@@ -353,8 +351,8 @@ namespace SW2URDF.SW
             logger.Info("Part export called");
             ModelDoc2 modeldoc = SwApp.ActiveDoc;
             if ((modeldoc.Extension.NeedsRebuild2 == 0) ||
-                MessageBox.Show("Save and rebuild document?",
-                "The SW to URDF exporter requires saving before continuing",
+                MessageBox.Show(ui.Get("Save and rebuild document?"),
+                ui.Get("The SW to URDF exporter requires saving before continuing"),
                 MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 if (modeldoc.Extension.NeedsRebuild2 != 0)
@@ -380,8 +378,7 @@ namespace SW2URDF.SW
             catch (Exception e)
             {
                 logger.Error("Excoption caught setting up export form", e);
-                MessageBox.Show("An exception occured setting up the export form, please email " +
-                    " your maintainer with the log file found at " + Logger.GetFileName());
+                MessageBox.Show(string.Format(ui.Get("An exception occurred setting up the export form, please email your maintainer with the log file found at {0}"), Logger.GetFileName()));
             }
         }
 
