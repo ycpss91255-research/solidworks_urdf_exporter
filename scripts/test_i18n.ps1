@@ -30,7 +30,7 @@ try {
         Require ($other.Get('URDF Name') -ceq 'URDF Name') "English capitalization preserved for '$language'"
     }
     Require ($zh.Get('no such resource') -ceq 'no such resource') 'missing key falls back to the original text'
-    Require ($null -eq $zh.Get($null) -and $zh.Get('') -ceq '') 'null and empty pass through'
+    Require ($null -eq $zh.Get([NullString]::Value) -and $zh.Get('') -ceq '') 'null and empty pass through'
 
     # Apply translates captions only; editable values, tree nodes and protocol-valued
     # combo boxes keep their text even when they equal a caption.

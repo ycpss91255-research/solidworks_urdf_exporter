@@ -49,16 +49,24 @@ if ($english -and $chinese) {
             }
         }
     }
-    # Every ui.Get("...") caption in code needs a resource, and every resource must be used
-    # by a form caption or a ui.Get call (no orphans).
+    # Every caption the code looks up needs a resource, and every resource must be looked
+    # up or shown somewhere in this tree (no orphans from strings that live in other branches).
     $used = New-Object System.Collections.Generic.HashSet[string]
     foreach ($file in Get-ChildItem -Path (Join-Path $Root 'SW2URDF') -Recurse -Filter *.cs) {
         $text = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8
-        foreach ($m in [regex]::Matches($text, '\bui\.Get\("([^"\r\n]+)"\)')) {
-            [void]$used.Add($m.Groups[1].Value.ToLowerInvariant())
-            if (-not $chinese.Contains($m.Groups[1].Value.ToLowerInvariant())) { Fail "$($file.Name) uses untranslated '$($m.Groups[1].Value)'" }
+        foreach ($m in [regex]::Matches($text, '\bui\.Get\(' + $literal + '\)')) {
+            $key = $m.Groups[1].Value.Replace('\"', '"').Replace('\n', "`n").Replace('\r', "`r").Replace('\\', '\').ToLowerInvariant()
+            [void]$used.Add($key)
+            if (-not $chinese.Contains($key)) { Fail "$($file.Name) uses untranslated '$($m.Groups[1].Value)'" }
+        }
+        if ($file.Name -match '^(Assembly|Part)ExportForm\.Designer\.cs$') {
+            foreach ($m in [regex]::Matches($text, '\bText\s*=\s*(' + $literal + '(?:\s*\+\s*' + $literal + ')*)')) {
+                $caption = (([regex]::Matches($m.Groups[1].Value, $literal) | ForEach-Object { $_.Groups[1].Value }) -join '').Replace("\'", "'")
+                [void]$used.Add($caption.ToLowerInvariant())
+            }
         }
     }
+    foreach ($k in $chinese.Keys) { if (-not $used.Contains($k)) { Fail "resource '$k' is not used by any caption or ui.Get call" } }
 }
 if ($failures.Count) { $failures | ForEach-Object { Write-Output "FAIL: $_" }; exit 1 }
 Write-Output "PASS: catalogs match ($($english.Count) keys), no case-only duplicates, placeholders and form captions covered"
