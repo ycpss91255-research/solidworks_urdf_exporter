@@ -13,7 +13,7 @@ namespace SW2URDF.URDFExport
     /// </summary>
     internal static class ObjConversionRunner
     {
-        public static void Run(string source, string target, string linkName, CancellationToken externalToken)
+        public static void Run(string source, string target, string linkName, CancellationToken externalToken, SW2URDF.UI.UiText ui = null)
         {
             using (var cancel = CancellationTokenSource.CreateLinkedTokenSource(externalToken))
             {
@@ -21,7 +21,7 @@ namespace SW2URDF.URDFExport
                 ProgressDialog dialog = null;
                 if (Application.OpenForms.Count > 0)
                 {
-                    dialog = new ProgressDialog(cancel);
+                    dialog = new ProgressDialog(cancel, ui ?? new SW2URDF.UI.UiText(null));
                     progress = new Progress<double>(dialog.SetFraction);   // captures the UI context
                 }
                 Task<ObjConversionResult> task = ObjConverter.ConvertAsync(source, target, new ObjConversionOptions
@@ -52,19 +52,19 @@ namespace SW2URDF.URDFExport
             private readonly CancellationTokenSource cancel;
             private volatile bool finished;
 
-            public ProgressDialog(CancellationTokenSource cancel)
+            public ProgressDialog(CancellationTokenSource cancel, SW2URDF.UI.UiText ui)
             {
                 this.cancel = cancel;
-                Text = "Converting mesh to OBJ";
+                Text = ui.Get("Converting mesh to OBJ");
                 ClientSize = new Size(360, 96);
                 FormBorderStyle = FormBorderStyle.FixedDialog;
                 StartPosition = FormStartPosition.CenterParent;
                 ControlBox = false;
                 MinimizeBox = MaximizeBox = false;
                 ShowInTaskbar = false;
-                var button = new Button { Text = "Cancel", Anchor = AnchorStyles.Bottom | AnchorStyles.Right, Location = new Point(270, 60) };
+                var button = new Button { Text = ui.Get("Cancel"), Anchor = AnchorStyles.Bottom | AnchorStyles.Right, Location = new Point(270, 60) };
                 button.Click += (s, e) => { button.Enabled = false; cancel.Cancel(); };
-                var label = new Label { Text = "Converting 3DXML to OBJ + MTL...", Dock = DockStyle.Top, Height = 28, Padding = new Padding(8, 8, 8, 0) };
+                var label = new Label { Text = ui.Get("Converting 3DXML to OBJ + MTL..."), Dock = DockStyle.Top, Height = 28, Padding = new Padding(8, 8, 8, 0) };
                 Controls.Add(button);
                 Controls.Add(bar);
                 Controls.Add(label);
