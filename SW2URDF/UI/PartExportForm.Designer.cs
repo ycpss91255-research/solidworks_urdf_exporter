@@ -359,7 +359,7 @@
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(9, 179);
+            this.label34.Location = new System.Drawing.Point(9, 176);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(43, 13);
             this.label34.TabIndex = 60;
@@ -367,7 +367,7 @@
             // 
             // button_texturebrowse
             // 
-            this.button_texturebrowse.Location = new System.Drawing.Point(398, 192);
+            this.button_texturebrowse.Location = new System.Drawing.Point(398, 196);
             this.button_texturebrowse.Name = "button_texturebrowse";
             this.button_texturebrowse.Size = new System.Drawing.Size(75, 23);
             this.button_texturebrowse.TabIndex = 59;
@@ -377,7 +377,7 @@
             // 
             // textBox_texture
             // 
-            this.textBox_texture.Location = new System.Drawing.Point(17, 195);
+            this.textBox_texture.Location = new System.Drawing.Point(17, 199);
             this.textBox_texture.Name = "textBox_texture";
             this.textBox_texture.Size = new System.Drawing.Size(352, 20);
             this.textBox_texture.TabIndex = 58;
@@ -737,7 +737,7 @@
             this.groupBox1.Controls.Add(this.textBox_izz);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.textBox_mass);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.groupBox1.Location = new System.Drawing.Point(12, 96);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(543, 185);
@@ -747,7 +747,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label15.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label15.Location = new System.Drawing.Point(6, 0);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(46, 13);
@@ -827,7 +827,7 @@
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label19.Location = new System.Drawing.Point(3, 0);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(41, 13);
@@ -896,7 +896,7 @@
             // label35
             // 
             this.label35.AutoSize = true;
-            this.label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label35.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label35.Location = new System.Drawing.Point(3, 0);
             this.label35.Name = "label35";
             this.label35.Size = new System.Drawing.Size(54, 13);

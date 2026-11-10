@@ -124,12 +124,14 @@ foreach ($typeName in $formTypes) {
             $form = New-Form $type $font
             try {
                 $form.StartPosition = 'Manual'; $form.Location = New-Object System.Drawing.Point(-32000, -32000)
+                $wasVisible = @{}; foreach ($c in $form.Controls) { $wasVisible[$c.Name] = (Test-Shown $c) }
                 $form.ShowInTaskbar = $false; $form.Show(); [System.Windows.Forms.Application]::DoEvents()
                 foreach ($page in (Get-Pages $form)) {
                     $problems = New-Object System.Collections.ArrayList
                     $panel = $page[2]
-                    if ($page[0] -eq 'joint page') { $panel.Visible = $false }
-                    if ($page[0] -eq 'link page') { $panel.Visible = $true }
+                    # The link page panel covers the joint page; show one page at a time.
+                    if ($page[0] -eq 'joint page') { $panel.Visible = $false; foreach ($c in $form.Controls) { if ($c -ne $panel -and $wasVisible[$c.Name]) { $c.Visible = $true } } }
+                    if ($page[0] -eq 'link page') { $panel.Visible = $true; foreach ($c in $form.Controls) { if ($c -ne $panel) { $c.Visible = $false } } }
                     [System.Windows.Forms.Application]::DoEvents()
                     Test-Container $page[1] ($page[0]) $ShowAll.IsPresent $problems
                     $label = "$($type.Name) [$($f[0]) $($f[1])pt x$scale] $($page[0])"
