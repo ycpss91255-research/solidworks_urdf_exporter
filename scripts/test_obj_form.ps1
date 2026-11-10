@@ -185,9 +185,6 @@ public static class ObjFormCheck {
         foreach (System.Xml.XmlNode node in doc.SelectNodes("/root/data")) {
             map[node.Attributes["name"].Value] = node.SelectSingleNode("value").InnerText;
         }
-        // The OBJ notes are new in this branch and not in the i18n catalog yet.
-        map["obj mesh density is determined by solidworks."] = "OBJ 網格密度由 SolidWorks 決定。";
-        map["obj color and texture are defined by the mtl file."] = "OBJ 的顏色與貼圖由 MTL 檔案決定。";
         return map;
     }
 

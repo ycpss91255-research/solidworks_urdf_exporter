@@ -2,6 +2,7 @@
 using SolidWorks.Interop.swconst;
 using SW2URDF.Legacy;
 using SW2URDF.URDF;
+using SW2URDF.UI;
 using SW2URDF.Utilities;
 using System;
 using System.Collections.Generic;
@@ -63,8 +64,9 @@ namespace SW2URDF.URDFExport
         /// </summary>
         /// <param name="model">ModelDoc containing the URDF configuration</param>
         /// <returns>TreeView LinkNode loaded from configuration</returns>
-        public static LinkNode LoadBaseNodeFromModel(ModelDoc2 model, out bool error)
+        public static LinkNode LoadBaseNodeFromModel(ModelDoc2 model, out bool error, UiText ui = null)
         {
+            ui = ui ?? new UiText(null);
             LogOrphanConfigurationAttributes(model);
             string data = GetConfigTreeData(model, out double configVersion);
 
@@ -72,9 +74,7 @@ namespace SW2URDF.URDFExport
             ConfigurationFormatKind kind = ConfigurationFormat.Classify(configVersion);
             if (kind == ConfigurationFormatKind.TooNew)
             {
-                MessageBox.Show("The configuration saved in this model is newer than what this " +
-                    "exporter supports " + string.Format("({0} > {1})", configVersion, SerializationVersion) +
-                    ". Please update your exporter version");
+                MessageBox.Show(string.Format(ui.Get("The configuration saved in this model is newer than what this exporter supports ({0} > {1}). Please update your exporter version"), configVersion, SerializationVersion));
                 error = true;
                 return null;
             }
@@ -100,31 +100,30 @@ namespace SW2URDF.URDFExport
         /// <param name="BaseNode">TreeView LinkNode which contains the data you are saving</param>
         /// <param name="warnUser">Warn the user with a YesNo MessageBox, otherwise this will be done silently
         ///  and overwrite any existing data</param>
-        public static void SaveConfigTreeXML(SldWorks swApp, ModelDoc2 model, LinkNode BaseNode, bool warnUser)
+        public static void SaveConfigTreeXML(SldWorks swApp, ModelDoc2 model, LinkNode BaseNode, bool warnUser, UiText ui = null)
         {
+            ui = ui ?? new UiText(null);
             string oldData = GetConfigTreeData(model, out double version);
             if (oldData.Length > 0 && ConfigurationFormat.NeedsUpgrade(version))
             {
-                MessageBox.Show("You have a URDF configuration with an outdated save format. It will automatically be " +
-                    "upgraded to the latest version and saved for the active SolidWorks configuration. " +
-                    "The old data is left in place and can be deleted at your convenience.");
+                MessageBox.Show(ui.Get("You have a URDF configuration with an outdated save format. It will automatically be upgraded to the latest version and saved for the active SolidWorks configuration. The old data is left in place and can be deleted at your convenience."));
                 warnUser = false;
             }
 
             string newData = SerializeToString(BaseNode);
             if (BaseNode != null && string.IsNullOrEmpty(newData))
             {
-                MessageBox.Show("Serializing this link failed. Please email your maintainer with your SW assembly.");
+                MessageBox.Show(ui.Get("Serializing this link failed. Please email your maintainer with your SW assembly."));
                 return;
             }
             if (oldData != newData || !HasConfigurationAttribute(model))
             {
                 if (!warnUser ||
                     (warnUser &&
-                    MessageBox.Show("The configuration has changed, would you like to save?",
-                    "Save Export Configuration", MessageBoxButtons.YesNo) == DialogResult.Yes))
+                    MessageBox.Show(ui.Get("The configuration has changed, would you like to save?"),
+                    ui.Get("Save Export Configuration"), MessageBoxButtons.YesNo) == DialogResult.Yes))
                 {
-                    SaveDataToModelDoc(swApp, model, newData);
+                    SaveDataToModelDoc(swApp, model, newData, ui);
                 }
             }
         }
@@ -567,7 +566,7 @@ namespace SW2URDF.URDFExport
         /// <param name="data">string to save</param>
         /// <param name="attributeName">Name of attribute to save to</param>
         private static void SaveDataToModelDoc(SldWorks swApp, ModelDoc2 model,
-            string data)
+            string data, UiText ui)
         {
             string configurationName = GetActiveConfigurationName(model);
             int ConfigurationOptions = (int)swInConfigurationOpts_e.swAllConfiguration;
@@ -599,7 +598,7 @@ namespace SW2URDF.URDFExport
             {
                 logger.Error("SolidWorks did not create the URDF configuration attribute" +
                     (configurationName == null ? "" : " for configuration \"" + configurationName + "\""));
-                MessageBox.Show("The URDF configuration could not be saved to this model.");
+                MessageBox.Show(ui.Get("The URDF configuration could not be saved to this model."));
                 return;
             }
 

@@ -47,6 +47,25 @@ try {
     Require ($value.Text -ceq 'Cancel' -and $number.Text -ceq '1.2345' -and $combo.Text -ceq 'Cancel' -and $tree.Nodes[0].Text -ceq 'Cancel') 'editable values and identifiers were changed'
     $form.Dispose()
 
+    # Dialog text built outside the forms goes through the same catalog. English keeps the
+    # original wording, zh-TW is translated, and a configuration name is only ever inserted
+    # as an argument (a name containing braces must not break the format string).
+    $policy = $assembly.GetType('SW2URDF.URDFExport.MissingComponentPolicy', $true)
+    $build = $policy.GetMethod('BuildMessage')
+    $links = [Collections.Generic.List[string]]::new(); $links.Add('base_link'); $links.Add('arm {1}')
+    $en = New-Ui 'english'
+    foreach ($exporting in $true, $false) {
+        $english = $build.Invoke($null, @($links, 'Config {0}', $exporting, $en))
+        $chinese = $build.Invoke($null, @($links, 'Config {0}', $exporting, $zh))
+        $default = $build.Invoke($null, @($links, 'Config {0}', $exporting, $null))
+        Require ($english -ceq $default) 'English is the default when no UiText is given'
+        Require ($english.StartsWith('The following links are missing SolidWorks components in the active configuration "Config {0}"')) 'English wording changed'
+        Require ($chinese -cne $english -and $chinese.Contains('Config {0}') -and $chinese.Contains('base_link, arm {1}')) 'zh-TW message must be translated and keep names verbatim'
+        Require (-not ($chinese -cmatch '[A-Za-z]{4,} [A-Za-z]{4,} [A-Za-z]{4,}')) 'zh-TW message still contains untranslated English sentences'
+    }
+    $noConfig = $build.Invoke($null, @($links, $null, $false, $zh))
+    Require ($noConfig -cne $build.Invoke($null, @($links, $null, $false, $en)) -and -not $noConfig.Contains('{0}')) 'zh-TW message without configuration name'
+
     Require ($thread.CurrentCulture.Name -eq 'de-DE') 'numeric culture was changed'
     Require ($thread.CurrentUICulture.Name -eq 'fr-FR') 'host UI culture was changed'
 } finally {

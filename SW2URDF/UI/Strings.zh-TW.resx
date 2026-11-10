@@ -126,7 +126,7 @@
   <data xml:space="preserve" name="mimic other joint">
     <value>跟隨其他關節</value>
   </data>
-  <data xml:space="preserve" name="moment of inertia (kg * m^-2)">
+  <data xml:space="preserve" name="moment of inertia (kg * m^2)">
     <value>慣性矩 (kg·m²)</value>
   </data>
   <data xml:space="preserve" name="multiplier">
@@ -134,6 +134,18 @@
   </data>
   <data xml:space="preserve" name="next">
     <value>下一步</value>
+  </data>
+  <data xml:space="preserve" name="obj + mtl">
+    <value>OBJ + MTL</value>
+  </data>
+  <data xml:space="preserve" name="obj + mtl (native colors)">
+    <value>OBJ + MTL（原生配色）</value>
+  </data>
+  <data xml:space="preserve" name="obj color and texture are defined by the mtl file.">
+    <value>OBJ 的顏色與貼圖由 MTL 檔案決定。</value>
+  </data>
+  <data xml:space="preserve" name="obj mesh density is determined by solidworks.">
+    <value>OBJ 的網格密度由 SolidWorks 決定。</value>
   </data>
   <data xml:space="preserve" name="offset (rad)">
     <value>偏移 (rad)</value>
@@ -408,5 +420,44 @@
   <data xml:space="preserve" name="creating urdf package &quot;{0}&quot; at:&#10;{1}">
     <value>建立 URDF 套件「{0}」於：
 {1}</value>
+  </data>
+  <data xml:space="preserve" name="the following links are missing solidworks components in the active configuration &quot;{0}&quot; (for example because the configuration suppresses a part):">
+    <value>以下連桿在作用中的組態「{0}」缺少 SolidWorks 元件（例如該組態抑制了某個零件）：</value>
+  </data>
+  <data xml:space="preserve" name="the following links are missing solidworks components (for example because the configuration suppresses a part):">
+    <value>以下連桿缺少 SolidWorks 元件（例如目前組態抑制了某個零件）：</value>
+  </data>
+  <data xml:space="preserve" name="the exported robot will be incomplete (missing geometry, mass and inertia). export anyway?">
+    <value>匯出的機器人將不完整（缺少幾何、質量與慣性）。仍要匯出嗎？</value>
+  </data>
+  <data xml:space="preserve" name="please inspect these links before exporting, or switch to the configuration this urdf configuration was saved from.">
+    <value>匯出前請檢查這些連桿，或切換到儲存此 URDF 設定時使用的組態。</value>
+  </data>
+  <data xml:space="preserve" name="components are missing">
+    <value>缺少元件</value>
+  </data>
+  <data xml:space="preserve" name="the configuration saved in this model is newer than what this exporter supports ({0} &gt; {1}). please update your exporter version">
+    <value>此模型中儲存的設定版本比目前匯出工具支援的版本新（{0} &gt; {1}）。請更新匯出工具版本。</value>
+  </data>
+  <data xml:space="preserve" name="you have a urdf configuration with an outdated save format. it will automatically be upgraded to the latest version and saved for the active solidworks configuration. the old data is left in place and can be deleted at your convenience.">
+    <value>您的 URDF 設定使用舊的儲存格式，將自動升級為最新版本，並儲存到目前作用中的 SolidWorks 組態。舊資料會保留，可隨時刪除。</value>
+  </data>
+  <data xml:space="preserve" name="serializing this link failed. please email your maintainer with your sw assembly.">
+    <value>序列化此連桿失敗，請將您的 SolidWorks 組件寄給維護者。</value>
+  </data>
+  <data xml:space="preserve" name="the configuration has changed, would you like to save?">
+    <value>設定已變更，是否要儲存？</value>
+  </data>
+  <data xml:space="preserve" name="save export configuration">
+    <value>儲存匯出設定</value>
+  </data>
+  <data xml:space="preserve" name="the urdf configuration could not be saved to this model.">
+    <value>無法將 URDF 設定儲存到此模型。</value>
+  </data>
+  <data xml:space="preserve" name="converting mesh to obj">
+    <value>正在將網格轉換為 OBJ</value>
+  </data>
+  <data xml:space="preserve" name="converting 3dxml to obj + mtl...">
+    <value>正在將 3DXML 轉換為 OBJ + MTL...</value>
   </data>
 </root>
