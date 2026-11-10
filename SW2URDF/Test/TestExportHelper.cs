@@ -1,4 +1,5 @@
 ﻿using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using SW2URDF.URDF;
 using SW2URDF.UI;
 using SW2URDF.URDFExport;
@@ -163,6 +164,76 @@ namespace SW2URDF.Test
                 try { Directory.Delete(temp, true); } catch (IOException) { }
             }
         }
+        private ModelDoc2 OpenPart(string modelName, string partName)
+        {
+            Assert.True(SwApp.CloseAllDocuments(true));
+            string filename = Path.Combine(GetModelDirectory(modelName), partName + ".SLDPRT");
+            Assert.True(File.Exists(filename));
+            int errors = 0;
+            int warnings = 0;
+            ModelDoc2 doc = SwApp.OpenDoc6(filename, (int)swDocumentTypes_e.swDocPART,
+                (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
+            Assert.Equal(0, errors);
+            Assert.NotNull(doc);
+            return doc;
+        }
+
+        // Fixture parts: BOX_RED is (1, 0, 0), BOX_BLUE is (0, 0, 1), both opaque.
+        [Theory]
+        [InlineData("TWO_BOXES", "BOX_RED", 1.0, 0.0, 0.0)]
+        [InlineData("TWO_BOXES", "BOX_BLUE", 0.0, 0.0, 1.0)]
+        public void TestExportLinkObjColor(string modelName, string partName, double r, double g, double b)
+        {
+            Mock<IMessageBox> messageBoxMock = new Mock<IMessageBox>();
+            messageBoxMock.Setup(m => m.Show(It.IsAny<string>())).Returns(MessageBoxResult.OK);
+            URDFPackage.MessageBox = messageBoxMock.Object;
+            string temp = CreateRandomTempDirectory();
+            try
+            {
+                string[] mtlTexts = new string[2];
+                for (int run = 0; run < 2; run++)
+                {
+                    OpenPart(modelName, partName);
+                    ExportHelper helper = new ExportHelper(SwApp);
+                    helper.SavePath = Path.Combine(temp, run.ToString());
+                    helper.PackageName = partName + "_package";
+                    helper.CreateRobotFromActiveModel();
+                    helper.URDFRobot.Name = partName.ToLowerInvariant();
+                    helper.URDFRobot.BaseLink.Name = partName.ToLowerInvariant() + "_link";
+                    helper.ExportLink(true, MeshExportFormat.OBJ);
+                    Assert.True(SwApp.CloseAllDocuments(true));
+
+                    string package = Path.Combine(helper.SavePath, helper.PackageName);
+                    string obj = Path.Combine(package, "meshes", helper.URDFRobot.BaseLink.Name + ".obj");
+                    string mtl = Path.ChangeExtension(obj, ".mtl");
+                    Assert.True(File.Exists(obj));
+                    Assert.True(File.Exists(mtl));
+                    Assert.Equal(12, ObjLines(obj, "f").Length); // a box: 6 sides, 2 triangles each
+
+                    string[] names = ObjLines(mtl, "newmtl").Select(l => l.Substring(7)).ToArray();
+                    string name = Assert.Single(names);
+                    Assert.StartsWith(helper.URDFRobot.BaseLink.Name + "_", name);
+                    double[] kd = Assert.Single(ObjLines(mtl, "Kd")).Substring(3)
+                        .Split(' ').Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+                    Assert.Equal(r, kd[0], 3);
+                    Assert.Equal(g, kd[1], 3);
+                    Assert.Equal(b, kd[2], 3);
+                    Assert.Equal("d 1", Assert.Single(ObjLines(mtl, "d")));
+
+                    string urdfPath = Directory.GetFiles(Path.Combine(package, "urdf"), "*.urdf").Single();
+                    XDocument urdf = XDocument.Load(urdfPath);
+                    Assert.All(urdf.Descendants("mesh"), m => Assert.EndsWith(".obj", (string)m.Attribute("filename")));
+                    Assert.Empty(urdf.Descendants("material"));
+                    mtlTexts[run] = File.ReadAllText(mtl);
+                }
+                Assert.Equal(mtlTexts[0], mtlTexts[1]); // reproducible
+            }
+            finally
+            {
+                try { Directory.Delete(temp, true); } catch (IOException) { }
+            }
+        }
+
         [Theory]
         [InlineData("3_DOF_ARM")]
         public void TestExportRobotObjIsReproducible(string modelName)
