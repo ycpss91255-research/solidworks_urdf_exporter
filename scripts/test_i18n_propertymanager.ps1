@@ -35,6 +35,9 @@ $identifiers = @{
     'fixed'                  = 'URDF joint type'
     'nothing'                = 'sentinel for the item search loop, never displayed'
 }
+# Static COM (un)registration runs under regasm, outside SolidWorks: no SolidWorks language exists
+# there, so those two messages stay English (raw source text, backslashes included).
+$registrationOnly = @('There was a problem unregistering this dll: \n\"', '\"\nEmail your maintainer with the log file found at ')
 $literal = '"((?:[^"\\]|\\.)*)"'
 $files = 'SW2URDF/URDFExport/ExportPropertyManager.cs', 'SW2URDF/URDFExport/ExportPropertyManagerExtension.cs', 'SW2URDF/SW/SwAddin.cs'
 foreach ($rel in $files) {
@@ -51,6 +54,7 @@ foreach ($rel in $files) {
         if ($rel -like '*SwAddin.cs' -and $statement -notmatch 'MessageBox') { continue }
         if ($statement -match 'ui\.Get\(\s*$') { continue }
         if ($identifiers.ContainsKey($value)) { continue }
+        if ($rel -like '*SwAddin.cs' -and $registrationOnly -contains $value) { continue }
         Fail "$rel has an untranslated user-visible literal: `"$value`""
     }
 }
