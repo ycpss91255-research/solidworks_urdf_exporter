@@ -1,5 +1,5 @@
-﻿# Offline checks for the OBJ options on the export forms and for STLQualityFine
-# serialization compatibility. Does not connect to SOLIDWORKS or register COM.
+﻿# Offline checks for the OBJ options on the export forms and for loading data saved
+# with the removed STLQualityFine member. Does not connect to SOLIDWORKS or register COM.
 # Optional -ScreenshotDirectory saves PNGs of both forms (default and OBJ selected).
 param(
     [string]$AssemblyPath = "$PSScriptRoot/../SW2URDF/bin/x64/Debug/SW2URDF.dll",
@@ -132,20 +132,14 @@ public static class ObjFormCheck {
     public static void Forms(string shots) {
         using (PartExportForm part = Create<PartExportForm>()) {
             CheckBox obj = Find<CheckBox>(part, "objExport");
-            Control fine = Find<Control>(part, "radioButton_fine");
-            Control coarse = Find<Control>(part, "radioButton_course");
-            Control note = Find<Control>(part, "panelObjQualityNote");
             Require(obj.Parent is FlowLayoutPanel, "objExport must live in a FlowLayoutPanel");
             Require(Find<CheckBox>(part, "checkBox_rotate").Parent == obj.Parent, "rotate and OBJ share one panel");
-            Require(fine.Enabled && coarse.Enabled && !Shown(note), "Part: default quality enabled");
             RequireColor(part, PartColorControls, true, "Part default");
             Shot(part, shots, "part_default");
             obj.Checked = true;
-            Require(!fine.Enabled && !coarse.Enabled && Shown(note), "Part: OBJ disables quality");
             RequireColor(part, PartColorControls, false, "Part OBJ");
             Shot(part, shots, "part_obj");
             obj.Checked = false;
-            Require(fine.Enabled && coarse.Enabled && !Shown(note), "Part: STL re-enables quality");
             RequireColor(part, PartColorControls, true, "Part back to STL");
         }
         using (AssemblyExportForm assembly = Create<AssemblyExportForm>()) {
@@ -154,24 +148,17 @@ public static class ObjFormCheck {
             RadioButton objRadio = Find<RadioButton>(assembly, "radioButtonObj");
             RadioButton stl = Find<RadioButton>(assembly, "radioButtonStl");
             RadioButton xml = Find<RadioButton>(assembly, "radioButton3dxml");
-            Control fine = Find<Control>(assembly, "radioButtonFine");
-            Control coarse = Find<Control>(assembly, "radioButtonCourse");
-            Control note = Find<Control>(assembly, "panelObjQualityNote");
             Require(objRadio.Parent is FlowLayoutPanel && stl.Parent == objRadio.Parent && xml.Parent == objRadio.Parent,
                 "Mesh format radios must share a FlowLayoutPanel");
-            Require(fine.Enabled && coarse.Enabled && !Shown(note), "Assembly: default quality enabled");
             RequireColor(assembly, AssemblyColorControls, true, "Assembly default");
             Shot(assembly, shots, "assembly_default");
             objRadio.Checked = true;
-            Require(!fine.Enabled && !coarse.Enabled && Shown(note), "Assembly: OBJ disables quality");
             RequireColor(assembly, AssemblyColorControls, false, "Assembly OBJ");
             Shot(assembly, shots, "assembly_obj");
             xml.Checked = true;
-            Require(fine.Enabled && coarse.Enabled && !Shown(note), "Assembly: 3dxml re-enables quality");
             RequireColor(assembly, AssemblyColorControls, true, "Assembly 3dxml");
             objRadio.Checked = true;
             stl.Checked = true;
-            Require(fine.Enabled && coarse.Enabled && !Shown(note), "Assembly: STL re-enables quality");
             RequireColor(assembly, AssemblyColorControls, true, "Assembly STL");
         }
     }
@@ -249,11 +236,9 @@ public static class ObjFormCheck {
     }
 
     static readonly string[] PartObjLayout = {
-        "flowLayoutPanelOptions", "objExport", "checkBox_rotate", "label1", "radioButton_fine",
-        "radioButton_course", "panelObjQualityNote", "panelObjColorNote", "comboBox_materials" };
+        "flowLayoutPanelOptions", "objExport", "checkBox_rotate", "panelObjColorNote", "comboBox_materials" };
     static readonly string[] AssemblyObjLayout = {
         "flowLayoutPanelMeshFormat", "radioButtonStl", "radioButton3dxml", "radioButtonObj",
-        "label10", "radioButtonFine", "radioButtonCourse", "panelObjQualityNote",
         "panelObjColorNote", "comboBoxMaterials" };
 
     // Self-check: the detector must actually report overlap and clipping.
@@ -317,23 +302,22 @@ public static class ObjFormCheck {
     }
 
     public static void Serialization() {
+        // STLQualityFine was removed from Link; it must neither be written nor break loading of old data.
         Link link = (Link)FormatterServices.GetUninitializedObject(typeof(Link));
-        link.STLQualityFine = true;
+        link.isFixedFrame = true;
         string xml = Serialize(link);
-        Require(xml.Contains("STLQualityFine>true<"), "STLQualityFine is serialized: " + xml);
-        Require(Deserialize(xml).STLQualityFine, "STLQualityFine round-trips");
+        Require(!xml.Contains("STLQualityFine"), "STLQualityFine is no longer serialized: " + xml);
+        foreach (string value in new string[] { "true", "false" }) {
+            string old = xml.Replace("<isIncomplete", "<STLQualityFine>" + value + "</STLQualityFine><isIncomplete");
+            Require(old != xml, "Old member injected");
+            Require(Deserialize(old).isFixedFrame, "Data saved with STLQualityFine=" + value + " still loads");
+        }
 
-        // Data written before or after the field existed must still load.
-        string without = System.Text.RegularExpressions.Regex.Replace(xml, "<(\\w+:)?STLQualityFine>[^<]*</(\\w+:)?STLQualityFine>", "");
-        Require(without != xml, "Field removed from sample");
-        Require(!Deserialize(without).STLQualityFine, "Missing STLQualityFine loads as false");
-
-        // A future version that drops the field, or any unknown member, must be ignored.
+        // Any other unknown member must be ignored as well.
         string unknown = xml.Replace("<isIncomplete", "<SomeRemovedSetting>1</SomeRemovedSetting><isIncomplete");
         Require(unknown != xml, "Unknown member injected");
-        Require(Deserialize(unknown).STLQualityFine, "Unknown members are ignored");
-    }
-}
+        Require(Deserialize(unknown).isFixedFrame, "Unknown members are ignored");
+    }}
 '@
 Add-Type -TypeDefinition $code -ReferencedAssemblies @($AssemblyPath, 'System.Windows.Forms', 'System.Drawing', 'System.Runtime.Serialization', 'System.Xml')
 if ($ScreenshotDirectory) { New-Item -ItemType Directory -Force -Path $ScreenshotDirectory | Out-Null }
@@ -342,4 +326,4 @@ if ($ScreenshotDirectory) { New-Item -ItemType Directory -Force -Path $Screensho
 [ObjFormCheck]::Layouts($ScreenshotDirectory, $ZhResx)
 if (-not $ZhResx) { Write-Output 'NOTE: -ZhResx not given; Traditional Chinese layouts were not checked' }
 [ObjFormCheck]::Serialization()
-Write-Output 'PASS: OBJ quality controls follow the format selection; STLQualityFine serialization is compatible'
+Write-Output 'PASS: OBJ color controls follow the format selection; data with STLQualityFine still loads'

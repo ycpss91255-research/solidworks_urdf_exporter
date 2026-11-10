@@ -37,11 +37,6 @@ public static class ObjExportCli
         public System.Windows.MessageBoxResult Show(string message) { Console.WriteLine(message); return System.Windows.MessageBoxResult.OK; }
         public System.Windows.MessageBoxResult Show(string message,string caption,System.Windows.MessageBoxButton buttons) { return Show(message); }
     }
-    static void Fine(SW2URDF.URDF.Link link)
-    {
-        link.STLQualityFine=true;
-        foreach(var child in link.Children) Fine(child);
-    }
     [STAThread] public static int Main(string[] args)
     {
         try
@@ -90,7 +85,6 @@ public static class ObjExportCli
                     if(part)
                     {
                         helper.CreateRobotFromActiveModel();helper.URDFRobot.Name="part_test";helper.URDFRobot.BaseLink.Name="part_test";
-                        helper.URDFRobot.BaseLink.STLQualityFine=true;
                         helper.ExportLink(true,format);
                     }
                     else
@@ -100,7 +94,6 @@ public static class ObjExportCli
                         var missing=new List<string>();CommonSwOperations.LoadSWComponents(model,tree,missing);
                         if(missing.Count>0)throw new Exception("Missing saved references");
                         if(!helper.CreateRobotFromTreeView(tree))throw new Exception("Robot build failed");
-                        Fine(helper.URDFRobot.BaseLink);
                         helper.URDFRobot.Name="assembly_test";helper.ExportRobot(true,format);
                     }
                     string urdf=Path.Combine(helper.SavePath,helper.PackageName,"urdf",helper.URDFRobot.Name+".urdf");

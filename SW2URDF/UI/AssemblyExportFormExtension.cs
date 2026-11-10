@@ -77,8 +77,6 @@ namespace SW2URDF.UI
                                                      domainUpDownAlpha,
                                                      "G5");
 
-                radioButtonFine.Checked = Link.STLQualityFine;
-                radioButtonCourse.Checked = !Link.STLQualityFine;
             }
         }
 
@@ -270,7 +268,6 @@ namespace SW2URDF.UI
                                                   domainUpDownBlue,
                                                   domainUpDownAlpha);
 
-                Link.STLQualityFine = radioButtonFine.Checked;
             }
         }
 
