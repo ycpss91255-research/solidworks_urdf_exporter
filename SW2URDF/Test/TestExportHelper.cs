@@ -1,6 +1,11 @@
 ﻿using SolidWorks.Interop.sldworks;
 using SW2URDF.URDF;
 using SW2URDF.URDFExport;
+using System;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using System.Collections.Generic;
 using Xunit;
 
@@ -20,6 +25,7 @@ namespace SW2URDF.Test
         [InlineData("3_DOF_ARM", 4, MeshExportFormat.THREEDXML)]
         [InlineData("4_WHEELER", 5, MeshExportFormat.THREEDXML)]
         [InlineData("ORIGINAL_3_DOF_ARM", 4, MeshExportFormat.THREEDXML)]
+        [InlineData("3_DOF_ARM", 4, MeshExportFormat.OBJ)]
         public void TestExportRobot(string modelName, int expNumLinks, MeshExportFormat meshExportFormat)
         {
             ModelDoc2 doc = OpenSWDocument(modelName);
@@ -37,6 +43,115 @@ namespace SW2URDF.Test
             Assert.True(SwApp.CloseAllDocuments(true));
         }
 
+
+        private string ExportRobotTo(string modelName, MeshExportFormat format, string saveDirectory, out int linkCount)
+        {
+            ModelDoc2 doc = OpenSWDocument(modelName);
+            ExportHelper helper = new ExportHelper(SwApp);
+            helper.SetComputeInertial(true);
+            helper.SetComputeJointKinematics(true);
+            helper.SetComputeJointLimits(true);
+            helper.SetComputeVisualCollision(true);
+            helper.SavePath = saveDirectory;
+            helper.PackageName = modelName + "_" + format;
+            LinkNode baseNode = ConfigurationSerialization.LoadBaseNodeFromModel(doc, out bool error);
+            Assert.False(error);
+            helper.CreateRobotFromTreeView(baseNode);
+            helper.ExportRobot(true, format);
+            linkCount = CommonSwOperations.GetCount(helper.URDFRobot.BaseLink);
+            Assert.True(SwApp.CloseAllDocuments(true));
+            return Path.Combine(saveDirectory, helper.PackageName);
+        }
+
+        private static int CountStlTriangles(string path)
+        {
+            byte[] bytes = File.ReadAllBytes(path);
+            if (bytes.Length >= 84 && bytes.Length == 84 + 50L * BitConverter.ToUInt32(bytes, 80))
+            {
+                return (int)BitConverter.ToUInt32(bytes, 80);
+            }
+            return Regex.Matches(System.Text.Encoding.ASCII.GetString(bytes), "facet normal").Count;
+        }
+
+        private static string[] ObjLines(string path, string prefix)
+        {
+            return File.ReadAllLines(path).Where(l => l.StartsWith(prefix + " ")).ToArray();
+        }
+
+        [Theory]
+        [InlineData("3_DOF_ARM", 4)]
+        public void TestExportRobotObjFiles(string modelName, int expNumLinks)
+        {
+            string temp = CreateRandomTempDirectory();
+            try
+            {
+                string objPackage = ExportRobotTo(modelName, MeshExportFormat.OBJ, temp, out int objLinks);
+                string stlPackage = ExportRobotTo(modelName, MeshExportFormat.STL, temp, out int stlLinks);
+                Assert.Equal(expNumLinks, objLinks);
+                Assert.Equal(stlLinks, objLinks);
+
+                string[] objFiles = Directory.GetFiles(Path.Combine(objPackage, "meshes"), "*.obj");
+                Assert.Equal(expNumLinks, objFiles.Length);
+                foreach (string obj in objFiles)
+                {
+                    string linkName = Path.GetFileNameWithoutExtension(obj);
+                    string mtl = Path.ChangeExtension(obj, ".mtl");
+                    Assert.True(File.Exists(mtl), "Missing MTL for " + linkName);
+                    Assert.Single(ObjLines(obj, "mtllib"));
+
+                    // Same triangles as the STL export of the same link
+                    string stl = Path.Combine(stlPackage, "meshes", linkName + ".STL");
+                    Assert.True(File.Exists(stl), "Missing STL for " + linkName);
+                    Assert.Equal(CountStlTriangles(stl), ObjLines(obj, "f").Length);
+
+                    // Materials are used, defined, named after the link and have the explicit fields
+                    string prefix = ObjConverter.SanitizeName(linkName, "mesh") + "_";
+                    string[] defined = ObjLines(mtl, "newmtl").Select(l => l.Substring(7)).ToArray();
+                    string[] used = ObjLines(obj, "usemtl").Select(l => l.Substring(7)).Distinct().ToArray();
+                    Assert.NotEmpty(defined);
+                    Assert.All(used, m => Assert.Contains(m, defined));
+                    Assert.All(defined, m => Assert.StartsWith(prefix, m));
+                    foreach (string key in new[] { "Ka", "Kd", "Ks", "Ns", "d", "illum" })
+                    {
+                        Assert.Equal(defined.Length, ObjLines(mtl, key).Length);
+                    }
+                }
+
+                // URDF points to the .obj meshes and has no <material>
+                string urdfPath = Directory.GetFiles(Path.Combine(objPackage, "urdf"), "*.urdf").Single();
+                XDocument urdf = XDocument.Load(urdfPath);
+                var meshes = urdf.Descendants("mesh").Select(m => (string)m.Attribute("filename")).ToList();
+                Assert.NotEmpty(meshes);
+                Assert.All(meshes, f => Assert.EndsWith(".obj", f));
+                Assert.Empty(urdf.Descendants("material"));
+                Assert.Equal(expNumLinks, urdf.Descendants("link").Count());
+            }
+            finally
+            {
+                try { Directory.Delete(temp, true); } catch (IOException) { }
+            }
+        }
+
+        [Theory]
+        [InlineData("3_DOF_ARM")]
+        public void TestExportRobotObjIsReproducible(string modelName)
+        {
+            string temp = CreateRandomTempDirectory();
+            try
+            {
+                string first = ExportRobotTo(modelName, MeshExportFormat.OBJ, Path.Combine(temp, "a"), out int _);
+                string second = ExportRobotTo(modelName, MeshExportFormat.OBJ, Path.Combine(temp, "b"), out int _);
+                foreach (string mtl in Directory.GetFiles(Path.Combine(first, "meshes"), "*.mtl"))
+                {
+                    string other = Path.Combine(second, "meshes", Path.GetFileName(mtl));
+                    Assert.Equal(File.ReadAllText(mtl), File.ReadAllText(other));
+                }
+            }
+            finally
+            {
+                try { Directory.Delete(temp, true); } catch (IOException) { }
+            }
+        }
         [Theory]
         [InlineData("3_DOF_ARM", 4)]
         [InlineData("4_WHEELER", 5)]
