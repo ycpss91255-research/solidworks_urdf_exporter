@@ -1,0 +1,598 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data xml:space="preserve" name="* field group is required">
+    <value>* Field group is required</value>
+  </data>
+  <data xml:space="preserve" name="3dxml (color)">
+    <value>3dxml (color)</value>
+  </data>
+  <data xml:space="preserve" name="alpha">
+    <value>Alpha</value>
+  </data>
+  <data xml:space="preserve" name="axis">
+    <value>Axis</value>
+  </data>
+  <data xml:space="preserve" name="blue">
+    <value>Blue</value>
+  </data>
+  <data xml:space="preserve" name="browse...">
+    <value>Browse...</value>
+  </data>
+  <data xml:space="preserve" name="calibration">
+    <value>Calibration</value>
+  </data>
+  <data xml:space="preserve" name="cancel">
+    <value>Cancel</value>
+  </data>
+  <data xml:space="preserve" name="child link:">
+    <value>Child Link:</value>
+  </data>
+  <data xml:space="preserve" name="collision">
+    <value>Collision</value>
+  </data>
+  <data xml:space="preserve" name="collision mesh detail">
+    <value>Collision Mesh Detail</value>
+  </data>
+  <data xml:space="preserve" name="color">
+    <value>Color</value>
+  </data>
+  <data xml:space="preserve" name="configure joint properties">
+    <value>Configure Joint Properties</value>
+  </data>
+  <data xml:space="preserve" name="configure link properties">
+    <value>Configure Link Properties</value>
+  </data>
+  <data xml:space="preserve" name="configure custom properties for exporting the solidworks part to a urdf link">
+    <value>Configure custom properties for exporting the SolidWorks part to a URDF link</value>
+  </data>
+  <data xml:space="preserve" name="coordinates">
+    <value>Coordinates</value>
+  </data>
+  <data xml:space="preserve" name="course">
+    <value>Course</value>
+  </data>
+  <data xml:space="preserve" name="custom color">
+    <value>Custom Color</value>
+  </data>
+  <data xml:space="preserve" name="dynamics">
+    <value>Dynamics</value>
+  </data>
+  <data xml:space="preserve" name="entries that are blank will not be written to urdf.">
+    <value>Entries that are blank will not be written to URDF.</value>
+  </data>
+  <data xml:space="preserve" name="export urdf only...">
+    <value>Export URDF Only...</value>
+  </data>
+  <data xml:space="preserve" name="export urdf and meshes...">
+    <value>Export URDF and Meshes...</value>
+  </data>
+  <data xml:space="preserve" name="export as urdf">
+    <value>Export as URDF</value>
+  </data>
+  <data xml:space="preserve" name="export assembly as urdf file">
+    <value>Export assembly as URDF file</value>
+  </data>
+  <data xml:space="preserve" name="export part as urdf file">
+    <value>Export part as URDF file</value>
+  </data>
+  <data xml:space="preserve" name="fine">
+    <value>Fine</value>
+  </data>
+  <data xml:space="preserve" name="finish">
+    <value>Finish</value>
+  </data>
+  <data xml:space="preserve" name="green">
+    <value>Green</value>
+  </data>
+  <data xml:space="preserve" name="inertial">
+    <value>Inertial</value>
+  </data>
+  <data xml:space="preserve" name="joint name">
+    <value>Joint Name</value>
+  </data>
+  <data xml:space="preserve" name="joint type">
+    <value>Joint Type</value>
+  </data>
+  <data xml:space="preserve" name="joint to mimic:">
+    <value>Joint to Mimic:</value>
+  </data>
+  <data xml:space="preserve" name="limit">
+    <value>Limit</value>
+  </data>
+  <data xml:space="preserve" name="link frame">
+    <value>Link frame</value>
+  </data>
+  <data xml:space="preserve" name="mass (kg)">
+    <value>Mass (kg)</value>
+  </data>
+  <data xml:space="preserve" name="material name">
+    <value>Material name</value>
+  </data>
+  <data xml:space="preserve" name="mesh detail">
+    <value>Mesh Detail</value>
+  </data>
+  <data xml:space="preserve" name="mesh format">
+    <value>Mesh Format</value>
+  </data>
+  <data xml:space="preserve" name="mimic other joint">
+    <value>Mimic Other Joint</value>
+  </data>
+  <data xml:space="preserve" name="moment of inertia (kg * m^2)">
+    <value>Moment of Inertia (Kg * m^2)</value>
+  </data>
+  <data xml:space="preserve" name="multiplier">
+    <value>Multiplier</value>
+  </data>
+  <data xml:space="preserve" name="next">
+    <value>Next</value>
+  </data>
+  <data xml:space="preserve" name="offset (rad)">
+    <value>Offset (rad)</value>
+  </data>
+  <data xml:space="preserve" name="orientation (rad)">
+    <value>Orientation (rad)</value>
+  </data>
+  <data xml:space="preserve" name="origin">
+    <value>Origin</value>
+  </data>
+  <data xml:space="preserve" name="origin (m)">
+    <value>Origin (m)</value>
+  </data>
+  <data xml:space="preserve" name="package name">
+    <value>Package Name</value>
+  </data>
+  <data xml:space="preserve" name="package name must be nonempty and valid as a filename.">
+    <value>Package name must be nonempty and valid as a filename.</value>
+  </data>
+  <data xml:space="preserve" name="parent link:">
+    <value>Parent Link:</value>
+  </data>
+  <data xml:space="preserve" name="pitch">
+    <value>Pitch</value>
+  </data>
+  <data xml:space="preserve" name="position (m)">
+    <value>Position (m)</value>
+  </data>
+  <data xml:space="preserve" name="previous">
+    <value>Previous</value>
+  </data>
+  <data xml:space="preserve" name="ros version">
+    <value>ROS Version</value>
+  </data>
+  <data xml:space="preserve" name="red">
+    <value>Red</value>
+  </data>
+  <data xml:space="preserve" name="roll">
+    <value>Roll</value>
+  </data>
+  <data xml:space="preserve" name="rotate global origin to make z-axis vertical">
+    <value>Rotate global origin to make Z-axis vertical</value>
+  </data>
+  <data xml:space="preserve" name="stl (grayscale)">
+    <value>STL (grayscale)</value>
+  </data>
+  <data xml:space="preserve" name="safety controller">
+    <value>Safety Controller</value>
+  </data>
+  <data xml:space="preserve" name="save directory">
+    <value>Save Directory</value>
+  </data>
+  <data xml:space="preserve" name="solidworks assembly to urdf exporter">
+    <value>SolidWorks Assembly to URDF Exporter</value>
+  </data>
+  <data xml:space="preserve" name="solidworks part to urdf link exporter">
+    <value>SolidWorks Part to URDF Link Exporter</value>
+  </data>
+  <data xml:space="preserve" name="texture">
+    <value>Texture</value>
+  </data>
+  <data xml:space="preserve" name="texture (replaces color)">
+    <value>Texture (Replaces Color)</value>
+  </data>
+  <data xml:space="preserve" name="urdf / robot name">
+    <value>URDF / robot name</value>
+  </data>
+  <data xml:space="preserve" name="urdf errors">
+    <value>URDF Errors</value>
+  </data>
+  <data xml:space="preserve" name="urdf joint errors">
+    <value>URDF Joint Errors</value>
+  </data>
+  <data xml:space="preserve" name="urdf name">
+    <value>URDF Name</value>
+  </data>
+  <data xml:space="preserve" name="urdf names">
+    <value>URDF Names</value>
+  </data>
+  <data xml:space="preserve" name="urdf warnings">
+    <value>URDF Warnings</value>
+  </data>
+  <data xml:space="preserve" name="urdf name must be nonempty and valid as a filename.">
+    <value>URDF name must be nonempty and valid as a filename.</value>
+  </data>
+  <data xml:space="preserve" name="urdf robot name must be nonempty and valid as a filename.">
+    <value>URDF robot name must be nonempty and valid as a filename.</value>
+  </data>
+  <data xml:space="preserve" name="use this page to make any changes to the links' properties">
+    <value>Use this page to make any changes to the links' properties</value>
+  </data>
+  <data xml:space="preserve" name="visual">
+    <value>Visual</value>
+  </data>
+  <data xml:space="preserve" name="visual mesh detail">
+    <value>Visual Mesh Detail</value>
+  </data>
+  <data xml:space="preserve" name="visual and collision meshes">
+    <value>Visual and Collision Meshes</value>
+  </data>
+  <data xml:space="preserve" name="yaw">
+    <value>Yaw</value>
+  </data>
+  <data xml:space="preserve" name="damping (n*m*s*rad^-1)">
+    <value>damping (N*m*s*rad^-1)</value>
+  </data>
+  <data xml:space="preserve" name="effort (n-m)">
+    <value>effort (N-m)</value>
+  </data>
+  <data xml:space="preserve" name="falling">
+    <value>falling</value>
+  </data>
+  <data xml:space="preserve" name="friction (n*m)">
+    <value>friction (N*m)</value>
+  </data>
+  <data xml:space="preserve" name="k position">
+    <value>k position</value>
+  </data>
+  <data xml:space="preserve" name="k velocity">
+    <value>k velocity</value>
+  </data>
+  <data xml:space="preserve" name="lower (rad)">
+    <value>lower (rad)</value>
+  </data>
+  <data xml:space="preserve" name="rising">
+    <value>rising</value>
+  </data>
+  <data xml:space="preserve" name="soft lower limit (rad)">
+    <value>soft lower limit (rad)</value>
+  </data>
+  <data xml:space="preserve" name="soft upper limit (rad)">
+    <value>soft upper limit (rad)</value>
+  </data>
+  <data xml:space="preserve" name="upper (rad)">
+    <value>upper (rad)</value>
+  </data>
+  <data xml:space="preserve" name="velocity (m/s)">
+    <value>velocity (m/s)</value>
+  </data>
+  <data xml:space="preserve" name="urdf robot name">
+    <value>URDF robot name</value>
+  </data>
+  <data xml:space="preserve" name="urdf exporter">
+    <value>URDF Exporter</value>
+  </data>
+  <data xml:space="preserve" name="configure and organize links">
+    <value>Configure and Organize Links</value>
+  </data>
+  <data xml:space="preserve" name="parent link">
+    <value>Parent Link</value>
+  </data>
+  <data xml:space="preserve" name="link name">
+    <value>Link Name</value>
+  </data>
+  <data xml:space="preserve" name="enter the name of the link">
+    <value>Enter the name of the link</value>
+  </data>
+  <data xml:space="preserve" name="enter the name of the joint">
+    <value>Enter the name of the joint</value>
+  </data>
+  <data xml:space="preserve" name="global origin coordinate system">
+    <value>Global Origin Coordinate System</value>
+  </data>
+  <data xml:space="preserve" name="global origin coordinate system name">
+    <value>Global Origin Coordinate System Name</value>
+  </data>
+  <data xml:space="preserve" name="select the reference coordinate system for the global origin">
+    <value>Select the reference coordinate system for the global origin</value>
+  </data>
+  <data xml:space="preserve" name="reference coordinate system">
+    <value>Reference Coordinate System</value>
+  </data>
+  <data xml:space="preserve" name="reference coordinate system name">
+    <value>Reference Coordinate System Name</value>
+  </data>
+  <data xml:space="preserve" name="select the reference coordinate system for the joint origin">
+    <value>Select the reference coordinate system for the joint origin</value>
+  </data>
+  <data xml:space="preserve" name="reference axis">
+    <value>Reference Axis</value>
+  </data>
+  <data xml:space="preserve" name="reference axis name">
+    <value>Reference Axis Name</value>
+  </data>
+  <data xml:space="preserve" name="select the reference axis for the joint">
+    <value>Select the reference axis for the joint</value>
+  </data>
+  <data xml:space="preserve" name="select the joint type">
+    <value>Select the joint type</value>
+  </data>
+  <data xml:space="preserve" name="link components">
+    <value>Link Components</value>
+  </data>
+  <data xml:space="preserve" name="select components associated with this link">
+    <value>Select components associated with this link</value>
+  </data>
+  <data xml:space="preserve" name="number of child links">
+    <value>Number of child links</value>
+  </data>
+  <data xml:space="preserve" name="enter the number of child links and they will be automatically added">
+    <value>Enter the number of child links and they will be automatically added</value>
+  </data>
+  <data xml:space="preserve" name="load configuration...">
+    <value>Load Configuration...</value>
+  </data>
+  <data xml:space="preserve" name="import values from a csv file">
+    <value>Import values from a CSV file</value>
+  </data>
+  <data xml:space="preserve" name="imported file: ">
+    <value>Imported File: </value>
+  </data>
+  <data xml:space="preserve" name="filename: ">
+    <value>Filename: </value>
+  </data>
+  <data xml:space="preserve" name="compute mass and inertia">
+    <value>Compute Mass and Inertia</value>
+  </data>
+  <data xml:space="preserve" name="external values have been loaded. check this box to recompute the mass and inertia values">
+    <value>External values have been loaded. Check this box to recompute the Mass and Inertia values</value>
+  </data>
+  <data xml:space="preserve" name="compute visual and collision">
+    <value>Compute Visual and Collision</value>
+  </data>
+  <data xml:space="preserve" name="external values have been loaded. check this box to recompute the visual and collision values">
+    <value>External values have been loaded. Check this box to recompute the visual and collision values</value>
+  </data>
+  <data xml:space="preserve" name="compute joint kinematics">
+    <value>Compute Joint Kinematics</value>
+  </data>
+  <data xml:space="preserve" name="external values have been loaded. check this box to recompute the joint kinematics">
+    <value>External values have been loaded. Check this box to recompute the joint kinematics</value>
+  </data>
+  <data xml:space="preserve" name="compute joint limits">
+    <value>Compute Joint Limits</value>
+  </data>
+  <data xml:space="preserve" name="external values have been loaded. check this box to recompute the joint limits">
+    <value>External values have been loaded. Check this box to recompute the joint limits</value>
+  </data>
+  <data xml:space="preserve" name="search nested components">
+    <value>Search nested components</value>
+  </data>
+  <data xml:space="preserve" name="filter reference geometry by name:">
+    <value>Filter reference geometry by name:</value>
+  </data>
+  <data xml:space="preserve" name="link tree">
+    <value>Link Tree</value>
+  </data>
+  <data xml:space="preserve" name="list coordinate systems and axes found inside sub-assemblies and parts, not just the top level assembly and its immediate components.">
+    <value>List coordinate systems and axes found inside sub-assemblies and parts, not just the top level assembly and its immediate components.</value>
+  </data>
+  <data xml:space="preserve" name="optional: only list coordinate systems / axes whose name contains this text (case-insensitive). leave blank to list everything.">
+    <value>Optional: only list coordinate systems / axes whose name contains this text (case-insensitive). Leave blank to list everything.</value>
+  </data>
+  <data xml:space="preserve" name="customize the joint properties. if you want to adjust the coordinate systems and axes in the model, click cancel and restart the export. the tool will recognize your changes on the next run.">
+    <value>Customize the joint properties. If you want to adjust the coordinate systems and axes in the model, click cancel and restart the export. The tool will recognize your changes on the next run.</value>
+  </data>
+  <data xml:space="preserve" name="lower">
+    <value>lower</value>
+  </data>
+  <data xml:space="preserve" name="lower (m)">
+    <value>lower (m)</value>
+  </data>
+  <data xml:space="preserve" name="lower (n)">
+    <value>lower (N)</value>
+  </data>
+  <data xml:space="preserve" name="lower (n-m)">
+    <value>lower (N-m)</value>
+  </data>
+  <data xml:space="preserve" name="lower (rad/s)">
+    <value>lower (rad/s)</value>
+  </data>
+  <data xml:space="preserve" name="lower (m/s)">
+    <value>lower (m/s)</value>
+  </data>
+  <data xml:space="preserve" name="lower (n-m-s/rad)">
+    <value>lower (N-m-s/rad)</value>
+  </data>
+  <data xml:space="preserve" name="lower (n-s/m)">
+    <value>lower (N-s/m)</value>
+  </data>
+  <data xml:space="preserve" name="upper">
+    <value>upper</value>
+  </data>
+  <data xml:space="preserve" name="upper (m)">
+    <value>upper (m)</value>
+  </data>
+  <data xml:space="preserve" name="upper (n)">
+    <value>upper (N)</value>
+  </data>
+  <data xml:space="preserve" name="upper (n-m)">
+    <value>upper (N-m)</value>
+  </data>
+  <data xml:space="preserve" name="upper (rad/s)">
+    <value>upper (rad/s)</value>
+  </data>
+  <data xml:space="preserve" name="upper (m/s)">
+    <value>upper (m/s)</value>
+  </data>
+  <data xml:space="preserve" name="upper (n-m-s/rad)">
+    <value>upper (N-m-s/rad)</value>
+  </data>
+  <data xml:space="preserve" name="upper (n-s/m)">
+    <value>upper (N-s/m)</value>
+  </data>
+  <data xml:space="preserve" name="effort">
+    <value>effort</value>
+  </data>
+  <data xml:space="preserve" name="effort (m)">
+    <value>effort (m)</value>
+  </data>
+  <data xml:space="preserve" name="effort (rad)">
+    <value>effort (rad)</value>
+  </data>
+  <data xml:space="preserve" name="effort (n)">
+    <value>effort (N)</value>
+  </data>
+  <data xml:space="preserve" name="effort (rad/s)">
+    <value>effort (rad/s)</value>
+  </data>
+  <data xml:space="preserve" name="effort (m/s)">
+    <value>effort (m/s)</value>
+  </data>
+  <data xml:space="preserve" name="effort (n-m-s/rad)">
+    <value>effort (N-m-s/rad)</value>
+  </data>
+  <data xml:space="preserve" name="effort (n-s/m)">
+    <value>effort (N-s/m)</value>
+  </data>
+  <data xml:space="preserve" name="velocity">
+    <value>velocity</value>
+  </data>
+  <data xml:space="preserve" name="velocity (m)">
+    <value>velocity (m)</value>
+  </data>
+  <data xml:space="preserve" name="velocity (rad)">
+    <value>velocity (rad)</value>
+  </data>
+  <data xml:space="preserve" name="velocity (n)">
+    <value>velocity (N)</value>
+  </data>
+  <data xml:space="preserve" name="velocity (n-m)">
+    <value>velocity (N-m)</value>
+  </data>
+  <data xml:space="preserve" name="velocity (rad/s)">
+    <value>velocity (rad/s)</value>
+  </data>
+  <data xml:space="preserve" name="velocity (n-m-s/rad)">
+    <value>velocity (N-m-s/rad)</value>
+  </data>
+  <data xml:space="preserve" name="velocity (n-s/m)">
+    <value>velocity (N-s/m)</value>
+  </data>
+  <data xml:space="preserve" name="friction">
+    <value>friction</value>
+  </data>
+  <data xml:space="preserve" name="friction (m)">
+    <value>friction (m)</value>
+  </data>
+  <data xml:space="preserve" name="friction (rad)">
+    <value>friction (rad)</value>
+  </data>
+  <data xml:space="preserve" name="friction (n)">
+    <value>friction (N)</value>
+  </data>
+  <data xml:space="preserve" name="friction (n-m)">
+    <value>friction (N-m)</value>
+  </data>
+  <data xml:space="preserve" name="friction (rad/s)">
+    <value>friction (rad/s)</value>
+  </data>
+  <data xml:space="preserve" name="friction (m/s)">
+    <value>friction (m/s)</value>
+  </data>
+  <data xml:space="preserve" name="friction (n-m-s/rad)">
+    <value>friction (N-m-s/rad)</value>
+  </data>
+  <data xml:space="preserve" name="friction (n-s/m)">
+    <value>friction (N-s/m)</value>
+  </data>
+  <data xml:space="preserve" name="damping">
+    <value>damping</value>
+  </data>
+  <data xml:space="preserve" name="damping (m)">
+    <value>damping (m)</value>
+  </data>
+  <data xml:space="preserve" name="damping (rad)">
+    <value>damping (rad)</value>
+  </data>
+  <data xml:space="preserve" name="damping (n)">
+    <value>damping (N)</value>
+  </data>
+  <data xml:space="preserve" name="damping (n-m)">
+    <value>damping (N-m)</value>
+  </data>
+  <data xml:space="preserve" name="damping (rad/s)">
+    <value>damping (rad/s)</value>
+  </data>
+  <data xml:space="preserve" name="damping (m/s)">
+    <value>damping (m/s)</value>
+  </data>
+  <data xml:space="preserve" name="damping (n-m-s/rad)">
+    <value>damping (N-m-s/rad)</value>
+  </data>
+  <data xml:space="preserve" name="damping (n-s/m)">
+    <value>damping (N-s/m)</value>
+  </data>
+  <data xml:space="preserve" name="soft lower limit">
+    <value>soft lower limit</value>
+  </data>
+  <data xml:space="preserve" name="soft lower limit (m)">
+    <value>soft lower limit (m)</value>
+  </data>
+  <data xml:space="preserve" name="soft lower limit (n)">
+    <value>soft lower limit (N)</value>
+  </data>
+  <data xml:space="preserve" name="soft lower limit (n-m)">
+    <value>soft lower limit (N-m)</value>
+  </data>
+  <data xml:space="preserve" name="soft lower limit (rad/s)">
+    <value>soft lower limit (rad/s)</value>
+  </data>
+  <data xml:space="preserve" name="soft lower limit (m/s)">
+    <value>soft lower limit (m/s)</value>
+  </data>
+  <data xml:space="preserve" name="soft lower limit (n-m-s/rad)">
+    <value>soft lower limit (N-m-s/rad)</value>
+  </data>
+  <data xml:space="preserve" name="soft lower limit (n-s/m)">
+    <value>soft lower limit (N-s/m)</value>
+  </data>
+  <data xml:space="preserve" name="soft upper limit">
+    <value>soft upper limit</value>
+  </data>
+  <data xml:space="preserve" name="soft upper limit (m)">
+    <value>soft upper limit (m)</value>
+  </data>
+  <data xml:space="preserve" name="soft upper limit (n)">
+    <value>soft upper limit (N)</value>
+  </data>
+  <data xml:space="preserve" name="soft upper limit (n-m)">
+    <value>soft upper limit (N-m)</value>
+  </data>
+  <data xml:space="preserve" name="soft upper limit (rad/s)">
+    <value>soft upper limit (rad/s)</value>
+  </data>
+  <data xml:space="preserve" name="soft upper limit (m/s)">
+    <value>soft upper limit (m/s)</value>
+  </data>
+  <data xml:space="preserve" name="soft upper limit (n-m-s/rad)">
+    <value>soft upper limit (N-m-s/rad)</value>
+  </data>
+  <data xml:space="preserve" name="soft upper limit (n-s/m)">
+    <value>soft upper limit (N-s/m)</value>
+  </data>
+  <data xml:space="preserve" name="creating urdf package &quot;{0}&quot; at:&#10;{1}">
+    <value>Creating URDF Package "{0}" at:
+{1}</value>
+  </data>
+</root>
