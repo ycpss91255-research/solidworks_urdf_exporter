@@ -41,6 +41,10 @@ function New-Form([Type]$type, [System.Drawing.Font]$font, $ui) {
         $align = $type.GetMethod('AlignFieldLabels', $flags)
         if ($align) { [void]$align.Invoke($form, @()) }
     }
+    # The constructors also grow too-short push buttons (UiLayout); check that state at 150% DPI.
+    $layoutType = $assembly.GetType('SW2URDF.UI.UiLayout')
+    $fit = if ($layoutType) { $layoutType.GetMethod('FitButtonHeights', [Reflection.BindingFlags]'Static,NonPublic,Public') }
+    if ($fit) { [void]$fit.Invoke($null, @($form, [single]144)) }
     return $form
 }
 
