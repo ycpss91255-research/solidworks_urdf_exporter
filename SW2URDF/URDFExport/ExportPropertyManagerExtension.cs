@@ -58,7 +58,7 @@ namespace SW2URDF.URDFExport
         private void FillComboBox(PropertyManagerPageCombobox box, List<string> featureNames)
         {
             box.Clear();
-            box.AddItems("Automatically Generate");
+            box.AddItems(ui.ComboDisplay("Automatically Generate"));
             foreach (string name in featureNames)
             {
                 box.AddItems(name);
@@ -71,6 +71,7 @@ namespace SW2URDF.URDFExport
         private void SelectComboBox(PropertyManagerPageCombobox box, string item)
         {
             short i = 0;
+            item = ui.ComboDisplay(item);
             string itemtext = "nothing";
             box.CurrentSelection = 0;
 
@@ -198,7 +199,7 @@ namespace SW2URDF.URDFExport
             {
                 node.IsIncomplete = true;
                 node.WhyIncomplete +=
-                    "        Links with children cannot be empty. Select its associated components\r\n";
+                    "        " + ui.Get("Links with children cannot be empty. Select its associated components") + "\r\n";
             }
         }
 
@@ -208,7 +209,7 @@ namespace SW2URDF.URDFExport
             {
                 node.IsIncomplete = true;
                 node.WhyIncomplete +=
-                    "        Links with children cannot be empty. Select its associated components\r\n";
+                    "        " + ui.Get("Links with children cannot be empty. Select its associated components") + "\r\n";
             }
         }
 
@@ -218,24 +219,21 @@ namespace SW2URDF.URDFExport
             {
                 node.IsIncomplete = true;
                 node.WhyIncomplete +=
-                    "        The origin reference coordinate system cannot be automatically generated\r\n" +
-                    "        without components. Either select an origin or at least one component.\r\n";
+                    "        " + ui.Get("The origin reference coordinate system cannot be automatically generated without components. Either select an origin or at least one component.") + "\r\n";
             }
 
             if (node.Link.SWComponents.Count == 0 && node.Link.Joint.AxisName == "Automatically Generate")
             {
                 node.IsIncomplete = true;
                 node.WhyIncomplete +=
-                    "        The reference axis cannot be automatically generated\r\n" +
-                    "        without components. Either select an axis or at least one component.";
+                    "        " + ui.Get("The reference axis cannot be automatically generated without components. Either select an axis or at least one component.");
             }
 
             if (node.Link.SWComponents.Count == 0 && node.Link.Joint.Type == "Automatically Generate")
             {
                 node.IsIncomplete = true;
                 node.WhyIncomplete +=
-                    "        The joint type cannot be automatically detected\r\n" +
-                    "        without components. Either select an joint type or at least one component.";
+                    "        " + ui.Get("The joint type cannot be automatically detected without components. Either select a joint type or at least one component.");
             }
         }
 
@@ -247,12 +245,12 @@ namespace SW2URDF.URDFExport
             if (String.IsNullOrWhiteSpace(node.Link.Name))
             {
                 node.IsIncomplete = true;
-                node.WhyIncomplete += "        Link name is empty. Fill in a unique link name\r\n";
+                node.WhyIncomplete += "        " + ui.Get("Link name is empty. Fill in a unique link name") + "\r\n";
             }
             if (String.IsNullOrWhiteSpace(node.Link.Joint.Name) && !node.IsBaseNode)
             {
                 node.IsIncomplete = true;
-                node.WhyIncomplete += "        Joint name is empty. Fill in a unique joint name\r\n";
+                node.WhyIncomplete += "        " + ui.Get("Joint name is empty. Fill in a unique joint name") + "\r\n";
             }
 
             CheckNodeInertialComplete(node);
@@ -304,7 +302,7 @@ namespace SW2URDF.URDFExport
             if (!String.IsNullOrWhiteSpace(incompleteNodes))
             {
                 MessageBox.Show(
-                    "The following nodes are incomplete. You need to fix them before continuing.\r\n\r\n" + incompleteNodes);
+                    ui.Get("The following nodes are incomplete. You need to fix them before continuing.") + "\r\n\r\n" + incompleteNodes);
                 return false;
             }
             return true;
@@ -319,14 +317,14 @@ namespace SW2URDF.URDFExport
                 if (!previouslySelectedNode.IsBaseNode)
                 {
                     previouslySelectedNode.Link.Joint.Name = PMTextBoxJointName.Text;
-                    previouslySelectedNode.Link.Joint.AxisName = PMComboBoxAxes.get_ItemText(-1);
-                    previouslySelectedNode.Link.Joint.CoordinateSystemName = PMComboBoxCoordSys.get_ItemText(-1);
-                    previouslySelectedNode.Link.Joint.Type = PMComboBoxJointType.get_ItemText(-1);
+                    previouslySelectedNode.Link.Joint.AxisName = ui.ComboValue(PMComboBoxAxes.get_ItemText(-1));
+                    previouslySelectedNode.Link.Joint.CoordinateSystemName = ui.ComboValue(PMComboBoxCoordSys.get_ItemText(-1));
+                    previouslySelectedNode.Link.Joint.Type = ui.ComboValue(PMComboBoxJointType.get_ItemText(-1));
                 }
                 else
                 {
                     previouslySelectedNode.Link.Joint.CoordinateSystemName =
-                        PMComboBoxGlobalCoordsys.get_ItemText(-1);
+                        ui.ComboValue(PMComboBoxGlobalCoordsys.get_ItemText(-1));
                 }
                 CommonSwOperations.GetSelectedComponents(
                     ActiveSWModel, previouslySelectedNode.Link.SWComponents, PMSelection.Mark);
@@ -387,7 +385,7 @@ namespace SW2URDF.URDFExport
                 FillComboBox(PMComboBoxCoordSys, Exporter.GetRefCoordinateSystems());
                 FillComboBox(PMComboBoxAxes, Exporter.GetRefAxes());
 
-                PMComboBoxAxes.AddItems("None");
+                PMComboBoxAxes.AddItems(ui.ComboDisplay("None"));
                 SelectComboBox(PMComboBoxCoordSys, node.Link.Joint.CoordinateSystemName);
                 SelectComboBox(PMComboBoxAxes, node.Link.Joint.AxisName);
                 SelectComboBox(PMComboBoxJointType, node.Link.Joint.Type);
@@ -495,8 +493,7 @@ namespace SW2URDF.URDFExport
 
             if (abortProcess)
             {
-                MessageBox.Show("An error occured loading an existing configuration. Either resolve the issue" +
-                    " or delete the configuration from the feature manager");
+                MessageBox.Show(ui.Get("An error occurred loading an existing configuration. Either resolve the issue or delete the configuration from the feature manager"));
                 return false;
             }
 
@@ -507,7 +504,7 @@ namespace SW2URDF.URDFExport
             if (baseNode == null || !baseNode.RebuildLink().AreRequiredFieldsSatisfied())
             {
                 loadConfigurationControl.Tip = 
-                    "Your configuration has not been fully exported. This feature may not work correctly";
+                    ui.Get("Your configuration has not been fully exported. This feature may not work correctly");
             }
 
             return true;
@@ -656,7 +653,7 @@ namespace SW2URDF.URDFExport
             CheckIfLinkNamesAreUnique(node, node, linkConflicts);
             CheckIfJointNamesAreUnique(node, node, jointConflicts);
 
-            string message = "\r\nPlease fix these errors before proceeding.";
+            string message = "\r\n" + ui.Get("Please fix these errors before proceeding.");
             string specificErrors = "";
             bool displayInitialMessage = true;
             bool linkNamesInConflict = false;
@@ -668,7 +665,7 @@ namespace SW2URDF.URDFExport
                     if (displayInitialMessage)
                     {
                         specificErrors +=
-                            "The following links have LINK names that conflict:\r\n\r\n";
+                            ui.Get("The following links have LINK names that conflict:") + "\r\n\r\n";
                         displayInitialMessage = false;
                     }
                     bool isFirst = true;
@@ -689,7 +686,7 @@ namespace SW2URDF.URDFExport
                     if (displayInitialMessage)
                     {
                         specificErrors +=
-                            "The following links have JOINT names that conflict:\r\n\r\n";
+                            ui.Get("The following links have JOINT names that conflict:") + "\r\n\r\n";
                         displayInitialMessage = false;
                     }
                     bool isFirst = true;
