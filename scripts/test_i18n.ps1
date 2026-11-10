@@ -21,13 +21,13 @@ try {
     $zh = New-Ui 'chinese'
     Require ($zh.Culture.Name -eq 'zh-TW') 'chinese maps to zh-TW'
     Require ($zh.Get('Cancel') -ne 'Cancel') 'zh-TW satellite resources are missing or not loaded'
-    Require ($zh.Get('URDF name') -ne 'URDF name' -and $zh.Get('URDF name') -ceq $zh.Get('URDF Name')) 'case-equivalent captions resolve to one resource'
+    Require ($zh.Get('cancel') -ne 'cancel' -and $zh.Get('cancel') -ceq $zh.Get('CANCEL') -and $zh.Get('Cancel') -ceq $zh.Get('cancel')) 'case-equivalent captions resolve to one resource'
     Require ((New-Ui 'CHINESE').Get('Cancel') -ceq $zh.Get('Cancel')) 'language name is case-insensitive'
     foreach ($language in @($null, '', 'english', 'chinese-simplified', 'french', 'unknown')) {
         $other = New-Ui $language
         Require ($other.Culture.Name -eq 'en') "fallback culture for '$language'"
         Require ($other.Get('Cancel') -ceq 'Cancel') "English fallback for '$language'"
-        Require ($other.Get('URDF Name') -ceq 'URDF Name') "English capitalization preserved for '$language'"
+        Require ($other.Get('CANCEL') -ceq 'CANCEL') "English capitalization preserved for '$language'"
     }
     Require ($zh.Get('no such resource') -ceq 'no such resource') 'missing key falls back to the original text'
     Require ($null -eq $zh.Get([NullString]::Value) -and $zh.Get('') -ceq '') 'null and empty pass through'
