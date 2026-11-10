@@ -28,7 +28,7 @@ namespace TestRunner
                 Path.GetDirectoryName( // TestRunner
                 Path.GetDirectoryName( // bin
                 Path.GetDirectoryName( // x64
-                Path.GetDirectoryName( // net452
+                Path.GetDirectoryName( // net48
                     AppDomain.CurrentDomain.BaseDirectory // Debug
                 )))));
 
