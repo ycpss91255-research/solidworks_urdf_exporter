@@ -157,26 +157,18 @@ namespace SW2URDF.UI
                                                              textBox_collision_origin_pitch,
                                                              textBox_collision_origin_yaw);
 
-            Exporter.URDFRobot.BaseLink.STLQualityFine = radioButton_fine.Checked;
-
             Exporter.ExportLink(checkBox_rotate.Checked, objExport.Checked ? MeshExportFormat.OBJ : MeshExportFormat.STL);
             Close();
         }
 
         private void ObjExportCheckedChanged(object sender, EventArgs e)
         {
-            UpdateMeshQualityControls();
+            UpdateObjColorControls();
         }
 
-        // The OBJ path is exported through 3DXML, so the STL Fine/Coarse
-        // preference has no effect on it.
-        private void UpdateMeshQualityControls()
+        private void UpdateObjColorControls()
         {
             bool stl = !objExport.Checked;
-            label1.Enabled = stl;
-            radioButton_fine.Enabled = stl;
-            radioButton_course.Enabled = stl;
-            panelObjQualityNote.Visible = !stl;
 
             // OBJ writes no URDF <material>; color and texture come from the MTL file.
             Control[] colorControls = {

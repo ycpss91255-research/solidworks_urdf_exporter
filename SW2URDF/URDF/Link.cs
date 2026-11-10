@@ -39,9 +39,6 @@ namespace SW2URDF.URDF
         public Joint Joint;
 
         [DataMember]
-        public bool STLQualityFine;
-
-        [DataMember]
         public bool isIncomplete;
 
         [DataMember]
