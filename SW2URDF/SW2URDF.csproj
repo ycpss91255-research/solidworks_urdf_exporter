@@ -330,6 +330,7 @@
     <Compile Include="Test\TestExportHelper.cs" />
     <Compile Include="Test\TestLogger.cs" />
     <Compile Include="Test\TestMathOps.cs" />
+    <Compile Include="Test\TestObjConverter.cs" />
     <Compile Include="Test\TestOrphanAttributes.cs" />
     <Compile Include="Test\TestPerConfiguration.cs" />
     <Compile Include="Test\TestMissingComponentPolicy.cs" />
