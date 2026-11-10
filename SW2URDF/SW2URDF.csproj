@@ -332,6 +332,10 @@
     <Compile Include="Test\TestObjConverter.cs" />
     <Compile Include="Test\TestPropertyManager.cs" />
     <Compile Include="Test\TestROSFIles.cs" />
+    <Compile Include="Test\SolidWorksBinding.cs" />
+    <Compile Include="Test\TestSolidWorksBinding.cs" />
+    <Compile Include="Test\TestTwoBoxesFixture.cs" />
+    <Compile Include="Test\TwoBoxesModel.cs" />
     <Compile Include="Test\TestSerialization.cs" />
     <Compile Include="Test\TestSWAttached.cs" />
     <Compile Include="Test\TestURDFMerge.cs" />
