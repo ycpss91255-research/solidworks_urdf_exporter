@@ -57,6 +57,11 @@ namespace SW2URDF.Test
 
         public static string GetExamplesDirectory()
         {
+            string overridden = System.Environment.GetEnvironmentVariable(ExamplesDirectoryEnvironmentVariable);
+            if (!string.IsNullOrWhiteSpace(overridden))
+            {
+                return overridden;
+            }
             return Path.Combine(GetSolutionDirectory(), "examples");
         }
 
