@@ -132,6 +132,6 @@ coordinate system to the document if it has none, so use a copy of the part.
 
 ## Limits
 
-Tested with SOLIDWORKS 2023 SP5 and .NET Framework 4.5.2. Image textures are not
+Tested with SOLIDWORKS 2023 SP5 and .NET Framework 4.8. Image textures are not
 supported. Very large meshes are converted one occurrence at a time, but the
 parsed geometry of each part is kept in memory for the duration of the conversion.
