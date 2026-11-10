@@ -29,6 +29,7 @@ namespace SW2URDF.URDFExport
     public class URDFPackage
     {
         public static IMessageBox MessageBox = new MessageBoxHelper();
+        private readonly UiText ui;
         public string PackageName { get; }
 
         public string PackageDirectory { get; }
@@ -47,8 +48,9 @@ namespace SW2URDF.URDFExport
         public string WindowsCMakeLists { get; }
         public string WindowsConfigYAML { get; }
 
-        public URDFPackage(string name, string dir)
+        public URDFPackage(string name, string dir, UiText displayText = null)
         {
+            ui = displayText ?? new UiText(null);
             PackageName = name;
             PackageDirectory = @"package://" + name + @"/";
             MeshesDirectory = PackageDirectory + @"meshes/";
@@ -71,8 +73,8 @@ namespace SW2URDF.URDFExport
 
         public void CreateDirectories()
         {
-            MessageBox.Show("Creating URDF Package \"" +
-                PackageName + "\" at:\n" + WindowsPackageDirectory);
+            MessageBox.Show(string.Format(ui.Get("Creating URDF Package \"{0}\" at:\n{1}"),
+                PackageName, WindowsPackageDirectory));
             if (!Directory.Exists(WindowsPackageDirectory))
             {
                 Directory.CreateDirectory(WindowsPackageDirectory);

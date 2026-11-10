@@ -40,6 +40,7 @@ namespace SW2URDF.UI
         private static readonly log4net.ILog logger = Logger.GetLogger();
 
         public ExportHelper Exporter;
+        private readonly UiText ui;
         public bool AutoUpdatingForm;
         public AttributeDef saveConfigurationAttributeDef;
 
@@ -57,6 +58,8 @@ namespace SW2URDF.UI
             AppDomain.CurrentDomain.UnhandledException +=
                 new UnhandledExceptionEventHandler(UnhandledException);
             InitializeComponent();
+            ui = UiText.FromSolidWorks(SwApp);
+            ui.Apply(this);
             swApp = SwApp;
             BaseNode = node;
             ActiveSWModel = swApp.ActiveDoc;
@@ -158,7 +161,7 @@ namespace SW2URDF.UI
             {
                 string message = "The following joints are missing required fields, please " +
                     "address them before continuing\r\n\r\n" + errors;
-                MessageBox.Show(message, "URDF Joint Errors");
+                MessageBox.Show(message, ui.Get("URDF Joint Errors"));
                 return;
             }
 
@@ -270,7 +273,7 @@ namespace SW2URDF.UI
 
                 string message = "The following links contained errors in either their link or joint " +
                     "properties. Please address before continuing\r\n\r\n" + errors;
-                MessageBox.Show(message, "URDF Errors");
+                MessageBox.Show(message, ui.Get("URDF Errors"));
                 return;
             }
 
@@ -283,7 +286,7 @@ namespace SW2URDF.UI
                 string message = "The following links contained issues that may cause problems. " +
                 "Do you wish to proceed?\r\n\r\n" + warnings;
                 DialogResult result =
-                    MessageBox.Show(message, "URDF Warnings", MessageBoxButtons.YesNo);
+                    MessageBox.Show(message, ui.Get("URDF Warnings"), MessageBoxButtons.YesNo);
 
                 if (result == DialogResult.No)
                 {
