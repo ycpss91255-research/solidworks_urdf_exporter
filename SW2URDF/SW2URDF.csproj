@@ -329,6 +329,7 @@
     <Compile Include="Test\TestLogger.cs" />
     <Compile Include="Test\TestMathOps.cs" />
     <Compile Include="Test\TestOrphanAttributes.cs" />
+    <Compile Include="Test\TestPerConfiguration.cs" />
     <Compile Include="Test\TestMissingComponentPolicy.cs" />
     <Compile Include="Test\TestPropertyManager.cs" />
     <Compile Include="Test\TestROSFIles.cs" />
