@@ -124,6 +124,33 @@ namespace SW2URDF.UI
             Close();
         }
 
+        private void ObjExportCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMeshQualityControls();
+        }
+
+        // The OBJ path is exported through 3DXML, so the STL Fine/Coarse
+        // preference has no effect on it.
+        private void UpdateMeshQualityControls()
+        {
+            bool stl = !objExport.Checked;
+            label1.Enabled = stl;
+            radioButton_fine.Enabled = stl;
+            radioButton_course.Enabled = stl;
+            panelObjQualityNote.Visible = !stl;
+
+            // OBJ writes no URDF <material>; color and texture come from the MTL file.
+            Control[] colorControls = {
+                label28, label29, label30, label31, label32, label33, label34,
+                comboBox_materials, domainUpDown_red, domainUpDown_green, domainUpDown_blue,
+                domainUpDown_alpha, textBox_texture, button_texturebrowse };
+            foreach (Control control in colorControls)
+            {
+                control.Enabled = stl;
+            }
+            panelObjColorNote.Visible = !stl;
+        }
+
         private void ButtonCancelClick(object sender, EventArgs e)
         {
             Close();
