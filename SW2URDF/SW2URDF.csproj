@@ -333,6 +333,7 @@
     <Compile Include="Test\TestMathOps.cs" />
     <Compile Include="Test\TestObjConverter.cs" />
     <Compile Include="Test\TestConfigurationStatus.cs" />
+    <Compile Include="Test\TestDocumentPersistence.cs" />
     <Compile Include="Test\TestOrphanAttributes.cs" />
     <Compile Include="Test\TestPartPerConfiguration.cs" />
     <Compile Include="Test\TestPartSettings.cs" />
@@ -385,6 +386,7 @@
     </Compile>
     <Compile Include="URDFExport\CommonSwOperations.cs" />
     <Compile Include="URDFExport\ConfigurationStatus.cs" />
+    <Compile Include="URDFExport\DocumentPersistence.cs" />
     <Compile Include="URDFExport\OrphanAttributes.cs" />
     <Compile Include="URDFExport\ConfigurationFormat.cs" />
     <Compile Include="URDFExport\MissingComponentPolicy.cs" />
