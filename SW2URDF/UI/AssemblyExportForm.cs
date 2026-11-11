@@ -42,6 +42,7 @@ namespace SW2URDF.UI
         public ExportHelper Exporter;
         private readonly UiText ui;
         public bool AutoUpdatingForm;
+        private bool exportCompleted;
         public AttributeDef saveConfigurationAttributeDef;
 
         private readonly SldWorks swApp;
@@ -227,6 +228,17 @@ namespace SW2URDF.UI
             UiLayout.FitButtonHeightsToWindow(this);
         }
 
+        // Closing the preview in any way other than a completed export (Cancel, the window's close
+        // button, Escape) takes back what the preview put into the model.
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            base.OnFormClosed(e);
+            if (!exportCompleted && Exporter != null)
+            {
+                Exporter.DiscardGeneratedFeatures();
+            }
+        }
+
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
@@ -329,6 +341,9 @@ namespace SW2URDF.UI
                 treeViewJointTree.Nodes.Remove(node);
                 BaseNode.Nodes.Add(node);
             }
+
+            // The joint names go back to what they were before the preview, then the tree is saved
+            Exporter.DiscardGeneratedFeatures();
             SaveConfigTree(ActiveSWModel, BaseNode, true);
             Close();
         }
@@ -339,6 +354,9 @@ namespace SW2URDF.UI
             {
                 SaveLinkDataFromPropertyBoxes(previouslySelectedNode.Link);
             }
+
+            // The joint names go back to what they were before the preview, then the tree is saved
+            Exporter.DiscardGeneratedFeatures();
             SaveConfigTree(ActiveSWModel, BaseNode, true);
             Close();
         }
@@ -446,6 +464,8 @@ namespace SW2URDF.UI
                 Exporter.ExportRobot(exportSTL, meshFormat);
                 ConfigurationSerialization.GroupUrdfFeatures(ActiveSWModel, ui);
 
+                // A completed export keeps the generated features
+                exportCompleted = true;
                 Close();
             }
         }
