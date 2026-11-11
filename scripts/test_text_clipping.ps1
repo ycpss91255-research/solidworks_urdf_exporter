@@ -126,7 +126,9 @@ function Get-Clipped($form, [string]$tag, [double]$dpi) {
 
 $formTypes = @('SW2URDF.UI.AssemblyExportForm', 'SW2URDF.UI.PartExportForm')
 $fonts = @(@('Microsoft Sans Serif', 8.25), @('Microsoft JhengHei UI', 9), @('PMingLiU', 9))
-$scenarios = @(@(1.0, 'scaled'), @(1.25, 'scaled'), @(1.5, 'scaled'), @(1.25, 'unscaled'), @(1.5, 'unscaled'))
+# Display scales are only test scenarios: the layout code derives everything from the DPI it is given.
+$scenarios = @(@(1.0, 'scaled'), @(1.25, 'scaled'), @(1.5, 'scaled'), @(1.75, 'scaled'), @(2.0, 'scaled'),
+    @(1.25, 'unscaled'), @(1.5, 'unscaled'), @(1.75, 'unscaled'), @(2.0, 'unscaled'))
 $translated = [Activator]::CreateInstance($uiType, @(, [string]$Language))
 $lines = New-Object System.Collections.ArrayList
 $checked = 0
