@@ -329,6 +329,7 @@
     <Compile Include="Test\TestCSVImportExport.cs" />
     <Compile Include="Test\TestCsvColumnCheck.cs" />
     <Compile Include="Test\TestExportHelper.cs" />
+    <Compile Include="Test\TestFileNames.cs" />
     <Compile Include="Test\TestLogger.cs" />
     <Compile Include="Test\TestMathOps.cs" />
     <Compile Include="Test\TestObjConverter.cs" />
@@ -379,6 +380,7 @@
     <Compile Include="URDFExport\CSV\CSVImportExport.cs" />
     <Compile Include="URDFExport\ConfigurationSerialization.cs" />
     <Compile Include="URDFExport\ExportHelper.cs" />
+    <Compile Include="URDFExport\FileNames.cs" />
     <Compile Include="URDFExport\ObjConversionRunner.cs" />
     <Compile Include="URDFExport\ObjConverter.cs" />
     <Compile Include="URDFExport\ThreeDxmlReader.cs" />
