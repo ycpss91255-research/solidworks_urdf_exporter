@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2015 Stephen Brawner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -125,7 +125,6 @@ namespace SW2URDF.URDFExport
         private const int LabelLinkNameTitleID = 35;
         private const int LabelLinkComponentsID = 36;
         private const int LabelChildCountID = 37;
-        private const int LabelChildCountHelpID = 38;
 
         #endregion class variables
 
@@ -910,10 +909,6 @@ namespace SW2URDF.URDFExport
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
             PMGroup.AddControl2(
                 LabelChildCountID, (short)controlType, caption, (short)alignment, (int)options, tip);
-            // One line of explanation under the title: what the number does
-            PMGroup.AddControl2(
-                LabelChildCountHelpID, (short)controlType, ui.Get("Adds/removes child links"),
-                (short)alignment, (int)options, tip);
 
             //Create the number box
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Numberbox;
