@@ -11,9 +11,11 @@ namespace SW2URDF.URDF
     public class URDFAttribute
     {
         public static readonly NumberFormatInfo URDFNumberFormat =
-            CultureInfo.CreateSpecificCulture("en-US").NumberFormat;
+            CultureInfo.InvariantCulture.NumberFormat;
 
-        public static readonly NumberStyles URDFNumberStyle = NumberStyles.Any;
+        // Digits, a sign, one decimal point and an exponent. No thousands separators or currency symbols: "1,5" is
+        // not a number, and must not be read as 15.
+        public static readonly NumberStyles URDFNumberStyle = NumberStyles.Float;
 
         [DataMember]
         private bool IsRequired;
@@ -94,39 +96,58 @@ namespace SW2URDF.URDF
             string contextString = string.Join(".", context) + "." + AttributeType;
             if (dictionary.ContainsKey(contextString))
             {
-                Value = GetValueFromString(dictionary[contextString]);
+                SetValueFromText(contextString, dictionary[contextString]);
             }
         }
 
-        public static object GetValueFromString(string valueStr)
+        // Attributes whose value is text even when it is empty or not set yet
+        private static readonly HashSet<string> TextAttributeTypes =
+            new HashSet<string> { "name", "type", "link", "filename", "joint" };
+
+        /// <summary>
+        /// Sets the value from a CSV field according to what this attribute holds: text stays text (also
+        /// when it looks like a number or contains ';'), numbers are read with the invariant culture.
+        /// A field that is not a valid number is logged and ignored; the previous value stays.
+        /// </summary>
+        private void SetValueFromText(string column, string text)
         {
-            if (valueStr == null)
+            if (text == null)
             {
-                return null;
+                return;
             }
-            double resultDouble;
-            if (valueStr.Contains(";"))
+            if (Value is string || (Value == null && TextAttributeTypes.Contains(AttributeType)))
             {
-                string[] valueFields = valueStr.Split(';');
-                double[] arry = new double[valueFields.Length];
-                for (int i = 0; i < valueFields.Length; i++)
+                Value = text;
+            }
+            else if (Value is double[])
+            {
+                string[] parts = text.Split(';');
+                double[] numbers = new double[parts.Length];
+                for (int i = 0; i < parts.Length; i++)
                 {
-                    if (!Double.TryParse(valueFields[i], out resultDouble))
+                    if (!TryParseDouble(parts[i], out numbers[i]))
                     {
-                        throw new Exception("Parsing failed for CSV field " + valueStr);
+                        Utilities.Logger.GetLogger().Warn("Ignoring CSV field " + column + ": '" + text + "' is not a list of numbers");
+                        return;
                     }
-                    arry[i] = resultDouble;
                 }
-                return arry;
+                Value = numbers;
+            }
+            else if (TryParseDouble(text, out double number))
+            {
+                Value = number;
             }
             else
             {
-                if (Double.TryParse(valueStr, out resultDouble))
-                {
-                    return resultDouble;
-                }
+                Utilities.Logger.GetLogger().Warn("Ignoring CSV field " + column + ": '" + text + "' is not a number");
             }
-            return valueStr;
+        }
+
+        /// <summary>Reads a number the way the URDF and the CSV files write it: invariant culture, no
+        /// thousands separators.</summary>
+        public static bool TryParseDouble(string text, out double value)
+        {
+            return Double.TryParse(text, URDFNumberStyle, URDFNumberFormat, out value);
         }
 
         public bool GetIsRequired()
@@ -178,6 +199,10 @@ namespace SW2URDF.URDF
             }
             else if (GetIsRequired())
             {
+                if (!String.IsNullOrWhiteSpace(text))
+                {
+                    Utilities.Logger.GetLogger().Warn("'" + text + "' is not a number for " + AttributeType + "; using 0");
+                }
                 Value = 0.0;
             }
         }

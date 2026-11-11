@@ -65,6 +65,9 @@ namespace SW2URDF.URDFExport
 
         private UserProgressBar progressBar;
 
+        // Links whose mesh could not be written in the current export (issue 61).
+        private readonly List<string> failedMeshLinks = new List<string>();
+
         [XmlIgnore]
         public ModelDoc2 ActiveSWModel;
 
@@ -201,6 +204,9 @@ namespace SW2URDF.URDFExport
             ActiveSWModel.Extension.SelectAll();
             ActiveSWModel.HideComponent2();
 
+            UiText ui = UiText.FromSolidWorks(iSwApp);
+            failedMeshLinks.Clear();
+            MeshExportCheck.RemoveFailureMarker(package.WindowsPackageDirectory);
             bool success = false;
             try
             {
@@ -223,8 +229,19 @@ namespace SW2URDF.URDFExport
 
             if (!success)
             {
-                MessageBox.Show("Exporting the URDF failed unexpectedly. Email your maintainer " +
-                    "with the log file found at " + Logger.GetFileName());
+                progressBar.End();
+                URDFPackage.MessageBox.Show(ui.ProblemMessage(
+                    ui.Get("Exporting the URDF failed unexpectedly."), null));
+                return;
+            }
+
+            if (failedMeshLinks.Count > 0)
+            {
+                string failed = MeshExportCheck.JoinLinkNames(failedMeshLinks);
+                logger.Error("Mesh export failed for: " + failed + ". The URDF was not written.");
+                MeshExportCheck.WriteFailureMarker(package.WindowsPackageDirectory, failedMeshLinks);
+                progressBar.End();
+                URDFPackage.MessageBox.Show(MeshFailureMessage(ui, failed));
                 return;
             }
 
@@ -325,23 +342,37 @@ namespace SW2URDF.URDFExport
             // Export STL
             if (exportSTL)
             {
-                switch (meshFormat)
+                bool exported;
+                try
                 {
-                    case MeshExportFormat.STL:
-                        SaveSTL(link, windowsMeshFileName);
-                        break;
+                    switch (meshFormat)
+                    {
+                        case MeshExportFormat.OBJ:
+                            SaveObj(link, windowsMeshFileName);
+                            exported = MeshExportCheck.IsUsableMesh(windowsMeshFileName);
+                            break;
 
-                    case MeshExportFormat.OBJ:
-                        SaveObj(link, windowsMeshFileName);
-                        break;
+                        case MeshExportFormat.THREEDXML:
+                            exported = Save3dxml(link, windowsMeshFileName);
+                            break;
 
-                    case MeshExportFormat.THREEDXML:
-                        Save3dxml(link, windowsMeshFileName);
-                        break;
-
-                    default:
-                        SaveSTL(link, windowsMeshFileName);
-                        break;
+                        default:
+                            exported = SaveSTL(link, windowsMeshFileName);
+                            break;
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    logger.Error("Exporting the mesh of link " + link.Name + " failed", e);
+                    exported = false;
+                }
+                if (!exported)
+                {
+                    failedMeshLinks.Add(link.Name);
                 }
             }
             link.Visual.Geometry.Mesh.Filename = meshFilename;
@@ -401,7 +432,7 @@ namespace SW2URDF.URDFExport
                 throw new IOException("Native 3DXML export failed (" + errors + "): " + source);
         }
 
-        private void Save3dxml(Link link, string windowsMeshFilename)
+        private bool Save3dxml(Link link, string windowsMeshFilename)
         {
             int errors = 0;
             int warnings = 0;
@@ -465,7 +496,9 @@ namespace SW2URDF.URDFExport
                 {
                     logger.Info("Localizing Link : " + coordsysName);
                     Matrix<double> GlobalTransform = MathOps.GetTransformation(coordSysTransform);
-                    LocalizeLink(link, GlobalTransform);
+                    // Assembly inertial properties are already expressed in the link frame.
+                    // Only the 3dxml geometry needs this placement correction.
+                    LocalizeMeshOrigins(link, GlobalTransform);
                 }
                 else
                 {
@@ -478,7 +511,7 @@ namespace SW2URDF.URDFExport
             }
             // === 3dxml Localize Link === //
 
-            ActiveDoc.Extension.SaveAs(windowsMeshFilename,
+            bool saved = ActiveDoc.Extension.SaveAs(windowsMeshFilename,
                 (int)swSaveAsVersion_e.swSaveAsCurrentVersion, saveOptions, null, ref errors, ref warnings);
 
             if (errors + warnings != 0)
@@ -487,6 +520,23 @@ namespace SW2URDF.URDFExport
                     " or warnings " + warnings);
             }
             CommonSwOperations.HideComponents(ActiveSWModel, link.SWComponents);
+            return MeshSaveSucceeded(link, saved, errors, windowsMeshFilename);
+        }
+
+        private static string MeshFailureMessage(UiText ui, string failedLinks)
+        {
+            string text = ui.Get("The mesh of these links could not be exported: {0}. The URDF was not written and the package is incomplete (see {1}). Check the log and the output folder, then export again.");
+            return string.Format(text, failedLinks, MeshExportCheck.FailureMarkerFileName) + "\n" +
+                string.Format(ui.Get("Email your maintainer with the log file found at {0}"), Logger.GetFileName());
+        }
+
+        // A mesh counts as exported only when SolidWorks says so, reports no error and the file exists.
+        private static bool MeshSaveSucceeded(Link link, bool saved, int errors, string windowsMeshFilename)
+        {
+            if (saved && errors == 0 && MeshExportCheck.IsUsableMesh(windowsMeshFilename)) return true;
+            logger.Error("Exporting the mesh for link " + link.Name + " failed (saved=" + saved + ", error " +
+                errors + "): " + windowsMeshFilename);
+            return false;
         }
 
         private bool SaveSTL(Link link, string windowsMeshFilename)
@@ -506,6 +556,7 @@ namespace SW2URDF.URDFExport
             CommonSwOperations.ShowComponents(ActiveSWModel, link.SWComponents);
 
             bool success;
+            bool saved = false;
             try
             {
                 int saveOptions = (int)swSaveAsOptions_e.swSaveAsOptions_Silent |
@@ -513,7 +564,7 @@ namespace SW2URDF.URDFExport
                 SetLinkSpecificSTLPreferences(names["geo"], ActiveDoc);
 
                 logger.Info("Saving STL to " + windowsMeshFilename);
-                ActiveDoc.Extension.SaveAs(windowsMeshFilename,
+                saved = ActiveDoc.Extension.SaveAs(windowsMeshFilename,
                     (int)swSaveAsVersion_e.swSaveAsCurrentVersion, saveOptions, null,
                     ref errors, ref warnings);
                 if (errors + warnings != 0)
@@ -531,6 +582,7 @@ namespace SW2URDF.URDFExport
                 CommonSwOperations.HideComponents(ActiveSWModel, link.SWComponents);
             }
 
+            if (!MeshSaveSucceeded(link, saved, errors, windowsMeshFilename)) return false;
             if (!success)
             {
                 logger.Warn("There was an issue exporting the STL for " + link.Name + ". It " +
@@ -572,6 +624,7 @@ namespace SW2URDF.URDFExport
             SetLinkSpecificSTLPreferences("", ActiveSWModel);
             int errors = 0;
             int warnings = 0;
+            bool meshExported = true;
 
             try
             {
@@ -586,11 +639,28 @@ namespace SW2URDF.URDFExport
                 else
                 {
                     //Saving part as STL mesh
-                    ActiveSWModel.Extension.SaveAs(windowsMeshFileName, (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
+                    bool saved = ActiveSWModel.Extension.SaveAs(windowsMeshFileName, (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
                         (int)swSaveAsOptions_e.swSaveAsOptions_Silent, null, ref errors, ref warnings);
+                    meshExported = MeshSaveSucceeded(URDFRobot.BaseLink, saved, errors, windowsMeshFileName);
                 }
             }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception e)
+            {
+                logger.Error("Exporting the mesh of link " + URDFRobot.BaseLink.Name + " failed", e);
+                meshExported = false;
+            }
             finally { ResetUserPreferences(); }
+
+            if (!meshExported)
+            {
+                UiText ui = UiText.FromSolidWorks(iSwApp);
+                MeshExportCheck.WriteFailureMarker(package.WindowsPackageDirectory, new[] { URDFRobot.BaseLink.Name });
+                URDFPackage.MessageBox.Show(MeshFailureMessage(ui, URDFRobot.BaseLink.Name));
+                return;
+            }
+            MeshExportCheck.RemoveFailureMarker(package.WindowsPackageDirectory);
+
             URDFRobot.BaseLink.Visual.Geometry.Mesh.Filename = meshFileName;
             URDFRobot.BaseLink.Collision.Geometry.Mesh.Filename = meshFileName;
 
@@ -767,7 +837,7 @@ namespace SW2URDF.URDFExport
         //If the user selected something specific for a particular link, that is handled here.
         private void SetLinkSpecificSTLPreferences(string CoordinateSystemName, ModelDoc2 doc)
         {
-            doc.Extension.SetUserPreferenceString((int)swUserPreferenceStringValue_e.swFileSaveAsCoordinateSystem,
+            doc.Extension.SetUserPreferenceString((int)swUserPreferenceStringValue_e.swExportOutputCoordinateSystem,
                 (int)swUserPreferenceOption_e.swDetailingNoOptionSpecified, CoordinateSystemName);
         }
 
