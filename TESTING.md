@@ -68,7 +68,7 @@ manual checklist for the user interface.
 
 | Item | Where | Behaviour |
 |------|-------|-----------|
-| Settings of one SolidWorks configuration | one SolidWorks attribute per configuration, named exactly like the configuration (definition `URDF Export Configuration Data`) | written when you save while that configuration is active; read first |
+| Settings of one SolidWorks configuration (created when the exporter opens with that configuration active, not for all configurations at once) | one SolidWorks attribute per configuration, named exactly like the configuration (definition `URDF Export Configuration Data`) | written when you save while that configuration is active; read first |
 | Grouping | feature tree folder `URDF Export Configuration` holding those attributes | appearance only; created on the first save, rebuilt when attributes are added |
 | Legacy shared settings | attribute `URDF Export Configuration (v1.4)` (older: `(v1.3)`, `URDF Export Configuration`) | read only as a fallback when the active configuration has no attribute of its own; never changed by a save, never renamed |
 

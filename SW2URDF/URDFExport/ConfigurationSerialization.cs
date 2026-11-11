@@ -132,48 +132,47 @@ namespace SW2URDF.URDFExport
         }
 
         /// <summary>
-        /// Makes sure every SolidWorks configuration of the document has its own URDF attribute
-        /// (visible under the "URDF Export Configuration" feature tree folder, named like the
-        /// configuration). A configuration without one gets a copy of the shared (legacy) data,
-        /// or a blank attribute when there is none. Existing attributes are never changed. The
-        /// attribute can only be created for the active configuration, so the others are
-        /// activated one after the other and the original one is restored. Returns true when
-        /// anything was created (the document then needs saving).
+        /// Makes sure the active SolidWorks configuration has its own URDF attribute (visible under
+        /// the "URDF Export Configuration" feature tree folder, named like the configuration). Other
+        /// configurations get theirs when the user switches to them and opens the exporter. A
+        /// configuration without one gets a copy of the shared (legacy) data, or a blank attribute
+        /// when there is none. Existing attributes are never changed. A missing folder is rebuilt
+        /// around the attributes that exist. Returns true when anything was created or rebuilt
+        /// (the document then needs saving).
         /// </summary>
         public static bool EnsureConfigurationAttributes(SldWorks swApp, ModelDoc2 model)
         {
             string[] names = model.GetConfigurationNames() as string[];
-            string original = GetActiveConfigurationName(model);
-            if (names == null || names.Length == 0 || original == null)
-            {
-                return false;
-            }
-            SolidWorks.Interop.sldworks.Attribute shared =
-                FindSWSaveAttribute(model, UrdfConfigurationSwAttributeName) ?? CheckForOldAttributes(model);
-            string sharedData = shared == null ? "" : shared.GetParameter("data").GetStringValue();
-            double sharedVersion = shared == null ? SerializationVersion : shared.GetParameter("exporterVersion").GetDoubleValue();
-
-            bool created = false;
-            try
+            string active = GetActiveConfigurationName(model);
+            List<string> existing = new List<string>();
+            if (names != null)
             {
                 foreach (string name in names)
                 {
-                    AttributeInit init = DocumentPersistence.DecideAttribute(
-                        FindConfigurationAttributeFeature(model, name) != null, !string.IsNullOrEmpty(sharedData));
-                    if (init == AttributeInit.None)
+                    if (FindConfigurationAttributeFeature(model, name) != null)
                     {
-                        continue;
+                        existing.Add(name);
                     }
-                    if (GetActiveConfigurationName(model) != name)
-                    {
-                        model.ShowConfiguration2(name);
-                    }
-                    SolidWorks.Interop.sldworks.Attribute att = CreateConfigurationAttribute(swApp, model, name);
-                    if (att == null)
-                    {
-                        logger.Warn("Could not create the URDF attribute for configuration \"" + name + "\"");
-                        continue;
-                    }
+                }
+            }
+
+            bool created = false;
+            string[] toCreate = DocumentPersistence.NamesToCreate(names, active, existing.ToArray());
+            if (toCreate.Length > 0)
+            {
+                SolidWorks.Interop.sldworks.Attribute shared =
+                    FindSWSaveAttribute(model, UrdfConfigurationSwAttributeName) ?? CheckForOldAttributes(model);
+                string sharedData = shared == null ? "" : shared.GetParameter("data").GetStringValue();
+                double sharedVersion = shared == null ? SerializationVersion : shared.GetParameter("exporterVersion").GetDoubleValue();
+                AttributeInit init = DocumentPersistence.DecideAttribute(false, !string.IsNullOrEmpty(sharedData));
+
+                SolidWorks.Interop.sldworks.Attribute att = CreateConfigurationAttribute(swApp, model, active);
+                if (att == null)
+                {
+                    logger.Warn("Could not create the URDF attribute for configuration \"" + active + "\"");
+                }
+                else
+                {
                     int options = (int)swInConfigurationOpts_e.swThisConfiguration;
                     att.GetParameter("data").SetStringValue2(init == AttributeInit.CopyShared ? sharedData : "", options, "");
                     att.GetParameter("name").SetStringValue2("config1", options, "");
@@ -183,13 +182,7 @@ namespace SW2URDF.URDFExport
                     created = true;
                 }
             }
-            finally
-            {
-                if (GetActiveConfigurationName(model) != original)
-                {
-                    model.ShowConfiguration2(original);
-                }
-            }
+
             bool folderExisted = ConfigurationFolderExists(model);
             if (DocumentPersistence.NeedsGrouping(created, folderExisted))
             {
@@ -199,7 +192,6 @@ namespace SW2URDF.URDFExport
             }
             return created;
         }
-
         /// <summary>
         /// Where the settings for the active SolidWorks configuration come from (what
         /// <see cref="LoadBaseNodeFromModel"/> loads), without loading them.
