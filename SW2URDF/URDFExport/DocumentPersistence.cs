@@ -89,7 +89,7 @@ namespace SW2URDF.URDFExport
 
         /// <summary>
         /// Features the exporter generates (reference sketch, generated coordinate systems and
-        /// axes). Together with the configuration entries they all live in the one URDF folder.
+        /// axes). They stay loose at the feature tree root, never in the URDF folder; found by name wherever they sit.
         /// </summary>
         public static bool IsGeneratedUrdfFeature(string typeName, string name)
         {

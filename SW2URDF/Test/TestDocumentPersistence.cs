@@ -134,11 +134,24 @@ namespace SW2URDF.Test
         }
 
         [Fact]
-        public void AllUrdfFeaturesEndUpInOneFolderListWithoutDuplicates()
+        public void GeneratedFeaturesInsideTheFolderTriggerARegroupOnce()
+        {
+            // A model grouped by an earlier build: the folder also holds the generated features
+            string[] inFolder = { "CFG_BOTH", "URDF Reference", "Origin_global", "Axis_j" };
+            string[] toShow = DocumentPersistence.WithExtras(
+                DocumentPersistence.NamesToGroup(inFolder, "CFG_BOTH", new[] { "CFG_BOTH" }), new string[0]);
+            Assert.Equal(new[] { "CFG_BOTH" }, toShow);
+            Assert.True(DocumentPersistence.NeedsRegroup(inFolder, toShow, true));
+            // After the repair the folder holds only the entry, so a second open changes nothing
+            Assert.False(DocumentPersistence.NeedsRegroup(new[] { "CFG_BOTH" }, toShow, true));
+        }
+
+        [Fact]
+        public void FolderListHasEntriesAndSharedAttributesWithoutDuplicates()
         {
             string[] all = DocumentPersistence.WithExtras(
-                new[] { "CFG_BOTH" }, new[] { "URDF Reference", "Origin_global", "CFG_BOTH", "Axis_j" });
-            Assert.Equal(new[] { "CFG_BOTH", "URDF Reference", "Origin_global", "Axis_j" }, all);
+                new[] { "CFG_BOTH" }, new[] { "URDF Export Configuration (v1.4)", "CFG_BOTH" });
+            Assert.Equal(new[] { "CFG_BOTH", "URDF Export Configuration (v1.4)" }, all);
         }
 
         [Fact]
