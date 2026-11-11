@@ -58,6 +58,50 @@ $textFormat = [System.Windows.Forms.TextFormatFlags]::WordBreak -bor [System.Win
 # Vertical room an edit box needs around its text (border).
 $editBorder = 4
 
+# Height of the ink extent (first to last pixel row with dark ink) in x range [x0, x1), skipping the
+# outer border rows. Rows without ink inside a glyph do not matter, only where the text starts and ends.
+function Get-InkRows([System.Drawing.Bitmap]$bmp, [int]$x0, [int]$x1) {
+    $first = -1; $last = -1
+    for ($y = 1; $y -lt $bmp.Height - 1; $y++) {
+        for ($x = $x0; $x -lt $x1; $x++) {
+            if ($bmp.GetPixel($x, $y).R -lt 140) { if ($first -lt 0) { $first = $y }; $last = $y; break }
+        }
+    }
+    if ($first -lt 0) { return 0 }
+    return $last - $first + 1
+}
+
+# Draws the caption of a push button and the same caption in an unclipped label of the same font
+# next to it, and compares how many pixel rows of ink each shows. Returns @(label rows, button rows)
+# when the button loses glyph rows (the top of the characters is cut off), otherwise $null.
+# The theme clips a button caption to a rectangle smaller than the button, which neither the height
+# model nor a comparison with the same text drawn by GDI can see: both lose the same rows.
+# The label is the reference because a label draws the whole line box without a clip rectangle.
+function Get-GlyphLoss([System.Windows.Forms.Button]$b) {
+    if ([string]::IsNullOrEmpty($b.Text) -or $b.Width -lt 24 -or $b.Height -lt 8) { return $null }
+    $w = [System.Windows.Forms.TextRenderer]::MeasureText($b.Text, $b.Font, (New-Object System.Drawing.Size(0, 0)), $textFormat)
+    if ($w.Width -gt $b.Width - 12) { return $null }   # wraps or is cut at the sides: not a vertical question
+    $label = New-Object System.Windows.Forms.Label
+    $label.AutoSize = $false; $label.UseCompatibleTextRendering = $false
+    $label.Font = $b.Font; $label.Text = $b.Text; $label.TextAlign = 'MiddleCenter'
+    $label.Size = New-Object System.Drawing.Size($b.Width, ($b.Font.Height * 2 + 8))
+    $label.Location = New-Object System.Drawing.Point(0, 0)
+    $b.Parent.Controls.Add($label)
+    try {
+        $rect = New-Object System.Drawing.Rectangle(0, 0, $label.Width, $label.Height)
+        $lb = New-Object System.Drawing.Bitmap($label.Width, $label.Height); $label.DrawToBitmap($lb, $rect)
+        $bb = New-Object System.Drawing.Bitmap($b.Width, $b.Height)
+        $b.DrawToBitmap($bb, (New-Object System.Drawing.Rectangle(0, 0, $b.Width, $b.Height)))
+        $x0 = 6; $x1 = $b.Width - 6
+        $ref = Get-InkRows $lb $x0 $x1
+        $got = Get-InkRows $bb $x0 $x1
+        $lb.Dispose(); $bb.Dispose()
+    } finally { $b.Parent.Controls.Remove($label); $label.Dispose() }
+    # One row of difference is anti-aliasing and rounding between the two draw paths; the bug cut 2+ rows.
+    if ($got -lt $ref - 1) { return ,@($ref, $got) }
+    return $null
+}
+
 # Returns @(needed, actual) in pixels when the control cannot show its text, otherwise $null.
 function Get-Clipping([System.Windows.Forms.Control]$c, [double]$dpi) {
     $line = [System.Windows.Forms.TextRenderer]::MeasureText('Ag', $c.Font, (New-Object System.Drawing.Size(0, 0)), [System.Windows.Forms.TextFormatFlags]::NoPadding).Height
@@ -70,7 +114,12 @@ function Get-Clipping([System.Windows.Forms.Control]$c, [double]$dpi) {
         if ([string]::IsNullOrEmpty($c.Text)) { return $null }
         $inner = New-Object System.Drawing.Size([Math]::Max(1, $c.Width - 8), 0)
         $need = [System.Windows.Forms.TextRenderer]::MeasureText($c.Text, $c.Font, $inner, $textFormat)
-        if ($c -is [System.Windows.Forms.Button]) { $needed = [Math]::Max($need.Height, $c.Font.Height) + 2 * [Math]::Ceiling(3 * $dpi / 96) } else { $needed = $need.Height }
+        if ($c -is [System.Windows.Forms.Button]) {
+            $needed = [Math]::Max($need.Height, $c.Font.Height) + [Math]::Ceiling(9 * $dpi / 96)
+            # Real rendering at the theme's own DPI (96 here): glyph rows lost to the caption clip rectangle.
+            $loss = Get-GlyphLoss $c
+            if ($loss) { return ,@("glyph rows $($loss[0])", "$($loss[1])") }
+        } else { $needed = $need.Height }
         $actual = $c.Height
     } elseif ($c -is [System.Windows.Forms.Label]) {
         if ($c.AutoSize -or [string]::IsNullOrEmpty($c.Text)) { return $null }
