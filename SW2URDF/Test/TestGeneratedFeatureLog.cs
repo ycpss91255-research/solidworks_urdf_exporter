@@ -123,6 +123,32 @@ namespace SW2URDF.Test
             Assert.Equal(2, place.Count);
         }
 
+        // Older exporter versions, and the user's own choice, put the axes of a frame at another
+        // orientation than the current estimate gives (a half turn about one axis describes the same
+        // robot). A saved frame at the right place must not be replaced because of that.
+        private static double[] RowMajor(double x, double y, double z, bool halfTurnAboutZ)
+        {
+            double s = halfTurnAboutZ ? -1.0 : 1.0;
+            return new[] { s, 0, 0, x, 0, s, 0, y, 0, 0, 1.0, z, 0, 0, 0, 1.0 };
+        }
+
+        [Fact]
+        public void FrameAtTheWantedPlaceIsTheSamePlaceWhateverItsOrientation()
+        {
+            double[] wanted = { 0.0025, 0.1892, 0.0 };
+            Assert.True(GeneratedFeatureLog.SamePlace(RowMajor(0.0025, 0.1892, 0, false), wanted, 1e-5));
+            Assert.True(GeneratedFeatureLog.SamePlace(RowMajor(0.0025, 0.1892, 0, true), wanted, 1e-5));
+        }
+
+        [Fact]
+        public void FrameSomewhereElseIsNotTheSamePlace()
+        {
+            double[] wanted = { 0.0025, 0.1892, 0.0 };
+            Assert.False(GeneratedFeatureLog.SamePlace(RowMajor(0.0025, 0.2392, 0, false), wanted, 1e-5));
+            Assert.False(GeneratedFeatureLog.SamePlace(RowMajor(0.0025, 0.1892, 0, false), null, 1e-5));
+            Assert.False(GeneratedFeatureLog.SamePlace(new[] { 1.0, 2.0 }, wanted, 1e-5));
+        }
+
         [Fact]
         public void SameValuesUsesTheTolerance()
         {

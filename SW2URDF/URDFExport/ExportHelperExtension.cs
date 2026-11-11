@@ -780,7 +780,7 @@ namespace SW2URDF.URDFExport
             {
                 string name = GeneratedFeatureLog.RefreshName(
                     frameName, "Origin_" + child.Joint.Name, CoordinateSystemExists,
-                    n => IsGeneratedFeature(n, "COORDSYS"), n => CoordinateSystemIsAt(n, wanted),
+                    n => IsGeneratedFeature(n, "COORDSYS"), n => CoordinateSystemIsAtPlace(n, wanted),
                     out bool reuse, out bool changed);
                 if (changed)
                 {
@@ -1227,6 +1227,22 @@ namespace SW2URDF.URDFExport
                 double[] expected = MathOps.GetTransformation(wanted.GetXYZ(), wanted.GetRPY())
                     .ToRowMajorArray();
                 return GeneratedFeatureLog.SameValues(existing, expected, 1e-6);
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not compare the coordinate system " + name, e);
+                return false;
+            }
+        }
+
+        // True when the existing coordinate system is at the wanted position, whatever its orientation
+        private bool CoordinateSystemIsAtPlace(string name, Origin wanted)
+        {
+            try
+            {
+                double[] existing = MathOps.GetTransformation(GetCoordinateSystemTransform(name))
+                    .ToRowMajorArray();
+                return GeneratedFeatureLog.SamePlace(existing, wanted.GetXYZ(), 1e-5);
             }
             catch (Exception e)
             {
