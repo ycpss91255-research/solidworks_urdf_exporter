@@ -55,6 +55,36 @@ namespace SW2URDF.URDFExport
             return new[] { active };
         }
 
+        /// <summary>
+        /// Entries to show in the folder: those already in it, plus the active configuration's entry
+        /// when it exists. Entries of other configurations stay hidden until the user works with
+        /// that configuration. Ordered like <paramref name="existing"/>.
+        /// </summary>
+        public static string[] NamesToGroup(string[] inFolder, string active, string[] existing)
+        {
+            System.Collections.Generic.List<string> result = new System.Collections.Generic.List<string>();
+            foreach (string name in existing ?? new string[0])
+            {
+                if (name == active || (inFolder != null && System.Array.IndexOf(inFolder, name) >= 0))
+                {
+                    result.Add(name);
+                }
+            }
+            return result.ToArray();
+        }
+
+        public static bool NeedsRegroup(string[] inFolder, string[] toShow, bool folderExists)
+        {
+            if (!folderExists) return toShow.Length > 0;
+            int shown = inFolder == null ? 0 : inFolder.Length;
+            if (shown != toShow.Length) return true;
+            foreach (string name in toShow)
+            {
+                if (inFolder == null || System.Array.IndexOf(inFolder, name) < 0) return true;
+            }
+            return false;
+        }
+
         /// <summary>What to put into the attribute of a configuration when the exporter opens.</summary>
         public static AttributeInit DecideAttribute(bool hasOwnAttribute, bool hasSharedData)
         {

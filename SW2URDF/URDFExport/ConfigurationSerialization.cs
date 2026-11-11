@@ -7,6 +7,7 @@ using SW2URDF.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Windows.Forms;
@@ -183,14 +184,8 @@ namespace SW2URDF.URDFExport
                 }
             }
 
-            bool folderExisted = ConfigurationFolderExists(model);
-            if (DocumentPersistence.NeedsGrouping(created, folderExisted))
-            {
-                TryGroupConfigurationAttributes(model);
-                // Rebuilding a deleted folder changes the document too
-                created = created || (!folderExisted && ConfigurationFolderExists(model));
-            }
-            return created;
+            bool regrouped = RegroupFolder(model, active);
+            return created || regrouped;
         }
         /// <summary>
         /// Where the settings for the active SolidWorks configuration come from (what
@@ -550,6 +545,60 @@ namespace SW2URDF.URDFExport
             return null;
         }
 
+        /// <summary>
+        /// Shows the active configuration's entry in the folder (rebuilding a missing folder) and
+        /// keeps what the folder already shows. Entries of other configurations stay hidden outside
+        /// the folder, with their data, until that configuration is used. True when the tree changed.
+        /// </summary>
+        private static bool RegroupFolder(ModelDoc2 model, string active)
+        {
+            string[] inFolder = GetNamesInFolder(model);
+            string[] existing = GetConfigurationAttributeFeatures(model).Select(feature =>
+                ((SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2()).GetName()).ToArray();
+            string[] toShow = DocumentPersistence.NamesToGroup(inFolder, active, existing);
+            bool folderExisted = ConfigurationFolderExists(model);
+            if (!DocumentPersistence.NeedsRegroup(inFolder, toShow, folderExisted))
+            {
+                return false;
+            }
+            TryGroupConfigurationAttributes(model, toShow);
+            return true;
+        }
+
+        /// <summary>Names of the attributes that sit inside the folder (between the folder and its end tag).</summary>
+        private static string[] GetNamesInFolder(ModelDoc2 model)
+        {
+            List<string> names = new List<string>();
+            bool inside = false;
+            Feature feature = model.FirstFeature() as Feature;
+            while (feature != null)
+            {
+                string type = feature.GetTypeName2();
+                if (type == "FtrFolder")
+                {
+                    if (feature.Name == ConfigurationAttributeFolderName)
+                    {
+                        inside = true;
+                    }
+                    else if (inside && feature.Name.EndsWith("___EndTag___"))
+                    {
+                        break;
+                    }
+                }
+                else if (inside && type == "Attribute")
+                {
+                    SolidWorks.Interop.sldworks.Attribute att =
+                        feature.GetSpecificFeature2() as SolidWorks.Interop.sldworks.Attribute;
+                    if (att != null)
+                    {
+                        names.Add(att.GetName());
+                    }
+                }
+                feature = feature.GetNextFeature() as Feature;
+            }
+            return names.ToArray();
+        }
+
         private static bool ConfigurationFolderExists(ModelDoc2 model)
         {
             Feature feature = model.FirstFeature() as Feature;
@@ -576,7 +625,7 @@ namespace SW2URDF.URDFExport
         /// (deleting a folder keeps its contents) and recreated around all attributes. Failures are
         /// logged and never interrupt saving.
         /// </summary>
-        private static void TryGroupConfigurationAttributes(ModelDoc2 model)
+        private static void TryGroupConfigurationAttributes(ModelDoc2 model, string[] namesToGroup)
         {
             try
             {
@@ -586,7 +635,7 @@ namespace SW2URDF.URDFExport
                 {
                     SolidWorks.Interop.sldworks.Attribute att =
                         (SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2();
-                    if (Array.IndexOf(configNames, att.GetName()) >= 0)
+                    if (Array.IndexOf(configNames, att.GetName()) >= 0 && Array.IndexOf(namesToGroup, att.GetName()) >= 0)
                     {
                         attributes.Add(feature);
                     }
@@ -727,10 +776,7 @@ namespace SW2URDF.URDFExport
             param = saveExporterAttribute.GetParameter("exporterVersion");
             param.SetDoubleValue2(SerializationVersion, ConfigurationOptions, "");
 
-            if (DocumentPersistence.NeedsGrouping(created, ConfigurationFolderExists(model)))
-            {
-                TryGroupConfigurationAttributes(model);
-            }
+            RegroupFolder(model, configurationName);
             return true;
         }
 
