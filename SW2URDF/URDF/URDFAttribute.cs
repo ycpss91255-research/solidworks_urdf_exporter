@@ -144,6 +144,13 @@ namespace SW2URDF.URDF
             return Value != null;
         }
 
+        // The dialogs show values rounded (for example 5 significant digits). The text that was shown and
+        // the value it was made from are remembered, so reading the boxes back leaves a value that the
+        // user did not edit exactly as it was. Not serialized.
+        private string[] shownText;
+
+        private double[] shownValue;
+
         public string GetTextFromDoubleValue(string format = "G")
         {
             string result = "";
@@ -151,6 +158,13 @@ namespace SW2URDF.URDF
             {
                 double dValue = (double)Value;
                 result = dValue.ToString(format, URDFNumberFormat);
+                shownText = new[] { result };
+                shownValue = new[] { dValue };
+            }
+            else
+            {
+                shownText = null;
+                shownValue = null;
             }
             return result;
         }
@@ -166,12 +180,34 @@ namespace SW2URDF.URDF
                 {
                     result[i] = dArray[i].ToString(format, URDFNumberFormat);
                 }
+                shownText = (string[])result.Clone();
+                shownValue = (double[])dArray.Clone();
+            }
+            else
+            {
+                shownText = null;
+                shownValue = null;
             }
             return result;
         }
 
+        /// <summary>
+        /// True when the text is what was shown for element index of the current value, i.e. the user has
+        /// not edited the box and the stored full precision value is still the one the text came from.
+        /// </summary>
+        private bool IsUneditedShownText(string text, int index, double current)
+        {
+            return shownText != null && shownValue != null &&
+                index < shownText.Length && index < shownValue.Length &&
+                shownValue[index].Equals(current) && string.Equals(shownText[index], text, StringComparison.Ordinal);
+        }
+
         public void SetDoubleValueFromString(string text)
         {
+            if (Value is double current && IsUneditedShownText(text, 0, current))
+            {
+                return;
+            }
             if (Double.TryParse(text, URDFNumberStyle, URDFNumberFormat, out double result))
             {
                 Value = result;
@@ -184,10 +220,15 @@ namespace SW2URDF.URDF
 
         public void SetDoubleArrayFromStringArray(string[] textArray)
         {
+            double[] previous = Value as double[];
             double[] dArray = new double[textArray.Length];
             for (int i = 0; i < textArray.Length; i++)
             {
-                if (Double.TryParse(textArray[i], URDFNumberStyle, URDFNumberFormat, out double result))
+                if (previous != null && i < previous.Length && IsUneditedShownText(textArray[i], i, previous[i]))
+                {
+                    dArray[i] = previous[i];
+                }
+                else if (Double.TryParse(textArray[i], URDFNumberStyle, URDFNumberFormat, out double result))
                 {
                     dArray[i] = result;
                 }

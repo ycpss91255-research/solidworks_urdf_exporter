@@ -324,6 +324,7 @@
     <Compile Include="UI\MessageBoxHelper.cs" />
     <Compile Include="Test\SW2URDFTest.cs" />
     <Compile Include="Test\SWTestFixture.cs" />
+    <Compile Include="Test\TestBoxPrecision.cs" />
     <Compile Include="Test\TestCommon.cs" />
     <Compile Include="Test\TestConfigurationFormat.cs" />
     <Compile Include="Test\TestCSVImportExport.cs" />
