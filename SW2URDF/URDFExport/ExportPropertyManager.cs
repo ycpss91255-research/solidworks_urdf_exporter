@@ -343,7 +343,7 @@ namespace SW2URDF.URDFExport
             {
                 logger.Warn("Loading a configuration with an incomplete export");
                 if (MessageBox.Show(
-                    ui.Get("This model has not been fully exported and saved. Merging may result in an incomplete URDF, would you like to continue?"), ui.Get("Continue with incomplete export?"), MessageBoxButtons.YesNo) == 
+                    ui.Get("Some links in the current tree are incomplete. Merging may result in an incomplete URDF, would you like to continue?"), ui.Get("Continue with incomplete links?"), MessageBoxButtons.YesNo) == 
                         DialogResult.No) {
                     return;
                 }
@@ -913,8 +913,8 @@ namespace SW2URDF.URDFExport
 
             // Load Configuration button
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Button;
-            caption = ui.Get("Load Configuration...");
-            tip = ui.Get("Import values from a CSV file");
+            caption = ui.Get("Load from CSV...");
+            tip = ui.Get("Merge values from the CSV written by an earlier export (links are matched by name)");
             alignment = 0;// (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_DoubleIndent;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
