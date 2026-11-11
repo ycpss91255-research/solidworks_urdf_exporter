@@ -54,6 +54,8 @@ namespace SW2URDF.URDFExport
         /// '.' because SolidWorks rejects such folder names, so it carries no version.
         /// </summary>
         public const string ConfigurationAttributeFolderName = "URDF Export Configuration";
+        /// <summary>Folder of older exporter versions; its contents move into the current folder.</summary>
+        private const string LegacyItemsFolderName = "URDF Export Items";
 
         public static List<string> PREVIOUS_URDF_CONFIGURATION_NAMES =
             new List<string>(ConfigurationFormat.PreviousSharedAttributeNames);
@@ -550,14 +552,35 @@ namespace SW2URDF.URDFExport
         /// keeps what the folder already shows. Entries of other configurations stay hidden outside
         /// the folder, with their data, until that configuration is used. True when the tree changed.
         /// </summary>
+        /// <summary>
+        /// After an export created features (reference sketch, generated coordinate systems and axes):
+        /// put them into the URDF folder and save the document. Never throws.
+        /// </summary>
+        public static void GroupUrdfFeatures(ModelDoc2 model, UiText ui)
+        {
+            try
+            {
+                if (RegroupFolder(model, GetActiveConfigurationName(model)))
+                {
+                    PersistDocument(model, ui ?? new UiText(null));
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not group the URDF features after the export", e);
+            }
+        }
+
         private static bool RegroupFolder(ModelDoc2 model, string active)
         {
-            string[] inFolder = GetNamesInFolder(model);
+            string[] inFolder = GetNamesInFolder(model, ConfigurationAttributeFolderName);
             string[] existing = GetConfigurationAttributeFeatures(model).Select(feature =>
                 ((SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2()).GetName()).ToArray();
-            string[] toShow = DocumentPersistence.NamesToGroup(inFolder, active, existing);
+            string[] toShow = DocumentPersistence.WithExtras(
+                DocumentPersistence.NamesToGroup(inFolder, active, existing), GetOtherUrdfFeatureNames(model));
             bool folderExisted = ConfigurationFolderExists(model);
-            if (!DocumentPersistence.NeedsRegroup(inFolder, toShow, folderExisted))
+            bool legacyFolder = GetNamesInFolder(model, LegacyItemsFolderName).Length > 0 || LegacyFolderExists(model);
+            if (!DocumentPersistence.NeedsRegroup(inFolder, toShow, folderExisted) && !legacyFolder)
             {
                 return false;
             }
@@ -565,8 +588,66 @@ namespace SW2URDF.URDFExport
             return true;
         }
 
-        /// <summary>Names of the attributes that sit inside the folder (between the folder and its end tag).</summary>
-        private static string[] GetNamesInFolder(ModelDoc2 model)
+        /// <summary>
+        /// Other URDF features that belong in the same folder: the exporter's reference sketch,
+        /// generated coordinate systems and axes, the shared (legacy) attributes and whatever sits
+        /// in the older "URDF Export Items" folder.
+        /// </summary>
+        private static string[] GetOtherUrdfFeatureNames(ModelDoc2 model)
+        {
+            List<string> names = new List<string>();
+            bool inLegacy = false;
+            Feature feature = model.FirstFeature() as Feature;
+            while (feature != null)
+            {
+                string type = feature.GetTypeName2();
+                string name = feature.Name;
+                if (type == "FtrFolder")
+                {
+                    if (name == LegacyItemsFolderName)
+                    {
+                        inLegacy = true;
+                    }
+                    else if (inLegacy && name.EndsWith("___EndTag___"))
+                    {
+                        inLegacy = false;
+                    }
+                }
+                else if (type == "Attribute")
+                {
+                    SolidWorks.Interop.sldworks.Attribute att =
+                        feature.GetSpecificFeature2() as SolidWorks.Interop.sldworks.Attribute;
+                    if (att != null && att.GetName() != null &&
+                        (IsSharedAttributeName(att.GetName()) || inLegacy))
+                    {
+                        names.Add(name);
+                    }
+                }
+                else if (DocumentPersistence.IsGeneratedUrdfFeature(type, name) || inLegacy)
+                {
+                    names.Add(name);
+                }
+                feature = feature.GetNextFeature() as Feature;
+            }
+            return names.ToArray();
+        }
+
+        private static bool LegacyFolderExists(ModelDoc2 model)
+        {
+            Feature feature = model.FirstFeature() as Feature;
+            while (feature != null)
+            {
+                if (feature.GetTypeName2() == "FtrFolder" && feature.Name == LegacyItemsFolderName)
+                {
+                    return true;
+                }
+                feature = feature.GetNextFeature() as Feature;
+            }
+            return false;
+        }
+
+        /// <summary>Names of the features that sit inside the folder (between the folder and its end tag).</summary>
+        private static string[] GetNamesInFolder(ModelDoc2 model, string folderName)
         {
             List<string> names = new List<string>();
             bool inside = false;
@@ -576,7 +657,7 @@ namespace SW2URDF.URDFExport
                 string type = feature.GetTypeName2();
                 if (type == "FtrFolder")
                 {
-                    if (feature.Name == ConfigurationAttributeFolderName)
+                    if (feature.Name == folderName)
                     {
                         inside = true;
                     }
@@ -585,20 +666,14 @@ namespace SW2URDF.URDFExport
                         break;
                     }
                 }
-                else if (inside && type == "Attribute")
+                else if (inside)
                 {
-                    SolidWorks.Interop.sldworks.Attribute att =
-                        feature.GetSpecificFeature2() as SolidWorks.Interop.sldworks.Attribute;
-                    if (att != null)
-                    {
-                        names.Add(att.GetName());
-                    }
+                    names.Add(feature.Name);
                 }
                 feature = feature.GetNextFeature() as Feature;
             }
             return names.ToArray();
         }
-
         private static bool ConfigurationFolderExists(ModelDoc2 model)
         {
             Feature feature = model.FirstFeature() as Feature;
@@ -629,39 +704,43 @@ namespace SW2URDF.URDFExport
         {
             try
             {
-                string[] configNames = (string[])model.GetConfigurationNames();
-                List<Feature> attributes = new List<Feature>();
-                foreach (Feature feature in GetConfigurationAttributeFeatures(model))
+                List<Feature> features = new List<Feature>();
+                Feature walk = model.FirstFeature() as Feature;
+                while (walk != null)
                 {
-                    SolidWorks.Interop.sldworks.Attribute att =
-                        (SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2();
-                    if (Array.IndexOf(configNames, att.GetName()) >= 0 && Array.IndexOf(namesToGroup, att.GetName()) >= 0)
+                    if (walk.GetTypeName2() != "FtrFolder" && Array.IndexOf(namesToGroup, walk.Name) >= 0)
                     {
-                        attributes.Add(feature);
+                        features.Add(walk);
+                    }
+                    walk = walk.GetNextFeature() as Feature;
+                }
+
+                // Both folders go (deleting a folder keeps its contents): the current one, which is
+                // recreated below, and the older "URDF Export Items" one, whose contents move in.
+                foreach (string folderName in new[] { ConfigurationAttributeFolderName, LegacyItemsFolderName })
+                {
+                    Feature folder = model.FirstFeature() as Feature;
+                    while (folder != null)
+                    {
+                        if (folder.GetTypeName2() == "FtrFolder" && folder.Name == folderName)
+                        {
+                            model.ClearSelection2(true);
+                            folder.Select2(false, 0);
+                            // 0 = delete only the folder, its contents are kept
+                            model.Extension.DeleteSelection2(0);
+                            break;
+                        }
+                        folder = folder.GetNextFeature() as Feature;
                     }
                 }
-                if (attributes.Count == 0)
+                if (features.Count == 0)
                 {
                     return;
                 }
 
                 model.ClearSelection2(true);
-                Feature folder = model.FirstFeature() as Feature;
-                while (folder != null)
-                {
-                    if (folder.GetTypeName2() == "FtrFolder" && folder.Name == ConfigurationAttributeFolderName)
-                    {
-                        folder.Select2(false, 0);
-                        // 0 = delete only the folder, its contents are kept
-                        model.Extension.DeleteSelection2(0);
-                        break;
-                    }
-                    folder = folder.GetNextFeature() as Feature;
-                }
-
-                model.ClearSelection2(true);
                 bool append = false;
-                foreach (Feature feature in attributes)
+                foreach (Feature feature in features)
                 {
                     feature.Select2(append, 0);
                     append = true;
@@ -674,16 +753,15 @@ namespace SW2URDF.URDFExport
                 }
                 else
                 {
-                    logger.Warn("Could not create the URDF configuration feature tree folder");
+                    logger.Warn("Could not create the URDF feature tree folder");
                 }
                 model.ClearSelection2(true);
             }
             catch (Exception e)
             {
-                logger.Warn("Grouping the URDF configuration attributes into a folder failed", e);
+                logger.Warn("Grouping the URDF features into a folder failed", e);
             }
         }
-
         /// <summary>
         /// Builds a SW Attribute for saving our serialized data
         /// </summary>

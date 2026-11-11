@@ -439,6 +439,7 @@ namespace SW2URDF.UI
                     meshFormat = MeshExportFormat.STL;
                 }
                 Exporter.ExportRobot(exportSTL, meshFormat);
+                ConfigurationSerialization.GroupUrdfFeatures(ActiveSWModel, ui);
 
                 Close();
             }
