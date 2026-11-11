@@ -568,17 +568,17 @@
   <data xml:space="preserve" name="(none)">
     <value>（無）</value>
   </data>
-  <data xml:space="preserve" name="settings saved for this configuration.">
-    <value>此組態已儲存設定。</value>
+  <data xml:space="preserve" name="active configuration: {0}">
+    <value>使用中的組態：{0}</value>
   </data>
-  <data xml:space="preserve" name="settings loaded from the shared (legacy) data; they are saved to this configuration on the next save.">
-    <value>設定來自共用的（舊版）資料；下次儲存時會存入此組態。</value>
+  <data xml:space="preserve" name="stored for this configuration">
+    <value>已儲存於此組態</value>
   </data>
-  <data xml:space="preserve" name="new settings: nothing is saved for this configuration yet.">
-    <value>新的設定：此組態尚未儲存任何內容。</value>
+  <data xml:space="preserve" name="using shared (legacy) settings">
+    <value>使用共用（舊版）設定</value>
   </data>
-  <data xml:space="preserve" name="configuration: {0}. {1}">
-    <value>組態：{0}。{1}</value>
+  <data xml:space="preserve" name="new: nothing stored yet">
+    <value>新設定：尚未儲存</value>
   </data>
   <data xml:space="preserve" name="open a part or an assembly to use the urdf exporter.">
     <value>請開啟零件或組合件以使用 URDF 匯出工具。</value>

@@ -32,11 +32,15 @@ namespace SW2URDF.Test
         public void EnglishTextNamesTheConfigurationAndTheSource()
         {
             UiText ui = new UiText(null);
-            Assert.Equal("Configuration: Wide. Settings saved for this configuration.",
-                ConfigurationStatus.Describe(ui, "Wide", SettingsSource.Configuration));
-            Assert.Equal("Configuration: Wide. Settings loaded from the shared (legacy) data; they are saved to this configuration on the next save.",
-                ConfigurationStatus.Describe(ui, "Wide", SettingsSource.Shared));
-            Assert.Equal("Configuration: Wide. New settings: nothing is saved for this configuration yet.",
+            Assert.Equal("Active configuration: Wide",
+                ConfigurationStatus.Headline(ui, "Wide"));
+            Assert.Equal("Stored for this configuration",
+                ConfigurationStatus.Detail(ui, SettingsSource.Configuration));
+            Assert.Equal("Using shared (legacy) settings",
+                ConfigurationStatus.Detail(ui, SettingsSource.Shared));
+            Assert.Equal("New: nothing stored yet",
+                ConfigurationStatus.Detail(ui, SettingsSource.New));
+            Assert.Equal("Active configuration: Wide\r\nNew: nothing stored yet",
                 ConfigurationStatus.Describe(ui, "Wide", SettingsSource.New));
         }
 
@@ -48,18 +52,19 @@ namespace SW2URDF.Test
             {
                 string text = ConfigurationStatus.Describe(ui, "寬版", source);
                 Assert.Contains("寬版", text);
-                Assert.DoesNotContain("Settings", text);
-                Assert.DoesNotContain("Configuration", text);
+                Assert.DoesNotContain("settings", text);
+                Assert.DoesNotContain("configuration", text);
+                Assert.DoesNotContain("Active", text);
             }
         }
 
         [Fact]
         public void MissingConfigurationNameStillProducesText()
         {
-            Assert.Equal("Configuration: (none). New settings: nothing is saved for this configuration yet.",
-                ConfigurationStatus.Describe(new UiText(null), null, SettingsSource.New));
+            Assert.Equal("Active configuration: (none)",
+                ConfigurationStatus.Headline(new UiText(null), null));
             Assert.DoesNotContain("(none)",
-                ConfigurationStatus.Describe(new UiText("chinese"), "", SettingsSource.New));
+                ConfigurationStatus.Headline(new UiText("chinese"), ""));
         }
     }
 }

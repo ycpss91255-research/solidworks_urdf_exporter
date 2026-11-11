@@ -37,6 +37,14 @@ function New-Form([Type]$type, [System.Drawing.Font]$font, [single]$dpi) {
     if ($fit) { [void]$fit.Invoke($null, @($form, $dpi)) }
     $space = if ($layoutType) { $layoutType.GetMethod('SpaceRows', [Reflection.BindingFlags]'Static,NonPublic,Public') }
     if ($space) { [void]$space.Invoke($null, @($form, $dpi)) }
+    # Banner with the active configuration: the text is only known at run time, so check the longest case.
+    $banner = $form.Controls.Find('labelConfigurationStatus', $true) | Select-Object -First 1
+    $layoutHelper = $assembly.GetType('SW2URDF.UI.UiLayout')
+    if ($banner -and $layoutHelper) {
+        $sample = "Active configuration: A_rather_long_configuration_name_2000`r`nUsing the shared (legacy) settings; they are stored for this configuration on the next save."
+        if ($font -and $font.Name -ne 'Microsoft Sans Serif') { $sample = [regex]::Unescape('\u4f7f\u7528\u4e2d\u7684\u7d44\u614b\uff1a\u9019\u662f\u4e00\u500b\u76f8\u7576\u9577\u7684\u7d44\u614b\u540d\u7a31\u4e8c\u96f6\u96f6\u96f6\r\n\u76ee\u524d\u4f7f\u7528\u5171\u7528\uff08\u820a\u7248\uff09\u8a2d\u5b9a\uff1b\u4e0b\u6b21\u5132\u5b58\u6642\u6703\u5b58\u5165\u6b64\u7d44\u614b\u3002') }
+        [void]$layoutHelper.GetMethod('SetStatusBannerText', [Reflection.BindingFlags]'Static,NonPublic,Public').Invoke($null, [object[]]@([System.Windows.Forms.Label]$banner, [string]$sample))
+    }
     return $form
 }
 

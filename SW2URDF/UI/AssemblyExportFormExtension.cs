@@ -451,8 +451,8 @@ namespace SW2URDF.UI
             {
                 if (ActiveSWModel != null)
                 {
-                    labelConfigurationStatus.Text =
-                        ConfigurationSerialization.DescribeSettings(ActiveSWModel, ui);
+                    UiLayout.SetStatusBannerText(labelConfigurationStatus,
+                        ConfigurationSerialization.DescribeSettings(ActiveSWModel, ui));
                 }
             }
             catch (Exception e)
