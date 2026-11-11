@@ -51,7 +51,8 @@ namespace SW2URDF.UI
         // stored in the configuration and compared by the exporter. Only the shown text is
         // translated; ComboValue maps it back so the stored value is always the English one.
         private static readonly string[] ProtocolValues =
-            { "Automatically Generate", "Automatically Detect", "None" };
+            { "Automatically Generate", "Automatically Detect", "None",
+              "revolute", "continuous", "prismatic", "fixed", "floating", "planar" };
 
         public string ComboDisplay(string value)
         {
