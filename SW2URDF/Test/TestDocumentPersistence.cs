@@ -85,6 +85,39 @@ namespace SW2URDF.Test
         }
 
         [Fact]
+        public void DeletedFolderShowsOnlyTheActiveConfigurationAgain()
+        {
+            string[] existing = { "CFG_BOTH", "CFG_RED_ONLY" };
+            string[] shown = DocumentPersistence.NamesToGroup(new string[0], "CFG_BOTH", existing);
+            Assert.Equal(new[] { "CFG_BOTH" }, shown);
+            Assert.True(DocumentPersistence.NeedsRegroup(new string[0], shown, false));
+        }
+
+        [Fact]
+        public void SwitchingConfigurationShowsTheSecondEntryAndKeepsTheFirst()
+        {
+            string[] existing = { "CFG_BOTH", "CFG_RED_ONLY" };
+            string[] shown = DocumentPersistence.NamesToGroup(new[] { "CFG_BOTH" }, "CFG_RED_ONLY", existing);
+            Assert.Equal(new[] { "CFG_BOTH", "CFG_RED_ONLY" }, shown);
+            Assert.True(DocumentPersistence.NeedsRegroup(new[] { "CFG_BOTH" }, shown, true));
+        }
+
+        [Fact]
+        public void NothingToRegroupWhenTheFolderAlreadyShowsTheActiveConfiguration()
+        {
+            string[] existing = { "CFG_BOTH", "CFG_RED_ONLY" };
+            string[] shown = DocumentPersistence.NamesToGroup(new[] { "CFG_BOTH" }, "CFG_BOTH", existing);
+            Assert.False(DocumentPersistence.NeedsRegroup(new[] { "CFG_BOTH" }, shown, true));
+        }
+
+        [Fact]
+        public void HiddenEntriesOfOtherConfigurationsAreNeverGrouped()
+        {
+            string[] existing = { "CFG_BOTH", "CFG_RED_ONLY" };
+            Assert.Empty(DocumentPersistence.NamesToGroup(new string[0], "Other", existing));
+        }
+
+        [Fact]
         public void UnknownOrMissingActiveConfigurationCreatesNothing()
         {
             string[] names = { "CFG_BOTH", "CFG_RED_ONLY" };
