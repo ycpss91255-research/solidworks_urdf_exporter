@@ -48,7 +48,26 @@ namespace SW2URDF.UI
         // Same fit, using the DPI the (already created) form really has.
         internal static void FitButtonHeightsToWindow(Control root)
         {
-            FitButtonHeights(root, WindowDpi(root));
+            FitForm(root, WindowDpi(root));
+        }
+
+        // Fits the button heights and gives the form the height the buttons gained. The button row at
+        // the bottom sizes itself to its buttons, so taller buttons would otherwise take the room from
+        // the content above it and push its last line out of view.
+        internal static void FitForm(Control root, float dpi)
+        {
+            int gained = FitButtonHeights(root, dpi);
+            Form form = root as Form;
+            if (form == null || gained <= 0 || form.WindowState != FormWindowState.Normal)
+            {
+                return;
+            }
+            Rectangle area = Screen.FromControl(form).WorkingArea;
+            form.Height = Math.Min(form.Height + gained, area.Height);
+            if (form.IsHandleCreated && form.Bottom > area.Bottom)
+            {
+                form.Top = Math.Max(area.Top, area.Bottom - form.Height);
+            }
         }
 
         // Vertical room, at 96 DPI, that the visual theme takes from a push button's height before
@@ -63,8 +82,10 @@ namespace SW2URDF.UI
         // are taller). A button that is too short shows its caption with the top of the glyphs
         // cut off, even when the button frame itself looks fine. Grow every button that is
         // too short for its text by the missing height, around its centre line.
-        internal static void FitButtonHeights(Control root, float dpi)
+        // Returns the largest height any single button gained (0 when nothing had to grow).
+        internal static int FitButtonHeights(Control root, float dpi)
         {
+            int gained = 0;
             int margin = (int)Math.Ceiling(ButtonThemeVerticalMargin96 * dpi / 96f);
             foreach (Control child in root.Controls)
             {
@@ -77,15 +98,17 @@ namespace SW2URDF.UI
                     int needed = text + margin;
                     if (button.Height < needed)
                     {
+                        gained = Math.Max(gained, needed - button.Height);
                         button.SetBounds(button.Left, button.Top - (needed - button.Height) / 2,
                             button.Width, needed);
                     }
                 }
                 if (child.HasChildren)
                 {
-                    FitButtonHeights(child, dpi);
+                    gained = Math.Max(gained, FitButtonHeights(child, dpi));
                 }
             }
+            return gained;
         }
     }
 }
