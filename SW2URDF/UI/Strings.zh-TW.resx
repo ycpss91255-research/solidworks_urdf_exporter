@@ -508,6 +508,28 @@
   <data xml:space="preserve" name="merging the loaded csv configuration with the assembly&apos;s configuration failed. check your csv file. if you continue to run into errors, delete the configuration in the assembly and load a proper csv.">
     <value>將載入的 CSV 設定與組合件的設定合併失敗。請檢查 CSV 檔案。若仍持續發生錯誤，請刪除組合件中的設定，再載入正確的 CSV。</value>
   </data>
+  <data xml:space="preserve" name="the csv file cannot be read: it has no &quot;link name&quot; column. save it as comma-separated text (the format the exporter writes) and try again.">
+    <value>無法讀取此 CSV 檔：找不到「Link Name」欄。請將它存成以逗號分隔的文字檔（匯出器寫出的格式）後再試一次。</value>
+  </data>
+  <data xml:space="preserve" name="row {0}: the link name is empty, the row is skipped">
+    <value>第 {0} 列：連桿名稱為空，已略過此列</value>
+  </data>
+  <data xml:space="preserve" name="row {0}, column &quot;{1}&quot;: &quot;{2}&quot; is not a number">
+    <value>第 {0} 列，欄位「{1}」：「{2}」不是數字</value>
+  </data>
+  <data xml:space="preserve" name="... and {0} more">
+    <value>……還有 {0} 項</value>
+  </data>
+  <data xml:space="preserve" name="some cells of the csv could not be read and are ignored (the values of the model are kept). numbers need &quot;.&quot; as the decimal point.&#10;&#10;{0}&#10;&#10;continue with the merge?">
+    <value>CSV 中有些儲存格無法讀取，將被忽略（保留模型的值）。數字的小數點必須是「.」。
+
+{0}
+
+要繼續合併嗎？</value>
+  </data>
+  <data xml:space="preserve" name="csv cells could not be read">
+    <value>CSV 儲存格無法讀取</value>
+  </data>
   <data xml:space="preserve" name="some links in the current tree are incomplete. merging may result in an incomplete urdf, would you like to continue?">
     <value>目前連桿樹中仍有未填完的連桿，合併可能產生不完整的 URDF，是否繼續？</value>
   </data>

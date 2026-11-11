@@ -78,7 +78,8 @@ namespace SW2URDF.URDF
             string typeName = GetType().Name;
             List<string> updatedContext = new List<string>(context) { typeName };
 
-            double[] xyz = new double[3];
+            // A column that is not in the CSV (or whose cell is blank) keeps the current component.
+            double[] xyz = (double[])((double[])XYZAttribute.Value).Clone();
             
             string contextString = string.Join(".", updatedContext) + ".xyz";
             for (int i = 0; i < xyz.Length; i++)
