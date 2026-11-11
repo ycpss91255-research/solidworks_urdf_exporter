@@ -327,6 +327,7 @@
     <Compile Include="Test\TestCommon.cs" />
     <Compile Include="Test\TestConfigurationFormat.cs" />
     <Compile Include="Test\TestCSVImportExport.cs" />
+    <Compile Include="Test\TestCsvColumnCheck.cs" />
     <Compile Include="Test\TestExportHelper.cs" />
     <Compile Include="Test\TestLogger.cs" />
     <Compile Include="Test\TestMathOps.cs" />
