@@ -222,7 +222,7 @@ namespace SW2URDF.URDF
                 shownValue[index].Equals(current) && string.Equals(shownText[index], text, StringComparison.Ordinal);
         }
 
-        public string GetTextFromDoubleValue(string format = "G")
+        public string GetTextFromDoubleValue(string format = "R")
         {
             string result = "";
             shownText = null;
@@ -237,7 +237,7 @@ namespace SW2URDF.URDF
             return result;
         }
 
-        public string[] GetTextArrayFromDoubleArray(string format = "G")
+        public string[] GetTextArrayFromDoubleArray(string format = "R")
         {
             string[] result = null;
             shownText = null;
