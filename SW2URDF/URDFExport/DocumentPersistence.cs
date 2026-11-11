@@ -85,6 +85,33 @@ namespace SW2URDF.URDFExport
             return false;
         }
 
+        /// <summary>
+        /// Features the exporter generates (reference sketch, generated coordinate systems and
+        /// axes). Together with the configuration entries they all live in the one URDF folder.
+        /// </summary>
+        public static bool IsGeneratedUrdfFeature(string typeName, string name)
+        {
+            if (name == null) return false;
+            switch (typeName)
+            {
+                case "CoordSys": return name.StartsWith("Origin_");
+                case "RefAxis": return name.StartsWith("Axis_");
+                case "3DProfileFeature":
+                case "ProfileFeature": return name == "URDF Reference";
+                default: return false;
+            }
+        }
+
+        public static string[] WithExtras(string[] names, string[] extras)
+        {
+            System.Collections.Generic.List<string> result = new System.Collections.Generic.List<string>(names ?? new string[0]);
+            foreach (string extra in extras ?? new string[0])
+            {
+                if (!result.Contains(extra)) result.Add(extra);
+            }
+            return result.ToArray();
+        }
+
         /// <summary>What to put into the attribute of a configuration when the exporter opens.</summary>
         public static AttributeInit DecideAttribute(bool hasOwnAttribute, bool hasSharedData)
         {
