@@ -41,6 +41,24 @@ namespace SW2URDF.URDFExport
         {
             CommonSwOperations.RetrieveSWComponentPIDs(model, BaseNode);
             ConfigurationSerialization.SaveConfigTreeXML(swApp, model, BaseNode, warnUser, ui);
+            RefreshConfigurationStatus();
+        }
+
+        /// <summary>Shows the active configuration and where its settings come from.</summary>
+        private void RefreshConfigurationStatus()
+        {
+            try
+            {
+                if (PMLabelConfigurationStatus != null && ActiveSWModel != null)
+                {
+                    PMLabelConfigurationStatus.Caption =
+                        ConfigurationSerialization.DescribeSettings(ActiveSWModel, ui);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not update the configuration status", e);
+            }
         }
 
         //As nodes are created and destroyed, this menu gets called a lot. It basically just
@@ -498,6 +516,7 @@ namespace SW2URDF.URDFExport
             }
 
             SetConfigTree(baseNode);
+            RefreshConfigurationStatus();
 
             IPropertyManagerPageControl loadConfigurationControl = (IPropertyManagerPageControl)PMButtonLoad;
 

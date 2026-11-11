@@ -33,6 +33,7 @@
             this.panelLinkProperties = new System.Windows.Forms.Panel();
             this.buttonLinksExportUrdfOnly = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.labelConfigurationStatus = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.buttonLinksFinish = new System.Windows.Forms.Button();
             this.buttonLinksPrevious = new System.Windows.Forms.Button();
@@ -221,6 +222,7 @@
             // small screens); the buttons stay in a fixed panel below so they are always reachable.
             this.panelLinkContent.AutoScroll = true;
             this.panelLinkContent.Controls.Add(this.label2);
+            this.panelLinkContent.Controls.Add(this.labelConfigurationStatus);
             this.panelLinkContent.Controls.Add(this.label5);
             this.panelLinkContent.Controls.Add(this.groupBox5);
             this.panelLinkContent.Controls.Add(this.groupBox4);
@@ -286,9 +288,19 @@
             this.label2.Size = new System.Drawing.Size(308, 12);
             this.label2.TabIndex = 93;
             this.label2.Text = "Use this page to make any changes to the links\' properties";
-            // 
+            //
+            // labelConfigurationStatus
+            //
+            // Text is set at run time (active configuration and where its settings came from).
+            this.labelConfigurationStatus.AutoSize = true;
+            this.labelConfigurationStatus.Location = new System.Drawing.Point(22, 50);
+            this.labelConfigurationStatus.Name = "labelConfigurationStatus";
+            this.labelConfigurationStatus.Size = new System.Drawing.Size(308, 12);
+            this.labelConfigurationStatus.TabIndex = 95;
+            this.labelConfigurationStatus.Text = "";
+            //
             // label5
-            // 
+            //
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1.21F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
             this.label5.Location = new System.Drawing.Point(12, 8);
@@ -1847,6 +1859,7 @@
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Panel panelLinkProperties;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label labelConfigurationStatus;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button buttonLinksFinish;
         private System.Windows.Forms.Button buttonLinksPrevious;

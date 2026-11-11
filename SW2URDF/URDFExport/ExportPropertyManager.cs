@@ -88,6 +88,7 @@ namespace SW2URDF.URDFExport
         private PropertyManagerPageLabel PMLabelJointType;
         private PropertyManagerPageLabel PMLabelGlobalCoordsys;
         private PropertyManagerPageLabel PMLabelCSVFilename;
+        private PropertyManagerPageLabel PMLabelConfigurationStatus;
 
         private PropertyManagerPageWindowFromHandle PMTree;
 
@@ -117,6 +118,7 @@ namespace SW2URDF.URDFExport
         private const int ComputeJointKinematicsID = 29;
         private const int ComputeJointLimitsID = 30;
         private const int LoadedCSVFilenameID = 31;
+        private const int LabelConfigurationStatusID = 32;
 
         #endregion class variables
 
@@ -691,6 +693,15 @@ namespace SW2URDF.URDFExport
             options = (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Visible +
                 (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded;
             PMGroup = (PropertyManagerPageGroup)PMPage.AddGroupBox(GroupID, caption, (int)options);
+
+            //Active SolidWorks configuration and where its settings come from (filled in by
+            //RefreshConfigurationStatus once the model is known)
+            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
+            alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
+            options = (int)swAddControlOptions_e.swControlOptions_Visible +
+                (int)swAddControlOptions_e.swControlOptions_Enabled;
+            PMLabelConfigurationStatus = (PropertyManagerPageLabel)PMGroup.AddControl2(
+                LabelConfigurationStatusID, (short)controlType, "", (short)alignment, (int)options, "");
 
             //Create the parent link label (static)
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
