@@ -51,8 +51,10 @@ namespace SW2URDF.URDFExport
             {
                 if (PMLabelConfigurationStatus != null && ActiveSWModel != null)
                 {
-                    PMLabelConfigurationStatus.Caption =
-                        ConfigurationSerialization.DescribeSettings(ActiveSWModel, ui);
+                    PMConfigGroup.Caption = ConfigurationStatus.Headline(
+                        ui, ConfigurationSerialization.GetActiveConfigurationName(ActiveSWModel));
+                    PMLabelConfigurationStatus.Caption = ConfigurationStatus.Detail(
+                        ui, ConfigurationSerialization.GetSettingsSource(ActiveSWModel));
                 }
             }
             catch (Exception e)

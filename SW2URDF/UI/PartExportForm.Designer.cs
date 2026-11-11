@@ -51,6 +51,7 @@
             this.label12 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
+            this.labelConfigurationStatus = new System.Windows.Forms.Label();
             this.textBox_inertial_origin_yaw = new System.Windows.Forms.TextBox();
             this.textBox_inertial_origin_pitch = new System.Windows.Forms.TextBox();
             this.textBox_inertial_origin_roll = new System.Windows.Forms.TextBox();
@@ -311,6 +312,22 @@
             this.label14.Size = new System.Drawing.Size(368, 13);
             this.label14.TabIndex = 25;
             this.label14.Text = "Configure custom properties for exporting the SolidWorks part to a URDF link";
+            // 
+            // labelConfigurationStatus
+            // 
+            // Text is set at run time (active configuration and where its settings come from).
+            this.labelConfigurationStatus.AutoSize = false;
+            this.labelConfigurationStatus.BackColor = System.Drawing.Color.FromArgb(255, 241, 196);
+            this.labelConfigurationStatus.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.labelConfigurationStatus.Dock = System.Windows.Forms.DockStyle.Top;
+            this.labelConfigurationStatus.Font = new System.Drawing.Font(this.Font, System.Drawing.FontStyle.Bold);
+            this.labelConfigurationStatus.ForeColor = System.Drawing.Color.FromArgb(64, 40, 0);
+            this.labelConfigurationStatus.Name = "labelConfigurationStatus";
+            this.labelConfigurationStatus.Padding = new System.Windows.Forms.Padding(6, 3, 6, 3);
+            this.labelConfigurationStatus.Size = new System.Drawing.Size(569, 40);
+            this.labelConfigurationStatus.TabIndex = 96;
+            this.labelConfigurationStatus.Text = "";
+            this.labelConfigurationStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // textBox_inertial_origin_yaw
             // 
@@ -957,6 +974,7 @@
             this.ClientSize = new System.Drawing.Size(569, 705);
             this.Controls.Add(this.panelContent);
             this.Controls.Add(this.panelButtons);
+            this.Controls.Add(this.labelConfigurationStatus);
             this.Name = "PartExportForm";
             this.Text = "SolidWorks Part to URDF Link Exporter";
             this.Load += new System.EventHandler(this.PartExportFormLoad);
@@ -1003,6 +1021,7 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label labelConfigurationStatus;
         private System.Windows.Forms.TextBox textBox_inertial_origin_yaw;
         private System.Windows.Forms.TextBox textBox_inertial_origin_pitch;
         private System.Windows.Forms.TextBox textBox_inertial_origin_roll;

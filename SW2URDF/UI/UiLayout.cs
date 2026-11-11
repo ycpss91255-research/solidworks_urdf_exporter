@@ -49,7 +49,20 @@ namespace SW2URDF.UI
         // Same fit, using the DPI the (already created) form really has.
         internal static void FitButtonHeightsToWindow(Control root)
         {
+            RefitStatusBanner(root);
             FitForm(root, WindowDpi(root));
+        }
+
+        // The banner height was measured when its text was set, possibly at another DPI than the one
+        // the window is really drawn at: measure again.
+        internal static void RefitStatusBanner(Control root)
+        {
+            Control[] found = root.Controls.Find("labelConfigurationStatus", true);
+            Label banner = found.Length > 0 ? found[0] as Label : null;
+            if (banner != null && !string.IsNullOrEmpty(banner.Text))
+            {
+                SetStatusBannerText(banner, banner.Text);
+            }
         }
 
         // Fits the button heights and gives the form the height the buttons gained. The button row at
@@ -298,6 +311,28 @@ namespace SW2URDF.UI
                 }
             }
             return gained;
+        }
+
+        // Status banner (active configuration and where its settings come from): sized to its text.
+        // Sets the banner text and makes its height fit the wrapped text at the current font and
+        // DPI. A banner docked at the top of a form pushes the content down, so the form grows by
+        // the height it gained to keep the content area the size it had.
+        internal static void SetStatusBannerText(Label banner, string text)
+        {
+            int oldHeight = banner.Height;
+            banner.Text = text;
+            Size room = new Size(Math.Max(1, banner.ClientSize.Width - banner.Padding.Horizontal), 0);
+            Size need = TextRenderer.MeasureText(text ?? "", banner.Font, room,
+                TextFormatFlags.WordBreak | TextFormatFlags.NoPadding);
+            int height = need.Height + banner.Padding.Vertical + (banner.Height - banner.ClientSize.Height) + 6;
+            banner.Height = height;
+            Form form = banner.FindForm();
+            if (banner.Dock == DockStyle.Top && form != null && form.WindowState == FormWindowState.Normal
+                && height != oldHeight)
+            {
+                Rectangle area = Screen.FromControl(form).WorkingArea;
+                form.Height = Math.Min(form.Height + (height - oldHeight), area.Height);
+            }
         }
     }
 }
