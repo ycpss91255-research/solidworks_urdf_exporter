@@ -460,6 +460,24 @@
   <data xml:space="preserve" name="automatically detect">
     <value>自動偵測</value>
   </data>
+  <data xml:space="preserve" name="revolute">
+    <value>旋轉 (revolute)</value>
+  </data>
+  <data xml:space="preserve" name="continuous">
+    <value>連續旋轉 (continuous)</value>
+  </data>
+  <data xml:space="preserve" name="prismatic">
+    <value>滑動 (prismatic)</value>
+  </data>
+  <data xml:space="preserve" name="fixed">
+    <value>固定 (fixed)</value>
+  </data>
+  <data xml:space="preserve" name="floating">
+    <value>浮動 (floating)</value>
+  </data>
+  <data xml:space="preserve" name="planar">
+    <value>平面 (planar)</value>
+  </data>
   <data xml:space="preserve" name="none">
     <value>無</value>
   </data>

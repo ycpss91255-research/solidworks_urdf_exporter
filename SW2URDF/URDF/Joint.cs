@@ -96,16 +96,17 @@ namespace SW2URDF.URDF
             ChildElements.Add(Mimic);
         }
 
-        public void FillBoxes(TextBox boxName, ComboBox boxType)
+        // ui only changes the shown caption of the joint type; Type always holds the URDF identifier.
+        public void FillBoxes(TextBox boxName, ComboBox boxType, SW2URDF.UI.UiText ui = null)
         {
             boxName.Text = Name;
-            boxType.Text = Type;
+            boxType.Text = ui == null ? Type : ui.ComboDisplay(Type);
         }
 
-        public void Update(TextBox boxName, ComboBox boxType)
+        public void Update(TextBox boxName, ComboBox boxType, SW2URDF.UI.UiText ui = null)
         {
             Name = boxName.Text;
-            Type = boxType.Text;
+            Type = ui == null ? boxType.Text : ui.ComboValue(boxType.Text);
         }
 
         public override bool ElementContainsData()
