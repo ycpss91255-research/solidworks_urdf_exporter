@@ -114,6 +114,21 @@ namespace SW2URDF.UI
             InitializeComponent();
             ui = UiText.FromSolidWorks(SwApp);
             ui.Apply(this);
+            // Items show the localized caption; the stored/compared value is mapped back by ui.ComboValue.
+            comboBoxJointType.Items.Clear();
+            foreach (string type in SW2URDF.URDF.Joint.AvailableTypes)
+                comboBoxJointType.Items.Add(ui.ComboDisplay(type));
+            // The designer width fits the English identifiers; the longer captions must not be clipped.
+            int widest = 0;
+            foreach (object item in comboBoxJointType.Items)
+                widest = Math.Max(widest, TextRenderer.MeasureText(item.ToString(), comboBoxJointType.Font).Width);
+            int needed = widest + SystemInformation.VerticalScrollBarWidth + 10;
+            comboBoxJointType.DropDownWidth = Math.Max(comboBoxJointType.Width, needed);
+            if (needed > comboBoxJointType.Width)
+            {
+                int room = comboBoxJointType.Parent.ClientSize.Width - comboBoxJointType.Left - 8;
+                comboBoxJointType.Width = Math.Min(needed, room);
+            }
             AlignFieldLabels();
             UiLayout.FitForm(this, UiLayout.ScreenDpi());
             swApp = SwApp;
