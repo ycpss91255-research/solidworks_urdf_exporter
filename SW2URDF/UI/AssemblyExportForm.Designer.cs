@@ -75,6 +75,12 @@
             this.flowLayoutPanelMeshFormat = new System.Windows.Forms.FlowLayoutPanel();
             this.labelObjColorNote = new System.Windows.Forms.Label();
             this.panelObjColorNote = new System.Windows.Forms.Panel();
+            this.panelLinkContent = new System.Windows.Forms.Panel();
+            this.panelLinkButtons = new System.Windows.Forms.TableLayoutPanel();
+            this.flowLayoutPanelLinkButtons = new System.Windows.Forms.FlowLayoutPanel();
+            this.panelJointPage = new System.Windows.Forms.Panel();
+            this.panelJointContent = new System.Windows.Forms.Panel();
+            this.panelJointButtons = new System.Windows.Forms.TableLayoutPanel();
             this.label19 = new System.Windows.Forms.Label();
             this.textBoxVisualOriginZ = new System.Windows.Forms.TextBox();
             this.textBoxVisualOriginYaw = new System.Windows.Forms.TextBox();
@@ -190,30 +196,80 @@
             this.groupBox1.SuspendLayout();
             this.flowLayoutPanelMeshFormat.SuspendLayout();
             this.panelObjColorNote.SuspendLayout();
+            this.panelLinkContent.SuspendLayout();
+            this.panelLinkButtons.SuspendLayout();
+            this.flowLayoutPanelLinkButtons.SuspendLayout();
+            this.panelJointPage.SuspendLayout();
+            this.panelJointContent.SuspendLayout();
+            this.panelJointButtons.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelLinkProperties
             // 
-            this.panelLinkProperties.Controls.Add(this.buttonLinksExportUrdfOnly);
-            this.panelLinkProperties.Controls.Add(this.label2);
-            this.panelLinkProperties.Controls.Add(this.label5);
-            this.panelLinkProperties.Controls.Add(this.buttonLinksFinish);
-            this.panelLinkProperties.Controls.Add(this.buttonLinksPrevious);
-            this.panelLinkProperties.Controls.Add(this.buttonLinksCancel);
-            this.panelLinkProperties.Controls.Add(this.groupBox5);
-            this.panelLinkProperties.Controls.Add(this.groupBox4);
-            this.panelLinkProperties.Controls.Add(this.treeViewLinkProperties);
+            this.panelLinkProperties.Controls.Add(this.panelLinkContent);
+            this.panelLinkProperties.Controls.Add(this.panelLinkButtons);
             this.panelLinkProperties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelLinkProperties.Location = new System.Drawing.Point(0, 0);
             this.panelLinkProperties.Name = "panelLinkProperties";
-            this.panelLinkProperties.Size = new System.Drawing.Size(1073, 634);
+            this.panelLinkProperties.Size = new System.Drawing.Size(1073, 644);
             this.panelLinkProperties.TabIndex = 222;
             this.panelLinkProperties.Visible = false;
+            //
+            // panelLinkContent
+            //
+            // Page content scrolls when the form is smaller than its layout (high display scale, CJK fonts,
+            // small screens); the buttons stay in a fixed panel below so they are always reachable.
+            this.panelLinkContent.AutoScroll = true;
+            this.panelLinkContent.Controls.Add(this.label2);
+            this.panelLinkContent.Controls.Add(this.label5);
+            this.panelLinkContent.Controls.Add(this.groupBox5);
+            this.panelLinkContent.Controls.Add(this.groupBox4);
+            this.panelLinkContent.Controls.Add(this.treeViewLinkProperties);
+            this.panelLinkContent.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelLinkContent.Location = new System.Drawing.Point(0, 0);
+            this.panelLinkContent.Name = "panelLinkContent";
+            this.panelLinkContent.Size = new System.Drawing.Size(1073, 610);
+            this.panelLinkContent.TabIndex = 0;
+            //
+            // panelLinkButtons
+            //
+            // The button row is a table: Cancel at the left, the other buttons flowing at the right, so the
+            // row follows the width of the window and the buttons never overlap whatever the scale or font.
+            this.panelLinkButtons.AutoSize = true;
+            this.panelLinkButtons.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.panelLinkButtons.ColumnCount = 2;
+            this.panelLinkButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.panelLinkButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.panelLinkButtons.Controls.Add(this.buttonLinksCancel, 0, 0);
+            this.panelLinkButtons.Controls.Add(this.flowLayoutPanelLinkButtons, 1, 0);
+            this.panelLinkButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelLinkButtons.Location = new System.Drawing.Point(0, 610);
+            this.panelLinkButtons.Name = "panelLinkButtons";
+            this.panelLinkButtons.Padding = new System.Windows.Forms.Padding(12, 4, 12, 6);
+            this.panelLinkButtons.RowCount = 1;
+            this.panelLinkButtons.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.panelLinkButtons.Size = new System.Drawing.Size(1073, 34);
+            this.panelLinkButtons.TabIndex = 1;
+            //
+            // flowLayoutPanelLinkButtons
+            //
+            this.flowLayoutPanelLinkButtons.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.flowLayoutPanelLinkButtons.AutoSize = true;
+            this.flowLayoutPanelLinkButtons.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.flowLayoutPanelLinkButtons.Controls.Add(this.buttonLinksPrevious);
+            this.flowLayoutPanelLinkButtons.Controls.Add(this.buttonLinksExportUrdfOnly);
+            this.flowLayoutPanelLinkButtons.Controls.Add(this.buttonLinksFinish);
+            this.flowLayoutPanelLinkButtons.Location = new System.Drawing.Point(500, 4);
+            this.flowLayoutPanelLinkButtons.Margin = new System.Windows.Forms.Padding(0);
+            this.flowLayoutPanelLinkButtons.Name = "flowLayoutPanelLinkButtons";
+            this.flowLayoutPanelLinkButtons.Size = new System.Drawing.Size(549, 29);
+            this.flowLayoutPanelLinkButtons.TabIndex = 0;
+            this.flowLayoutPanelLinkButtons.WrapContents = false;
             // 
             // buttonLinksExportUrdfOnly
             // 
-            this.buttonLinksExportUrdfOnly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonLinksExportUrdfOnly.Location = new System.Drawing.Point(759, 603);
+            this.buttonLinksExportUrdfOnly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonLinksExportUrdfOnly.Location = new System.Drawing.Point(759, 7);
             this.buttonLinksExportUrdfOnly.Margin = new System.Windows.Forms.Padding(2);
             this.buttonLinksExportUrdfOnly.Name = "buttonLinksExportUrdfOnly";
             this.buttonLinksExportUrdfOnly.Size = new System.Drawing.Size(150, 21);
@@ -243,8 +299,8 @@
             // 
             // buttonLinksFinish
             // 
-            this.buttonLinksFinish.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonLinksFinish.Location = new System.Drawing.Point(914, 603);
+            this.buttonLinksFinish.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonLinksFinish.Location = new System.Drawing.Point(914, 7);
             this.buttonLinksFinish.Name = "buttonLinksFinish";
             this.buttonLinksFinish.Size = new System.Drawing.Size(150, 21);
             this.buttonLinksFinish.TabIndex = 91;
@@ -254,8 +310,8 @@
             // 
             // buttonLinksPrevious
             // 
-            this.buttonLinksPrevious.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonLinksPrevious.Location = new System.Drawing.Point(509, 603);
+            this.buttonLinksPrevious.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonLinksPrevious.Location = new System.Drawing.Point(509, 7);
             this.buttonLinksPrevious.Name = "buttonLinksPrevious";
             this.buttonLinksPrevious.Size = new System.Drawing.Size(75, 21);
             this.buttonLinksPrevious.TabIndex = 90;
@@ -265,8 +321,8 @@
             // 
             // buttonLinksCancel
             // 
-            this.buttonLinksCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonLinksCancel.Location = new System.Drawing.Point(12, 603);
+            this.buttonLinksCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonLinksCancel.Location = new System.Drawing.Point(12, 7);
             this.buttonLinksCancel.Name = "buttonLinksCancel";
             this.buttonLinksCancel.Size = new System.Drawing.Size(75, 21);
             this.buttonLinksCancel.TabIndex = 89;
@@ -907,14 +963,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.treeViewLinkProperties.Location = new System.Drawing.Point(12, 74);
             this.treeViewLinkProperties.Name = "treeViewLinkProperties";
-            this.treeViewLinkProperties.Size = new System.Drawing.Size(451, 525);
+            this.treeViewLinkProperties.Size = new System.Drawing.Size(451, 520);
             this.treeViewLinkProperties.TabIndex = 74;
             this.treeViewLinkProperties.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewLinkPropertiesAfterSelect);
             // 
             // buttonJointNext
             // 
-            this.buttonJointNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonJointNext.Location = new System.Drawing.Point(986, 603);
+            this.buttonJointNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonJointNext.Location = new System.Drawing.Point(986, 7);
             this.buttonJointNext.Name = "buttonJointNext";
             this.buttonJointNext.Size = new System.Drawing.Size(75, 21);
             this.buttonJointNext.TabIndex = 162;
@@ -924,8 +980,8 @@
             // 
             // buttonJointCancel
             // 
-            this.buttonJointCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonJointCancel.Location = new System.Drawing.Point(12, 603);
+            this.buttonJointCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonJointCancel.Location = new System.Drawing.Point(12, 7);
             this.buttonJointCancel.Name = "buttonJointCancel";
             this.buttonJointCancel.Size = new System.Drawing.Size(75, 21);
             this.buttonJointCancel.TabIndex = 160;
@@ -1003,7 +1059,7 @@
             // labelSoftUpper
             // 
             this.labelSoftUpper.AutoSize = true;
-            this.labelSoftUpper.Location = new System.Drawing.Point(850, 453);
+            this.labelSoftUpper.Location = new System.Drawing.Point(843, 453);
             this.labelSoftUpper.Name = "labelSoftUpper";
             this.labelSoftUpper.Size = new System.Drawing.Size(111, 12);
             this.labelSoftUpper.TabIndex = 215;
@@ -1045,7 +1101,7 @@
             // labelFriction
             // 
             this.labelFriction.AutoSize = true;
-            this.labelFriction.Location = new System.Drawing.Point(694, 427);
+            this.labelFriction.Location = new System.Drawing.Point(688, 427);
             this.labelFriction.Name = "labelFriction";
             this.labelFriction.Size = new System.Drawing.Size(76, 12);
             this.labelFriction.TabIndex = 208;
@@ -1061,7 +1117,7 @@
             // labelDamping
             // 
             this.labelDamping.AutoSize = true;
-            this.labelDamping.Location = new System.Drawing.Point(634, 451);
+            this.labelDamping.Location = new System.Drawing.Point(628, 451);
             this.labelDamping.Name = "labelDamping";
             this.labelDamping.Size = new System.Drawing.Size(133, 12);
             this.labelDamping.TabIndex = 209;
@@ -1439,7 +1495,7 @@
             // 
             this.treeViewJointTree.Location = new System.Drawing.Point(12, 82);
             this.treeViewJointTree.Name = "treeViewJointTree";
-            this.treeViewJointTree.Size = new System.Drawing.Size(462, 517);
+            this.treeViewJointTree.Size = new System.Drawing.Size(462, 512);
             this.treeViewJointTree.TabIndex = 163;
             this.treeViewJointTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewJointtreeAfterSelect);
             // 
@@ -1495,7 +1551,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(521, 598);
+            this.label4.Location = new System.Drawing.Point(521, 596);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(263, 12);
             this.label4.TabIndex = 230;
@@ -1538,7 +1594,7 @@
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(521, 617);
+            this.label27.Location = new System.Drawing.Point(800, 596);
             this.label27.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(130, 12);
@@ -1629,94 +1685,132 @@
             this.MimicEquationLabel.TabIndex = 242;
             this.MimicEquationLabel.Text = "pos = multiplier * pos_other + offset";
             this.MimicEquationLabel.Visible = false;
+            //
+            // panelJointPage
+            //
+            this.panelJointPage.Controls.Add(this.panelJointContent);
+            this.panelJointPage.Controls.Add(this.panelJointButtons);
+            this.panelJointPage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelJointPage.Location = new System.Drawing.Point(0, 0);
+            this.panelJointPage.Name = "panelJointPage";
+            this.panelJointPage.Size = new System.Drawing.Size(1073, 644);
+            this.panelJointPage.TabIndex = 223;
+            //
+            // panelJointContent
+            //
+            // Page content scrolls when the form is smaller than its layout; the buttons stay in a fixed panel below.
+            this.panelJointContent.AutoScroll = true;
+            this.panelJointContent.Controls.Add(this.label7);
+            this.panelJointContent.Controls.Add(this.label6);
+            this.panelJointContent.Controls.Add(this.label3);
+            this.panelJointContent.Controls.Add(this.textBoxKVelocity);
+            this.panelJointContent.Controls.Add(this.labelKVelocity);
+            this.panelJointContent.Controls.Add(this.textBoxSoftLower);
+            this.panelJointContent.Controls.Add(this.labelSoftLower);
+            this.panelJointContent.Controls.Add(this.textBoxSoftUpper);
+            this.panelJointContent.Controls.Add(this.labelSoftUpper);
+            this.panelJointContent.Controls.Add(this.label80);
+            this.panelJointContent.Controls.Add(this.textBoxKPosition);
+            this.panelJointContent.Controls.Add(this.labelKPosition);
+            this.panelJointContent.Controls.Add(this.textBoxFriction);
+            this.panelJointContent.Controls.Add(this.labelFriction);
+            this.panelJointContent.Controls.Add(this.textBoxDamping);
+            this.panelJointContent.Controls.Add(this.labelDamping);
+            this.panelJointContent.Controls.Add(this.label76);
+            this.panelJointContent.Controls.Add(this.textBoxCalibrationRising);
+            this.panelJointContent.Controls.Add(this.label7CalibrationRising);
+            this.panelJointContent.Controls.Add(this.textBoxCalibrationFalling);
+            this.panelJointContent.Controls.Add(this.label73);
+            this.panelJointContent.Controls.Add(this.label74);
+            this.panelJointContent.Controls.Add(this.textBoxLimitVelocity);
+            this.panelJointContent.Controls.Add(this.labelVelocity);
+            this.panelJointContent.Controls.Add(this.textBoxLimitLower);
+            this.panelJointContent.Controls.Add(this.labelLowerLimit);
+            this.panelJointContent.Controls.Add(this.textBoxLimitUpper);
+            this.panelJointContent.Controls.Add(this.labelLimitUpper);
+            this.panelJointContent.Controls.Add(this.label68);
+            this.panelJointContent.Controls.Add(this.textBoxLimitEffort);
+            this.panelJointContent.Controls.Add(this.labelEffort);
+            this.panelJointContent.Controls.Add(this.label65);
+            this.panelJointContent.Controls.Add(this.label64);
+            this.panelJointContent.Controls.Add(this.label63);
+            this.panelJointContent.Controls.Add(this.textBoxJointName);
+            this.panelJointContent.Controls.Add(this.label62);
+            this.panelJointContent.Controls.Add(this.comboBoxJointType);
+            this.panelJointContent.Controls.Add(this.textBoxAxisX);
+            this.panelJointContent.Controls.Add(this.label58);
+            this.panelJointContent.Controls.Add(this.textBoxAxisY);
+            this.panelJointContent.Controls.Add(this.label59);
+            this.panelJointContent.Controls.Add(this.label60);
+            this.panelJointContent.Controls.Add(this.textBoxAxisZ);
+            this.panelJointContent.Controls.Add(this.label61);
+            this.panelJointContent.Controls.Add(this.textBoxJointX);
+            this.panelJointContent.Controls.Add(this.label51);
+            this.panelJointContent.Controls.Add(this.textBoxJointYaw);
+            this.panelJointContent.Controls.Add(this.textBoxJointPitch);
+            this.panelJointContent.Controls.Add(this.label52);
+            this.panelJointContent.Controls.Add(this.textBoxJointRoll);
+            this.panelJointContent.Controls.Add(this.textBoxJointY);
+            this.panelJointContent.Controls.Add(this.label53);
+            this.panelJointContent.Controls.Add(this.label54);
+            this.panelJointContent.Controls.Add(this.label55);
+            this.panelJointContent.Controls.Add(this.label56);
+            this.panelJointContent.Controls.Add(this.textBoxJointZ);
+            this.panelJointContent.Controls.Add(this.label57);
+            this.panelJointContent.Controls.Add(this.labelChild);
+            this.panelJointContent.Controls.Add(this.labelParent);
+            this.panelJointContent.Controls.Add(this.treeViewJointTree);
+            this.panelJointContent.Controls.Add(this.comboBoxAxis);
+            this.panelJointContent.Controls.Add(this.comboBoxOrigin);
+            this.panelJointContent.Controls.Add(this.label66);
+            this.panelJointContent.Controls.Add(this.label67);
+            this.panelJointContent.Controls.Add(this.label69);
+            this.panelJointContent.Controls.Add(this.MimicJointLabel);
+            this.panelJointContent.Controls.Add(this.MimicCheckBox);
+            this.panelJointContent.Controls.Add(this.MimicJointComboBox);
+            this.panelJointContent.Controls.Add(this.MimicOffsetLabel);
+            this.panelJointContent.Controls.Add(this.MimicMultiplierLabel);
+            this.panelJointContent.Controls.Add(this.textBoxMimicOffset);
+            this.panelJointContent.Controls.Add(this.textBoxMimicMultiplier);
+            this.panelJointContent.Controls.Add(this.MimicEquationLabel);
+            this.panelJointContent.Controls.Add(this.LimitRequiredLabel);
+            this.panelJointContent.Controls.Add(this.AxisRequiredLabel);
+            this.panelJointContent.Controls.Add(this.label1);
+            this.panelJointContent.Controls.Add(this.label4);
+            this.panelJointContent.Controls.Add(this.label27);
+            this.panelJointContent.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelJointContent.Location = new System.Drawing.Point(0, 0);
+            this.panelJointContent.Name = "panelJointContent";
+            this.panelJointContent.Size = new System.Drawing.Size(1073, 610);
+            this.panelJointContent.TabIndex = 0;
+            //
+            // panelJointButtons
+            //
+            // Cancel at the left, Next at the right of a table row that follows the window width.
+            this.panelJointButtons.AutoSize = true;
+            this.panelJointButtons.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.panelJointButtons.ColumnCount = 2;
+            this.panelJointButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.panelJointButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.panelJointButtons.Controls.Add(this.buttonJointCancel, 0, 0);
+            this.panelJointButtons.Controls.Add(this.buttonJointNext, 1, 0);
+            this.panelJointButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelJointButtons.Location = new System.Drawing.Point(0, 610);
+            this.panelJointButtons.Name = "panelJointButtons";
+            this.panelJointButtons.Padding = new System.Windows.Forms.Padding(12, 4, 12, 6);
+            this.panelJointButtons.RowCount = 1;
+            this.panelJointButtons.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.panelJointButtons.Size = new System.Drawing.Size(1073, 34);
+            this.panelJointButtons.TabIndex = 1;
             // 
             // AssemblyExportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1073, 634);
+            this.ClientSize = new System.Drawing.Size(1073, 644);
             this.Controls.Add(this.panelLinkProperties);
-            this.Controls.Add(this.buttonJointNext);
-            this.Controls.Add(this.buttonJointCancel);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBoxKVelocity);
-            this.Controls.Add(this.labelKVelocity);
-            this.Controls.Add(this.textBoxSoftLower);
-            this.Controls.Add(this.labelSoftLower);
-            this.Controls.Add(this.textBoxSoftUpper);
-            this.Controls.Add(this.labelSoftUpper);
-            this.Controls.Add(this.label80);
-            this.Controls.Add(this.textBoxKPosition);
-            this.Controls.Add(this.labelKPosition);
-            this.Controls.Add(this.textBoxFriction);
-            this.Controls.Add(this.labelFriction);
-            this.Controls.Add(this.textBoxDamping);
-            this.Controls.Add(this.labelDamping);
-            this.Controls.Add(this.label76);
-            this.Controls.Add(this.textBoxCalibrationRising);
-            this.Controls.Add(this.label7CalibrationRising);
-            this.Controls.Add(this.textBoxCalibrationFalling);
-            this.Controls.Add(this.label73);
-            this.Controls.Add(this.label74);
-            this.Controls.Add(this.textBoxLimitVelocity);
-            this.Controls.Add(this.labelVelocity);
-            this.Controls.Add(this.textBoxLimitLower);
-            this.Controls.Add(this.labelLowerLimit);
-            this.Controls.Add(this.textBoxLimitUpper);
-            this.Controls.Add(this.labelLimitUpper);
-            this.Controls.Add(this.label68);
-            this.Controls.Add(this.textBoxLimitEffort);
-            this.Controls.Add(this.labelEffort);
-            this.Controls.Add(this.label65);
-            this.Controls.Add(this.label64);
-            this.Controls.Add(this.label63);
-            this.Controls.Add(this.textBoxJointName);
-            this.Controls.Add(this.label62);
-            this.Controls.Add(this.comboBoxJointType);
-            this.Controls.Add(this.textBoxAxisX);
-            this.Controls.Add(this.label58);
-            this.Controls.Add(this.textBoxAxisY);
-            this.Controls.Add(this.label59);
-            this.Controls.Add(this.label60);
-            this.Controls.Add(this.textBoxAxisZ);
-            this.Controls.Add(this.label61);
-            this.Controls.Add(this.textBoxJointX);
-            this.Controls.Add(this.label51);
-            this.Controls.Add(this.textBoxJointYaw);
-            this.Controls.Add(this.textBoxJointPitch);
-            this.Controls.Add(this.label52);
-            this.Controls.Add(this.textBoxJointRoll);
-            this.Controls.Add(this.textBoxJointY);
-            this.Controls.Add(this.label53);
-            this.Controls.Add(this.label54);
-            this.Controls.Add(this.label55);
-            this.Controls.Add(this.label56);
-            this.Controls.Add(this.textBoxJointZ);
-            this.Controls.Add(this.label57);
-            this.Controls.Add(this.labelChild);
-            this.Controls.Add(this.labelParent);
-            this.Controls.Add(this.treeViewJointTree);
-            this.Controls.Add(this.comboBoxAxis);
-            this.Controls.Add(this.comboBoxOrigin);
-            this.Controls.Add(this.label66);
-            this.Controls.Add(this.label67);
-            this.Controls.Add(this.label69);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label27);
-            this.Controls.Add(this.MimicJointLabel);
-            this.Controls.Add(this.MimicCheckBox);
-            this.Controls.Add(this.MimicJointComboBox);
-            this.Controls.Add(this.MimicOffsetLabel);
-            this.Controls.Add(this.MimicMultiplierLabel);
-            this.Controls.Add(this.textBoxMimicOffset);
-            this.Controls.Add(this.textBoxMimicMultiplier);
-            this.Controls.Add(this.MimicEquationLabel);
-            this.Controls.Add(this.LimitRequiredLabel);
-            this.Controls.Add(this.AxisRequiredLabel);
-            this.Controls.Add(this.label1);
-            this.MinimumSize = new System.Drawing.Size(1089, 673);
+            this.Controls.Add(this.panelJointPage);
+            this.MinimumSize = new System.Drawing.Size(640, 420);
             this.Name = "AssemblyExportForm";
             this.Text = "SolidWorks Assembly to URDF Exporter";
             this.Load += new System.EventHandler(this.AssemblyExportFormLoad);
@@ -1731,6 +1825,18 @@
             this.flowLayoutPanelMeshFormat.ResumeLayout(false);
             this.flowLayoutPanelMeshFormat.PerformLayout();
             this.panelObjColorNote.ResumeLayout(false);
+            this.panelLinkContent.ResumeLayout(false);
+            this.panelLinkContent.PerformLayout();
+            this.flowLayoutPanelLinkButtons.ResumeLayout(false);
+            this.flowLayoutPanelLinkButtons.PerformLayout();
+            this.panelLinkButtons.ResumeLayout(false);
+            this.panelLinkButtons.PerformLayout();
+            this.panelJointContent.ResumeLayout(false);
+            this.panelJointContent.PerformLayout();
+            this.panelJointButtons.ResumeLayout(false);
+            this.panelJointButtons.PerformLayout();
+            this.panelJointPage.ResumeLayout(false);
+            this.panelJointPage.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1892,6 +1998,12 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelMeshFormat;
         private System.Windows.Forms.Label labelObjColorNote;
         private System.Windows.Forms.Panel panelObjColorNote;
+        private System.Windows.Forms.Panel panelLinkContent;
+        private System.Windows.Forms.TableLayoutPanel panelLinkButtons;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelLinkButtons;
+        private System.Windows.Forms.Panel panelJointPage;
+        private System.Windows.Forms.Panel panelJointContent;
+        private System.Windows.Forms.TableLayoutPanel panelJointButtons;
         private System.Windows.Forms.RadioButton radioButtonStl;
     }
 }
