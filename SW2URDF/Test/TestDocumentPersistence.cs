@@ -117,6 +117,29 @@ namespace SW2URDF.Test
             Assert.Empty(DocumentPersistence.NamesToGroup(new string[0], "Other", existing));
         }
 
+        [Theory]
+        [InlineData("CoordSys", "Origin_global", true)]
+        [InlineData("CoordSys", "Origin_joint1", true)]
+        [InlineData("CoordSys", "My coordinate system", false)]
+        [InlineData("RefAxis", "Axis_joint1", true)]
+        [InlineData("RefAxis", "Axis1", false)]
+        [InlineData("3DProfileFeature", "URDF Reference", true)]
+        [InlineData("ProfileFeature", "URDF Reference", true)]
+        [InlineData("3DProfileFeature", "3DSketch1", false)]
+        [InlineData("Attribute", "Origin_x", false)]
+        public void OnlyFeaturesTheExporterGeneratesAreRecognised(string type, string name, bool expected)
+        {
+            Assert.Equal(expected, DocumentPersistence.IsGeneratedUrdfFeature(type, name));
+        }
+
+        [Fact]
+        public void AllUrdfFeaturesEndUpInOneFolderListWithoutDuplicates()
+        {
+            string[] all = DocumentPersistence.WithExtras(
+                new[] { "CFG_BOTH" }, new[] { "URDF Reference", "Origin_global", "CFG_BOTH", "Axis_j" });
+            Assert.Equal(new[] { "CFG_BOTH", "URDF Reference", "Origin_global", "Axis_j" }, all);
+        }
+
         [Fact]
         public void UnknownOrMissingActiveConfigurationCreatesNothing()
         {
