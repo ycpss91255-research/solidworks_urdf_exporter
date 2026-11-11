@@ -24,6 +24,8 @@ https://github.com/ros/solidworks_urdf_exporter/releases/tag/1.5.1
 
 See the [ROS Wiki](http://wiki.ros.org/sw_urdf_exporter) and associated [tutorials](http://wiki.ros.org/sw_urdf_exporter/Tutorials).
 
+Loading values from the CSV of an earlier export: [docs/LOAD_FROM_CSV.md](docs/LOAD_FROM_CSV.md) (English and 繁體中文).
+
 ## Development
 
 1. Install Visual Studio 2017
