@@ -138,7 +138,7 @@ namespace SW2URDF.URDFExport
             model.HideComponent2();
         }
 
-        private static List<Component2> ExpandSubAssemblies(List<Component2> components)
+        internal static List<Component2> ExpandSubAssemblies(List<Component2> components)
         {
             List<Component2> expanded = new List<Component2>();
             foreach (Component2 component in components)
