@@ -333,6 +333,7 @@
     <Compile Include="Test\TestMathOps.cs" />
     <Compile Include="Test\TestObjConverter.cs" />
     <Compile Include="Test\TestConfigurationStatus.cs" />
+    <Compile Include="Test\TestTreeKeyActions.cs" />
     <Compile Include="Test\TestDocumentPersistence.cs" />
     <Compile Include="Test\TestExporterRouting.cs" />
     <Compile Include="Test\TestOrphanAttributes.cs" />
@@ -387,6 +388,7 @@
     </Compile>
     <Compile Include="URDFExport\CommonSwOperations.cs" />
     <Compile Include="URDFExport\ConfigurationStatus.cs" />
+    <Compile Include="URDFExport\TreeKeyActions.cs" />
     <Compile Include="URDFExport\DocumentPersistence.cs" />
     <Compile Include="URDFExport\ExporterRouting.cs" />
     <Compile Include="URDFExport\OrphanAttributes.cs" />

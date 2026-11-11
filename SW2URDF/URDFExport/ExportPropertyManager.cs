@@ -467,7 +467,10 @@ namespace SW2URDF.URDFExport
             if (Id == NumBoxChildCountID)
             {
                 LinkNode node = (LinkNode)Tree.SelectedNode;
-                CreateNewNodes(node);
+                if (node != null)
+                {
+                    CreateNewNodes(node);
+                }
             }
         }
 
@@ -494,8 +497,11 @@ namespace SW2URDF.URDFExport
             if (Id == TextBoxLinkNameID)
             {
                 LinkNode node = (LinkNode)Tree.SelectedNode;
-                node.Text = PMTextBoxLinkName.Text;
-                node.Name = PMTextBoxLinkName.Text;
+                if (node != null)
+                {
+                    node.Text = PMTextBoxLinkName.Text;
+                    node.Name = PMTextBoxLinkName.Text;
+                }
             }
         }
 
@@ -536,16 +542,16 @@ namespace SW2URDF.URDFExport
         //When a keyboard key is pressed on the tree
         private void TreeKeyDown(object sender, KeyEventArgs e)
         {
-            if (rightClickedNode.IsEditing)
+            // rightClickedNode stays null until a node was right-clicked (a new assembly has none)
+            TreeKeyAction action = TreeKeyActions.Decide(
+                rightClickedNode != null, rightClickedNode != null && rightClickedNode.IsEditing, e.KeyCode);
+            if (action == TreeKeyAction.AcceptEdit)
             {
-                if (e.KeyCode == Keys.Enter)
-                {
-                    rightClickedNode.EndEdit(false);
-                }
-                else if (e.KeyCode == Keys.Escape)
-                {
-                    rightClickedNode.EndEdit(true);
-                }
+                rightClickedNode.EndEdit(false);
+            }
+            else if (action == TreeKeyAction.CancelEdit)
+            {
+                rightClickedNode.EndEdit(true);
             }
         }
 
@@ -554,6 +560,10 @@ namespace SW2URDF.URDFExport
         {
             try
             {
+                if (rightClickedNode == null)
+                {
+                    return;
+                }
                 CreateNewNodes(rightClickedNode, 1);
             }
             catch (Exception ex)
@@ -568,8 +578,11 @@ namespace SW2URDF.URDFExport
         {
             try
             {
-                LinkNode parent = (LinkNode)rightClickedNode.Parent;
-                parent.Nodes.Remove(rightClickedNode);
+                LinkNode parent = rightClickedNode == null ? null : (LinkNode)rightClickedNode.Parent;
+                if (TreeKeyActions.CanRemove(rightClickedNode != null, parent != null))
+                {
+                    parent.Nodes.Remove(rightClickedNode);
+                }
             }
             catch (Exception ex)
             {
@@ -585,6 +598,10 @@ namespace SW2URDF.URDFExport
         {
             try
             {
+                if (rightClickedNode == null)
+                {
+                    return;
+                }
                 Tree.SelectedNode = rightClickedNode;
                 Tree.LabelEdit = true;
                 rightClickedNode.BeginEdit();
