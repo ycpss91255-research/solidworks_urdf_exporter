@@ -121,6 +121,11 @@ namespace SW2URDF.URDFExport
         private const int LoadedCSVFilenameID = 31;
         private const int LabelConfigurationStatusID = 32;
         private const int ConfigurationGroupID = 33;
+        private const int LabelParentLinkTitleID = 34;
+        private const int LabelLinkNameTitleID = 35;
+        private const int LabelLinkComponentsID = 36;
+        private const int LabelChildCountID = 37;
+        private const int LabelChildCountHelpID = 38;
 
         #endregion class variables
 
@@ -733,6 +738,8 @@ namespace SW2URDF.URDFExport
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
+            PMGroup.AddControl2(
+                LabelParentLinkTitleID, (short)controlType, caption, (short)alignment, (int)options, "");
 
             //Create the parent link name label, the one that is updated
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
@@ -749,7 +756,9 @@ namespace SW2URDF.URDFExport
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
-            
+            PMGroup.AddControl2(
+                LabelLinkNameTitleID, (short)controlType, caption, (short)alignment, (int)options, tip);
+
             //Create the link name text box
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Textbox;
             caption = "base_link";
@@ -868,7 +877,9 @@ namespace SW2URDF.URDFExport
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
-            
+            PMGroup.AddControl2(
+                LabelLinkComponentsID, (short)controlType, caption, (short)alignment, (int)options, tip);
+
             //Create selection box
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Selectionbox;
             caption = ui.Get("Link Components");
@@ -897,7 +908,13 @@ namespace SW2URDF.URDFExport
             alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Visible +
                 (int)swAddControlOptions_e.swControlOptions_Enabled;
-            
+            PMGroup.AddControl2(
+                LabelChildCountID, (short)controlType, caption, (short)alignment, (int)options, tip);
+            // One line of explanation under the title: what the number does
+            PMGroup.AddControl2(
+                LabelChildCountHelpID, (short)controlType, ui.Get("Adds/removes child links"),
+                (short)alignment, (int)options, tip);
+
             //Create the number box
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Numberbox;
             caption = "";
