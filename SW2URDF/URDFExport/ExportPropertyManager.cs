@@ -28,6 +28,7 @@ using SW2URDF.URDF;
 using SW2URDF.URDFExport.CSV;
 using SW2URDF.Utilities;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -338,6 +339,40 @@ namespace SW2URDF.URDFExport
             return node;
         }
 
+        private const int MaxListedCsvProblems = 15;
+
+        /// <summary>The text that tells the user which cells of the CSV could not be read.</summary>
+        internal static string DescribeCsvProblems(CsvLoadReport report, UiText ui)
+        {
+            List<string> lines = new List<string>();
+            foreach (CsvProblem problem in report.Problems.Take(MaxListedCsvProblems))
+            {
+                lines.Add(problem.Kind == CsvProblemKind.EmptyLinkName
+                    ? string.Format(ui.Get("row {0}: the link name is empty, the row is skipped"), problem.Row)
+                    : string.Format(ui.Get("row {0}, column \"{1}\": \"{2}\" is not a number"),
+                        problem.Row, problem.Column, problem.Value));
+            }
+            if (report.Problems.Count > MaxListedCsvProblems)
+            {
+                lines.Add(string.Format(ui.Get("... and {0} more"), report.Problems.Count - MaxListedCsvProblems));
+            }
+            return string.Format(
+                ui.Get("Some cells of the CSV could not be read and are ignored (the values of the model are kept). Numbers need \".\" as the decimal point.\n\n{0}\n\nContinue with the merge?"),
+                string.Join("\n", lines));
+        }
+
+        private bool ConfirmCsvProblems(CsvLoadReport report)
+        {
+            if (report.Problems.Count == 0)
+            {
+                return true;
+            }
+
+            logger.Warn("The CSV has " + report.Problems.Count + " cells or rows that could not be read");
+            return MessageBox.Show(DescribeCsvProblems(report, ui), ui.Get("CSV cells could not be read"),
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
+        }
+
         private void LoadFromCSV()
         {
             SaveActiveNode();
@@ -368,8 +403,20 @@ namespace SW2URDF.URDFExport
                 logger.Info("Loading configuration " + loadFileDialog.FileName);
                 using (Stream stream = loadFileDialog.OpenFile())
                 {
-                    List<Link> loadedLinks = ImportExport.LoadURDFRobotFromCSV(stream);
-                    if (loadedLinks == null)
+                    CsvLoadReport report = new CsvLoadReport();
+                    List<Link> loadedLinks;
+                    try
+                    {
+                        loadedLinks = ImportExport.LoadURDFRobotFromCSV(stream, report);
+                    }
+                    catch (CsvFormatException e)
+                    {
+                        logger.Warn("The CSV file cannot be used: " + e.Message);
+                        MessageBox.Show(ui.Get("The CSV file cannot be read: it has no \"Link Name\" column. Save it as comma-separated text (the format the exporter writes) and try again."));
+                        return;
+                    }
+
+                    if (!ConfirmCsvProblems(report))
                     {
                         return;
                     }

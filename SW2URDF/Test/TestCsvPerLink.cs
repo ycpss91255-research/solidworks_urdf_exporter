@@ -12,7 +12,7 @@ namespace SW2URDF.Test
     /// <summary>No SOLIDWORKS needed. Values taken from the CSV apply per link (issue #83).</summary>
     public class TestCsvPerLink
     {
-        private static TreeViewItem Item(string name, params TreeViewItem[] children)
+        internal static TreeViewItem Item(string name, params TreeViewItem[] children)
         {
             TreeViewItem item = new TreeViewItem { Name = name, Tag = new Link { Name = name } };
             foreach (TreeViewItem child in children)
@@ -22,7 +22,7 @@ namespace SW2URDF.Test
             return item;
         }
 
-        private static void RunSta(Action action)
+        internal static void RunSta(Action action)
         {
             Exception error = null;
             Thread thread = new Thread(() =>

@@ -1,6 +1,7 @@
 using SolidWorks.Interop.sldworks;
 using SW2URDF.URDF;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Windows.Controls;
 
 namespace SW2URDF.URDFExport.URDFMerge
@@ -79,37 +80,88 @@ namespace SW2URDF.URDFExport.URDFMerge
             mergedLink.SWMainComponent = cadLink.SWMainComponent;
             mergedLink.SWComponents = new List<Component2>(cadLink.SWComponents);
 
+            // Cells of the CSV that are blank or could not be read are not in CsvData: for those the
+            // value of the model stays. A link that did not come from the loader is taken as a whole.
+            StringDictionary data = csvLink.CsvData;
+            List<string> linkContext = new List<string> { "Link" };
+            List<string> jointContext = new List<string> { "Link", "Joint" };
+
             if (UseCSVInertial)
             {
-                mergedLink.Inertial.SetElement(csvLink.Inertial);
+                if (data == null)
+                {
+                    mergedLink.Inertial.SetElement(csvLink.Inertial);
+                }
+                else
+                {
+                    mergedLink.Inertial.SetElementFromData(linkContext, data);
+                }
                 mergedLink.UsesCsvInertial = true;
             }
 
             if (UseCSVVisualCollision)
             {
-                mergedLink.Visual.SetElement(csvLink.Visual);
-                mergedLink.Collision.SetElement(csvLink.Collision);
+                if (data == null)
+                {
+                    mergedLink.Visual.SetElement(csvLink.Visual);
+                    mergedLink.Collision.SetElement(csvLink.Collision);
+                }
+                else
+                {
+                    mergedLink.Visual.SetElementFromData(linkContext, data);
+                    mergedLink.Collision.SetElementFromData(linkContext, data);
+                }
                 mergedLink.UsesCsvVisualCollision = true;
             }
 
             if (UseCSVJointKinematics)
             {
-                mergedLink.Joint.Origin.SetElement(csvLink.Joint.Origin);
-                mergedLink.Joint.CoordinateSystemName = csvLink.Joint.CoordinateSystemName;
+                if (data == null)
+                {
+                    mergedLink.Joint.Origin.SetElement(csvLink.Joint.Origin);
+                    mergedLink.Joint.CoordinateSystemName = csvLink.Joint.CoordinateSystemName;
 
-                mergedLink.Joint.Axis.SetElement(csvLink.Joint.Axis);
-                mergedLink.Joint.AxisName = csvLink.Joint.AxisName;
+                    mergedLink.Joint.Axis.SetElement(csvLink.Joint.Axis);
+                    mergedLink.Joint.AxisName = csvLink.Joint.AxisName;
 
-                mergedLink.Joint.Type = csvLink.Joint.Type;
+                    mergedLink.Joint.Type = csvLink.Joint.Type;
+                }
+                else
+                {
+                    mergedLink.Joint.Origin.SetElementFromData(jointContext, data);
+                    mergedLink.Joint.Axis.SetElementFromData(jointContext, data);
+                    if (data.ContainsKey("Link.CoordSysName"))
+                    {
+                        mergedLink.Joint.CoordinateSystemName = data["Link.CoordSysName"];
+                    }
+                    if (data.ContainsKey("Link.AxisName"))
+                    {
+                        mergedLink.Joint.AxisName = data["Link.AxisName"];
+                    }
+                    if (data.ContainsKey("Link.Joint.type"))
+                    {
+                        mergedLink.Joint.Type = data["Link.Joint.type"];
+                    }
+                }
                 mergedLink.UsesCsvJointKinematics = true;
             }
 
             if (UseCSVJointOther)
             {
-                mergedLink.Joint.Limit.SetElement(csvLink.Joint.Limit);
-                mergedLink.Joint.Calibration.SetElement(csvLink.Joint.Calibration);
-                mergedLink.Joint.Dynamics.SetElement(csvLink.Joint.Dynamics);
-                mergedLink.Joint.Safety.SetElement(csvLink.Joint.Safety);
+                if (data == null)
+                {
+                    mergedLink.Joint.Limit.SetElement(csvLink.Joint.Limit);
+                    mergedLink.Joint.Calibration.SetElement(csvLink.Joint.Calibration);
+                    mergedLink.Joint.Dynamics.SetElement(csvLink.Joint.Dynamics);
+                    mergedLink.Joint.Safety.SetElement(csvLink.Joint.Safety);
+                }
+                else
+                {
+                    mergedLink.Joint.Limit.SetElementFromData(jointContext, data);
+                    mergedLink.Joint.Calibration.SetElementFromData(jointContext, data);
+                    mergedLink.Joint.Dynamics.SetElementFromData(jointContext, data);
+                    mergedLink.Joint.Safety.SetElementFromData(jointContext, data);
+                }
                 mergedLink.UsesCsvJointLimits = true;
             }
 

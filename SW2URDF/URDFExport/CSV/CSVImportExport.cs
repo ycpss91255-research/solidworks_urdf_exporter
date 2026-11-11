@@ -46,17 +46,53 @@ namespace SW2URDF.URDFExport.CSV
         /// <returns></returns>
         public static List<Link> LoadURDFRobotFromCSV(Stream stream)
         {
-            List<StringDictionary> loadedFields = new List<StringDictionary>();
-            using (TextFieldParser csvParser = new TextFieldParser(stream))
-            {
-                csvParser.SetDelimiters(new string[] { "," });
+            return LoadURDFRobotFromCSV(stream, null);
+        }
 
-                string[] headers = csvParser.ReadFields();
+        /// <summary>
+        /// Loads a list of URDF Links from a CSV file and says in the report what could not be read.
+        /// The separator (comma, semicolon or tab) is detected from the header. Cells that are blank or
+        /// not readable are left out of Link.CsvData, so a merge keeps the current value for them.
+        /// </summary>
+        /// <exception cref="CsvFormatException">There is no "Link Name" column.</exception>
+        public static List<Link> LoadURDFRobotFromCSV(Stream stream, CsvLoadReport report)
+        {
+            report = report ?? new CsvLoadReport();
+            string text;
+            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true))
+            {
+                text = reader.ReadToEnd();
+            }
+
+            List<StringDictionary> loadedFields = new List<StringDictionary>();
+            string[] headers = null;
+            foreach (char delimiter in new[] { ',', ';', '\t' })
+            {
+                headers = ReadHeader(text, delimiter);
+                if (headers != null && headers.Any(h => h.Trim() == ContextToColumns.KeyName))
+                {
+                    report.Delimiter = delimiter;
+                    break;
+                }
+                headers = null;
+            }
+            if (headers == null)
+            {
+                throw new CsvFormatException("The CSV file has no '" + ContextToColumns.KeyName + "' column");
+            }
+            headers = headers.Select(h => h.Trim()).ToArray();
+
+            using (TextFieldParser csvParser = new TextFieldParser(new StringReader(text)))
+            {
+                csvParser.SetDelimiters(new string[] { report.Delimiter.ToString() });
+                csvParser.ReadFields();
+                int row = 1;
                 while (!csvParser.EndOfData)
                 {
                     string[] fields = csvParser.ReadFields();
+                    row++;
                     StringDictionary dictionary = new StringDictionary();
-                    
+
                     int minArrayLength = Math.Min(fields.Length, headers.Length);
                     if (fields.Length != headers.Length)
                     {
@@ -64,18 +100,74 @@ namespace SW2URDF.URDFExport.CSV
                             "The number of columns in the row do not match the number of columns in the header {0} != {1}",
                             fields.Length, headers.Length));
                     }
+                    bool rowHasProblem = false;
                     for (int i = 0; i < minArrayLength; i++)
                     {
-                        if (!string.IsNullOrWhiteSpace(fields[i]))
+                        if (string.IsNullOrWhiteSpace(fields[i]))
                         {
-                            dictionary[headers[i]] = fields[i];
+                            continue;
                         }
+                        if (IsNumericColumn(headers[i]) && !URDFAttribute.TryParseDouble(fields[i], out _))
+                        {
+                            report.Problems.Add(new CsvProblem
+                            {
+                                Kind = CsvProblemKind.NotANumber,
+                                Row = row,
+                                Column = headers[i],
+                                Value = fields[i]
+                            });
+                            rowHasProblem = true;
+                            continue;
+                        }
+                        dictionary[headers[i]] = fields[i];
+                    }
+
+                    if (string.IsNullOrWhiteSpace(dictionary[ContextToColumns.KeyName]))
+                    {
+                        if (dictionary.Count > 0 || rowHasProblem)
+                        {
+                            report.Problems.Add(new CsvProblem { Kind = CsvProblemKind.EmptyLinkName, Row = row });
+                        }
+                        continue;
                     }
                     loadedFields.Add(dictionary);
                 }
 
                 return loadedFields.Select(fields => BuildLinkFromData(fields)).ToList();
             }
+        }
+
+        private static string[] ReadHeader(string text, char delimiter)
+        {
+            using (TextFieldParser parser = new TextFieldParser(new StringReader(text)))
+            {
+                parser.SetDelimiters(new string[] { delimiter.ToString() });
+                try
+                {
+                    return parser.EndOfData ? null : parser.ReadFields();
+                }
+                catch (MalformedLineException)
+                {
+                    return null;
+                }
+            }
+        }
+
+        // Columns whose cells are text. All other columns of the exporter CSV hold numbers.
+        private static readonly string[] TextContextSuffixes =
+            { ".name", ".filename", ".type", ".link", ".SWComponents", ".CoordSysName", ".AxisName" };
+
+        private static bool IsNumericColumn(string columnName)
+        {
+            foreach (DictionaryEntry entry in ContextToColumns.Dictionary)
+            {
+                if ((string)entry.Value == columnName)
+                {
+                    string context = (string)entry.Key;
+                    return !TextContextSuffixes.Any(suffix => context.EndsWith(suffix, StringComparison.Ordinal));
+                }
+            }
+            return false;
         }
 
         #endregion Public Methods
@@ -181,6 +273,7 @@ namespace SW2URDF.URDFExport.CSV
 
             Link link = new Link();
             link.SetElementFromData(new List<string>(), contextDictionary);
+            link.CsvData = contextDictionary;
             return link;
         }
 

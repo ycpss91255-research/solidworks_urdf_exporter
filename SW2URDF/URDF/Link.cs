@@ -51,6 +51,10 @@ namespace SW2URDF.URDF
         public bool UsesCsvJointKinematics;
         public bool UsesCsvJointLimits;
 
+        // The cells that were read from the CSV for this link (context -> text), set by the CSV loader.
+        // Cells that were blank or unreadable are absent, so a merge keeps the model's value for them.
+        public StringDictionary CsvData;
+
         public Component2 SWMainComponent;
 
         public List<Component2> SWComponents;
