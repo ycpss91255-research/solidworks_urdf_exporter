@@ -553,8 +553,8 @@ namespace SW2URDF.URDFExport
         /// the folder, with their data, until that configuration is used. True when the tree changed.
         /// </summary>
         /// <summary>
-        /// After an export created features (reference sketch, generated coordinate systems and axes):
-        /// put them into the URDF folder and save the document. Never throws.
+        /// After an export: the URDF folder holds only configuration entries (the generated reference sketch,
+        /// coordinate systems and axes stay at the feature tree root). Saves the document if the tree changed. Never throws.
         /// </summary>
         public static void GroupUrdfFeatures(ModelDoc2 model, UiText ui)
         {
@@ -567,7 +567,7 @@ namespace SW2URDF.URDFExport
             }
             catch (Exception e)
             {
-                logger.Warn("Could not group the URDF features after the export", e);
+                logger.Warn("Could not tidy the URDF folder after the export", e);
             }
         }
 
@@ -585,7 +585,7 @@ namespace SW2URDF.URDFExport
             string[] existing = GetConfigurationAttributeFeatures(model).Select(feature =>
                 ((SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2()).GetName()).ToArray();
             string[] toShow = DocumentPersistence.WithExtras(
-                DocumentPersistence.NamesToGroup(inFolder, active, existing), GetOtherUrdfFeatureNames(model));
+                DocumentPersistence.NamesToGroup(inFolder, active, existing), GetOtherUrdfFeatureNames(model, false));
             bool folderExisted = ConfigurationFolderExists(model);
             bool legacyFolder = GetNamesInFolder(model, LegacyItemsFolderName).Length > 0 || LegacyFolderExists(model);
             if (!DocumentPersistence.NeedsRegroup(inFolder, toShow, folderExisted) && !legacyFolder)
@@ -669,7 +669,7 @@ namespace SW2URDF.URDFExport
         private static bool DeleteStrayFolders(ModelDoc2 model)
         {
             ReadFeatureChain(model, out string[] types, out string[] names);
-            List<string> ours = new List<string>(GetOtherUrdfFeatureNames(model));
+            List<string> ours = new List<string>(GetOtherUrdfFeatureNames(model, true));
             foreach (Feature feature in GetConfigurationAttributeFeatures(model))
             {
                 ours.Add(feature.Name);
@@ -697,11 +697,11 @@ namespace SW2URDF.URDFExport
         }
 
         /// <summary>
-        /// Other URDF features that belong in the same folder: the exporter's reference sketch,
-        /// generated coordinate systems and axes, the shared (legacy) attributes and whatever sits
-        /// in the older "URDF Export Items" folder.
+        /// Other exporter features besides the configuration entries: the shared (legacy) attributes, which
+        /// still go into the folder, and, only when includeGenerated is set (stray folder check), the generated
+        /// features and the older "URDF Export Items" folder contents, which stay loose.
         /// </summary>
-        private static string[] GetOtherUrdfFeatureNames(ModelDoc2 model)
+        private static string[] GetOtherUrdfFeatureNames(ModelDoc2 model, bool includeGenerated)
         {
             List<string> names = new List<string>();
             bool inLegacy = false;
@@ -731,7 +731,7 @@ namespace SW2URDF.URDFExport
                         names.Add(name);
                     }
                 }
-                else if (DocumentPersistence.IsGeneratedUrdfFeature(type, name) || inLegacy)
+                else if (includeGenerated && (DocumentPersistence.IsGeneratedUrdfFeature(type, name) || inLegacy))
                 {
                     names.Add(name);
                 }
@@ -1038,4 +1038,4 @@ namespace SW2URDF.URDFExport
 
         #endregion Private Methods
     }
-}
+}

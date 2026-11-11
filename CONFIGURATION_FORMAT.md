@@ -19,7 +19,7 @@ The feature tree folder name carries no version.
 
 The 3D sketch `URDF Reference`, `Origin_global`, `Origin_<joint>` and `Axis_<joint>` are model features,
 not part of a configuration: there is one set per model. They are points and lines at fixed assembly
-coordinates, so they do not follow the components. The settings of a configuration store only their
+coordinates, so they do not follow the components. They stay loose at the feature tree root, where SolidWorks creates them: the folder `URDF Export Configuration` holds only the configuration entries (and, until they are removed, the old shared attributes). Models grouped by an earlier build are repaired when the exporter opens: exporter-generated features inside the folder move back to the root, features of the user are never touched. The settings of a configuration store only their
 *names* (after an export, the generated name replaces `Automatically Generate`).
 
 - Every export checks a saved coordinate system or axis that the exporter generated (it hangs on the
