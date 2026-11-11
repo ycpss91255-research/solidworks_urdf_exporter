@@ -580,6 +580,9 @@
   <data xml:space="preserve" name="open a part or an assembly to use the urdf exporter.">
     <value>Open a part or an assembly to use the URDF exporter.</value>
   </data>
+  <data xml:space="preserve" name="saving the document did not finish cleanly (solidworks error code {0}, warning code {1}). the exporter continues, but its settings may not be stored in the file. save the document yourself, otherwise they can be lost when it is closed.">
+    <value>Saving the document did not finish cleanly (SolidWorks error code {0}, warning code {1}). The exporter continues, but its settings may not be stored in the file. Save the document yourself, otherwise they can be lost when it is closed.</value>
+  </data>
   <data xml:space="preserve" name="exporting the urdf failed unexpectedly.">
     <value>Exporting the URDF failed unexpectedly.</value>
   </data>
