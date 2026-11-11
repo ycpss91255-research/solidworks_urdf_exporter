@@ -47,6 +47,8 @@ function New-Form([Type]$type, [System.Drawing.Font]$font, $ui, [double]$dpi) {
     $layoutType = $assembly.GetType('SW2URDF.UI.UiLayout')
     $fit = if ($layoutType) { $layoutType.GetMethod('FitButtonHeights', [Reflection.BindingFlags]'Static,NonPublic,Public') }
     if ($fit) { [void]$fit.Invoke($null, @($form, [single]$dpi)) }
+    $space = if ($layoutType) { $layoutType.GetMethod('SpaceRows', [Reflection.BindingFlags]'Static,NonPublic,Public') }
+    if ($space) { [void]$space.Invoke($null, @($form, [single]$dpi)) }
     return $form
 }
 
