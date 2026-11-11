@@ -115,7 +115,7 @@ namespace SW2URDF.UI
             ui = UiText.FromSolidWorks(SwApp);
             ui.Apply(this);
             AlignFieldLabels();
-            UiLayout.FitButtonHeights(this, UiLayout.ScreenDpi());
+            UiLayout.FitForm(this, UiLayout.ScreenDpi());
             swApp = SwApp;
             BaseNode = node;
             ActiveSWModel = swApp.ActiveDoc;
