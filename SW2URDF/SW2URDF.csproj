@@ -328,6 +328,9 @@
     <Compile Include="Test\TestConfigurationFormat.cs" />
     <Compile Include="Test\TestCSVImportExport.cs" />
     <Compile Include="Test\TestCsvColumnCheck.cs" />
+    <Compile Include="Test\TestCsvPerLink.cs" />
+    <Compile Include="Test\TestCsvLoadProblems.cs" />
+    <Compile Include="Test\TestCsvMeshFilename.cs" />
     <Compile Include="Test\TestCsvInvariant.cs" />
     <Compile Include="Test\TestExportHelper.cs" />
     <Compile Include="Test\TestFileNames.cs" />
@@ -352,7 +355,8 @@
     <Compile Include="Test\TwoBoxesModel.cs" />
     <Compile Include="Test\TestSerialization.cs" />
     <Compile Include="Test\TestSWAttached.cs" />
-    <Compile Include="Test\TestURDFMerge.cs" />
+    <Compile Include="Test\TestTreeMerger.cs" />
+    <Compile Include="Test\TestTreeMergeWindowText.cs" />
     <Compile Include="Test\TestURDFPackage.cs" />
     <Compile Include="Test\TestVersioning.cs" />
     <Compile Include="URDF\Mimic.cs" />
@@ -379,6 +383,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="URDFExport\CSV\ContextToColumns.cs" />
+    <Compile Include="URDFExport\CSV\CsvLoadReport.cs" />
     <Compile Include="URDFExport\CSV\CSVImportExport.cs" />
     <Compile Include="URDFExport\ConfigurationSerialization.cs" />
     <Compile Include="URDFExport\ExportHelper.cs" />

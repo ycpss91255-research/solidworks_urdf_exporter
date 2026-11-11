@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015 Stephen Brawner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -121,6 +121,15 @@ namespace SW2URDF.URDFExport
             ComputeVisualCollision = true;
             ComputeJointKinematics = true;
             ComputeJointLimits = true;
+        }
+
+        /// <summary>
+        /// Whether a group of values is computed from the model for one link: the export setting
+        /// must allow it and the link must not carry values loaded from a CSV (issue #83).
+        /// </summary>
+        internal static bool ShouldCompute(bool computeSetting, bool linkUsesCsvValues)
+        {
+            return computeSetting && !linkUsesCsvValues;
         }
 
         public void SetComputeInertial(bool computeInertial)
@@ -353,8 +362,8 @@ namespace SW2URDF.URDFExport
                     windowsMeshFileName += ".STL";
                     break;
             }
-            // Export STL
-            if (exportSTL)
+            // Export STL (not when the CSV names existing meshes for both the visual and the collision)
+            if (ShouldExportMesh(exportSTL, link))
             {
                 bool exported;
                 try
@@ -389,8 +398,24 @@ namespace SW2URDF.URDFExport
                     failedMeshLinks.Add(link.Name);
                 }
             }
-            link.Visual.Geometry.Mesh.Filename = meshFilename;
-            link.Collision.Geometry.Mesh.Filename = meshFilename;
+            link.Visual.Geometry.Mesh.Filename = MeshFilenameForExport(
+                link.Visual.Geometry.Mesh.Filename, link.UsesCsvVisualMesh, meshFilename);
+            link.Collision.Geometry.Mesh.Filename = MeshFilenameForExport(
+                link.Collision.Geometry.Mesh.Filename, link.UsesCsvCollisionMesh, meshFilename);
+        }
+
+        /// <summary>A mesh file name that was loaded from the CSV is kept; any other gets the name of the
+        /// mesh that is exported for the link (issue #85).</summary>
+        internal static string MeshFilenameForExport(string current, bool keepCsvName, string exportedName)
+        {
+            return keepCsvName && !String.IsNullOrWhiteSpace(current) ? current : exportedName;
+        }
+
+        /// <summary>The mesh of a link is exported unless both its visual and collision mesh names come
+        /// from the CSV (existing meshes that the package refers to).</summary>
+        internal static bool ShouldExportMesh(bool exportMeshes, Link link)
+        {
+            return exportMeshes && !(link.UsesCsvVisualMesh && link.UsesCsvCollisionMesh);
         }
 
         /// <summary>Cancels an OBJ conversion that is in progress (for example from a progress dialog).</summary>

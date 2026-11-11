@@ -508,6 +508,118 @@
   <data xml:space="preserve" name="merging the loaded csv configuration with the assembly&apos;s configuration failed. check your csv file. if you continue to run into errors, delete the configuration in the assembly and load a proper csv.">
     <value>將載入的 CSV 設定與組合件的設定合併失敗。請檢查 CSV 檔案。若仍持續發生錯誤，請刪除組合件中的設定，再載入正確的 CSV。</value>
   </data>
+  <data xml:space="preserve" name="the csv file cannot be read: it has no &quot;link name&quot; column. save it as comma-separated text (the format the exporter writes) and try again.">
+    <value>無法讀取此 CSV 檔：找不到「Link Name」欄。請將它存成以逗號分隔的文字檔（匯出器寫出的格式）後再試一次。</value>
+  </data>
+  <data xml:space="preserve" name="row {0}: the link name is empty, the row is skipped">
+    <value>第 {0} 列：連桿名稱為空，已略過此列</value>
+  </data>
+  <data xml:space="preserve" name="row {0}, column &quot;{1}&quot;: &quot;{2}&quot; is not a number">
+    <value>第 {0} 列，欄位「{1}」：「{2}」不是數字</value>
+  </data>
+  <data xml:space="preserve" name="... and {0} more">
+    <value>……還有 {0} 項</value>
+  </data>
+  <data xml:space="preserve" name="some cells of the csv could not be read and are ignored (the values of the model are kept). numbers need &quot;.&quot; as the decimal point.&#10;&#10;{0}&#10;&#10;continue with the merge?">
+    <value>CSV 中有些儲存格無法讀取，將被忽略（保留模型的值）。數字的小數點必須是「.」。
+
+{0}
+
+要繼續合併嗎？</value>
+  </data>
+  <data xml:space="preserve" name="csv cells could not be read">
+    <value>CSV 儲存格無法讀取</value>
+  </data>
+  <data xml:space="preserve" name="there was a problem with the treemerge form:">
+    <value>URDF 合併視窗發生問題：</value>
+  </data>
+  <data xml:space="preserve" name="do you wish to cancel? any changes you have made will not be saved">
+    <value>要取消嗎？您所做的變更將不會被儲存</value>
+  </data>
+  <data xml:space="preserve" name="cancel merge?">
+    <value>取消合併？</value>
+  </data>
+  <data xml:space="preserve" name="the following links loaded from the csv {0} have not been matched with links in the assembly configuration. would you like to continue?">
+    <value>從 CSV {0} 載入的下列連桿沒有與組合件組態中的連桿配對。要繼續嗎？</value>
+  </data>
+  <data xml:space="preserve" name="merge with unmatched links?">
+    <value>仍有未配對的連桿，要合併嗎？</value>
+  </data>
+  <data xml:space="preserve" name="properties loaded from csv">
+    <value>從 CSV 載入的屬性</value>
+  </data>
+  <data xml:space="preserve" name="preview of merged properties">
+    <value>合併後屬性預覽</value>
+  </data>
+  <data xml:space="preserve" name="link name cannot be empty">
+    <value>連桿名稱不可空白</value>
+  </data>
+  <data xml:space="preserve" name="&quot;{0}&quot; already exists">
+    <value>「{0}」已存在</value>
+  </data>
+  <data xml:space="preserve" name="use mass and inertia properties loaded from: {0}">
+    <value>使用載入自 {0} 的質量與慣量屬性</value>
+  </data>
+  <data xml:space="preserve" name="use mesh and material properties loaded from: {0}">
+    <value>使用載入自 {0} 的網格與材質屬性</value>
+  </data>
+  <data xml:space="preserve" name="use joint kinematic properties loaded from: {0}">
+    <value>使用載入自 {0} 的關節運動學屬性</value>
+  </data>
+  <data xml:space="preserve" name="use limits, dynamics, calibration and safety controller values loaded from: {0}">
+    <value>使用載入自 {0} 的限制、動態、校準與安全控制器數值</value>
+  </data>
+  <data xml:space="preserve" name="matching links from csv: ">
+    <value>CSV 中已配對的連桿：</value>
+  </data>
+  <data xml:space="preserve" name="configuration from assembly: {0}">
+    <value>組合件的組態：{0}</value>
+  </data>
+  <data xml:space="preserve" name="urdf tree merge">
+    <value>URDF 連桿樹合併</value>
+  </data>
+  <data xml:space="preserve" name="match loaded csv links to the assembly configuration by renaming links in the &quot;unmatched links&quot; box">
+    <value>在「未配對連桿」清單中重新命名連桿，將載入的 CSV 連桿與組合件組態配對</value>
+  </data>
+  <data xml:space="preserve" name="preview of updated configuration">
+    <value>更新後組態預覽</value>
+  </data>
+  <data xml:space="preserve" name="unmatched links">
+    <value>未配對連桿</value>
+  </data>
+  <data xml:space="preserve" name="mass and inertia">
+    <value>質量與慣量</value>
+  </data>
+  <data xml:space="preserve" name="visual properties">
+    <value>外觀屬性</value>
+  </data>
+  <data xml:space="preserve" name="joint kinematics">
+    <value>關節運動學</value>
+  </data>
+  <data xml:space="preserve" name="other joint values">
+    <value>其他關節數值</value>
+  </data>
+  <data xml:space="preserve" name="use:">
+    <value>使用：</value>
+  </data>
+  <data xml:space="preserve" name="link: ">
+    <value>連桿：</value>
+  </data>
+  <data xml:space="preserve" name="change name">
+    <value>變更名稱</value>
+  </data>
+  <data xml:space="preserve" name="reset">
+    <value>重設</value>
+  </data>
+  <data xml:space="preserve" name="column">
+    <value>欄位</value>
+  </data>
+  <data xml:space="preserve" name="value">
+    <value>值</value>
+  </data>
+  <data xml:space="preserve" name="merge">
+    <value>合併</value>
+  </data>
   <data xml:space="preserve" name="some links in the current tree are incomplete. merging may result in an incomplete urdf, would you like to continue?">
     <value>目前連桿樹中仍有未填完的連桿，合併可能產生不完整的 URDF，是否繼續？</value>
   </data>
