@@ -15,8 +15,8 @@
   <data xml:space="preserve" name="* field group is required">
     <value>* Field group is required</value>
   </data>
-  <data xml:space="preserve" name="3dxml (color)">
-    <value>3dxml (color)</value>
+  <data xml:space="preserve" name="3dxml">
+    <value>3DXML</value>
   </data>
   <data xml:space="preserve" name="alpha">
     <value>Alpha</value>
@@ -165,8 +165,17 @@
   <data xml:space="preserve" name="rotate global origin to make z-axis vertical">
     <value>Rotate global origin to make Z-axis vertical</value>
   </data>
-  <data xml:space="preserve" name="stl (grayscale)">
-    <value>STL (grayscale)</value>
+  <data xml:space="preserve" name="stl">
+    <value>STL</value>
+  </data>
+  <data xml:space="preserve" name="geometry only, no colour.">
+    <value>Geometry only, no colour.</value>
+  </data>
+  <data xml:space="preserve" name="geometry with colour.">
+    <value>Geometry with colour.</value>
+  </data>
+  <data xml:space="preserve" name="geometry with colour and materials, as .obj and .mtl files.">
+    <value>Geometry with colour and materials, as .obj and .mtl files.</value>
   </data>
   <data xml:space="preserve" name="safety controller">
     <value>Safety Controller</value>

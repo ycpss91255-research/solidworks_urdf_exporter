@@ -18,6 +18,8 @@ $ErrorActionPreference = 'Stop'
 $AssemblyPath = (Resolve-Path -LiteralPath $AssemblyPath).Path
 $directory = Split-Path -Parent $AssemblyPath
 Add-Type -AssemblyName System.Windows.Forms
+# An exception inside a form event must fail the test, not open a modal dialog on the desktop.
+try { [System.Windows.Forms.Application]::SetUnhandledExceptionMode([System.Windows.Forms.UnhandledExceptionMode]::ThrowException) } catch { }  # refused once this process already created a control; a fresh process is the normal case
 Add-Type -AssemblyName System.Drawing
 [void][Reflection.Assembly]::LoadFrom((Join-Path $directory 'log4net.dll'))
 $assembly = [Reflection.Assembly]::LoadFrom($AssemblyPath)
@@ -50,6 +52,12 @@ function New-Form([Type]$type, [System.Drawing.Font]$font, $ui, [double]$dpi) {
     return $form
 }
 
+# Control.Visible is false while the form is not shown; read the control's own flag. A caption and an
+# edit box that are not both on screen are not compared: a hidden control keeps its position when a
+# scrolling panel scrolls, so its offset to a shown caption says nothing about the layout.
+$getState = [System.Windows.Forms.Control].GetMethod('GetState', $flags, $null, [Type[]]@([int]), $null)
+function Test-Shown([System.Windows.Forms.Control]$c) { return [bool]$getState.Invoke($c, @(2)) }
+
 function Test-Field([System.Windows.Forms.Control]$c) {
     return ($c -is [System.Windows.Forms.TextBox]) -or ($c -is [System.Windows.Forms.ComboBox]) -or ($c -is [System.Windows.Forms.UpDownBase])
 }
@@ -72,7 +80,7 @@ function Test-Container([System.Windows.Forms.Control]$parent, [string]$path, [d
     foreach ($l in @($kids | Where-Object { $_ -is [System.Windows.Forms.Label] })) {
         # The edit box beside the caption: the one whose centre is nearest to the caption's centre.
         $mid = $l.Top + $l.Height / 2
-        $beside = $fields | Where-Object { $l.Height -le $_.Height + 2 -and $mid -ge $_.Top -and $mid -lt $_.Bottom -and [Math]::Max($l.Left - $_.Right, $_.Left - $l.Right) -ge 0 -and [Math]::Max($l.Left - $_.Right, $_.Left - $l.Right) -le $l.Height * 2.5 } |
+        $beside = $fields | Where-Object { (Test-Shown $_) -and (Test-Shown $l) -and $l.Height -le $_.Height + 2 -and $mid -ge $_.Top -and $mid -lt $_.Bottom -and [Math]::Max($l.Left - $_.Right, $_.Left - $l.Right) -ge 0 -and [Math]::Max($l.Left - $_.Right, $_.Left - $l.Right) -le $l.Height * 2.5 } |
             Sort-Object { [Math]::Abs(($_.Top + $_.Height / 2) - $mid) } | Select-Object -First 1
         if ($beside) {
             $off = [Math]::Abs($mid - ($beside.Top + $beside.Height / 2))
