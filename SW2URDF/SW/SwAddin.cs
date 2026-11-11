@@ -307,8 +307,8 @@ namespace SW2URDF.SW
 
         /// <summary>
         /// Before the exporter opens: the document is saved (a never saved one through Save As),
-        /// then every SolidWorks configuration gets its URDF attribute in the feature tree
-        /// folder, and the document is saved once more. What the exporter writes later therefore
+        /// then the active SolidWorks configuration gets its URDF attribute in the feature tree
+        /// folder (the others when the user switches to them), and the document is saved once more. What the exporter writes later therefore
         /// builds on a saved document. Returns false when the user did not save a new document.
         /// </summary>
         private bool PrepareDocument(ModelDoc2 modeldoc, bool saveReferenced)
