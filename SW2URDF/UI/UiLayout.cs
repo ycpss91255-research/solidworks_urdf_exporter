@@ -55,6 +55,44 @@ namespace SW2URDF.UI
 
         // The banner height was measured when its text was set, possibly at another DPI than the one
         // the window is really drawn at: measure again.
+        /// <summary>
+        /// The edit boxes show numbers with their full precision, which is wider than the box. Show the
+        /// whole text in a tool tip while the mouse is over the box or it has the focus and the text does
+        /// not fit; the box itself scrolls to the rest of the text.
+        /// </summary>
+        internal static void ShowFullValueTips(Control root)
+        {
+            ToolTip tip = new ToolTip { ShowAlways = true, AutoPopDelay = 15000 };
+            root.Disposed += delegate { tip.Dispose(); };
+            AttachFullValueTips(root, tip);
+        }
+
+        private static void AttachFullValueTips(Control parent, ToolTip tip)
+        {
+            foreach (Control c in parent.Controls)
+            {
+                TextBox box = c as TextBox;
+                if ((box != null && !box.Multiline) || c is UpDownBase)
+                {
+                    Control edit = c;
+                    EventHandler refresh = delegate { SetFullValueTip(edit, tip); };
+                    edit.TextChanged += refresh;
+                    edit.SizeChanged += refresh;
+                    SetFullValueTip(edit, tip);
+                }
+                AttachFullValueTips(c, tip);
+            }
+        }
+
+        private static void SetFullValueTip(Control edit, ToolTip tip)
+        {
+            string text = edit.Text;
+            bool tooWide = !string.IsNullOrEmpty(text) &&
+                TextRenderer.MeasureText(text, edit.Font, new Size(int.MaxValue, 0),
+                    TextFormatFlags.NoPadding).Width > edit.ClientSize.Width - 6;
+            tip.SetToolTip(edit, tooWide ? text : null);
+        }
+
         internal static void RefitStatusBanner(Control root)
         {
             Control[] found = root.Controls.Find("labelConfigurationStatus", true);
