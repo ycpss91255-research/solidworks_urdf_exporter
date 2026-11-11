@@ -34,13 +34,13 @@ namespace SW2URDF.Test
             UiText ui = new UiText(null);
             Assert.Equal("Active configuration: Wide",
                 ConfigurationStatus.Headline(ui, "Wide"));
-            Assert.Equal("These settings are stored for this configuration.",
+            Assert.Equal("Stored for this configuration",
                 ConfigurationStatus.Detail(ui, SettingsSource.Configuration));
-            Assert.Equal("Using the shared (legacy) settings; they are stored for this configuration on the next save.",
+            Assert.Equal("Using shared (legacy) settings",
                 ConfigurationStatus.Detail(ui, SettingsSource.Shared));
-            Assert.Equal("New: nothing is stored for this configuration yet.",
+            Assert.Equal("New: nothing stored yet",
                 ConfigurationStatus.Detail(ui, SettingsSource.New));
-            Assert.Equal("Active configuration: Wide\r\nNew: nothing is stored for this configuration yet.",
+            Assert.Equal("Active configuration: Wide\r\nNew: nothing stored yet",
                 ConfigurationStatus.Describe(ui, "Wide", SettingsSource.New));
         }
 
