@@ -29,7 +29,13 @@ namespace SW2URDF.UI
 
         // Tools-menu registration. The same string is used to add and to remove the item,
         // because SOLIDWORKS identifies a menu item by its full caption.
-        public string ExportMenuPath { get { return Get("Export as URDF") + "@&Tools"; } }
+        // The parent must equal the caption of SOLIDWORKS' own (localized) Tools menu, otherwise
+        // SOLIDWORKS creates a second submenu with that caption instead of using the real one.
+        public string ToolsMenuCaption
+        {
+            get { return Culture.Name == "en" ? "&Tools" : "工具(&T)"; }
+        }
+        public string ExportMenuPath { get { return Get("Export as URDF") + "@" + ToolsMenuCaption; } }
         public string ExportAssemblyHint { get { return Get("Export assembly as URDF file"); } }
         public string ExportPartHint { get { return Get("Export part as URDF file"); } }
 
