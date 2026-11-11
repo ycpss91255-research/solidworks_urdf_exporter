@@ -114,11 +114,15 @@
             this.flowLayoutPanelOptions = new System.Windows.Forms.FlowLayoutPanel();
             this.labelObjColorNote = new System.Windows.Forms.Label();
             this.panelObjColorNote = new System.Windows.Forms.Panel();
+            this.panelContent = new System.Windows.Forms.Panel();
+            this.panelButtons = new System.Windows.Forms.Panel();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.flowLayoutPanelOptions.SuspendLayout();
             this.panelObjColorNote.SuspendLayout();
+            this.panelContent.SuspendLayout();
+            this.panelButtons.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox_inertial_origin_x
@@ -583,7 +587,7 @@
             // 
             // button_cancel
             // 
-            this.button_cancel.Location = new System.Drawing.Point(12, 675);
+            this.button_cancel.Location = new System.Drawing.Point(12, 6);
             this.button_cancel.Name = "button_cancel";
             this.button_cancel.Size = new System.Drawing.Size(75, 23);
             this.button_cancel.TabIndex = 65;
@@ -593,7 +597,8 @@
             // 
             // button_finish
             // 
-            this.button_finish.Location = new System.Drawing.Point(480, 675);
+            this.button_finish.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_finish.Location = new System.Drawing.Point(480, 6);
             this.button_finish.Name = "button_finish";
             this.button_finish.Size = new System.Drawing.Size(75, 23);
             this.button_finish.TabIndex = 64;
@@ -904,6 +909,38 @@
             this.panelObjColorNote.TabIndex = 76;
             this.panelObjColorNote.Visible = false;
             //
+            // panelContent
+            //
+            // The form content scrolls when the form is smaller than its layout (high display scale,
+            // CJK fonts, small screens); the buttons below stay in a fixed panel so they are always reachable.
+            this.panelContent.AutoScroll = true;
+            this.panelContent.Controls.Add(this.flowLayoutPanelOptions);
+            this.panelContent.Controls.Add(this.button_savename_browse);
+            this.panelContent.Controls.Add(this.textBox_save_as);
+            this.panelContent.Controls.Add(this.label45);
+            this.panelContent.Controls.Add(this.groupBox3);
+            this.panelContent.Controls.Add(this.groupBox2);
+            this.panelContent.Controls.Add(this.label14);
+            this.panelContent.Controls.Add(this.groupBox1);
+            this.panelContent.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelContent.Location = new System.Drawing.Point(0, 0);
+            this.panelContent.Name = "panelContent";
+            this.panelContent.Size = new System.Drawing.Size(569, 670);
+            this.panelContent.TabIndex = 0;
+            //
+            // panelButtons
+            //
+            this.panelButtons.AutoSize = true;
+            this.panelButtons.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.panelButtons.Controls.Add(this.button_cancel);
+            this.panelButtons.Controls.Add(this.button_finish);
+            this.panelButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelButtons.Location = new System.Drawing.Point(0, 670);
+            this.panelButtons.Name = "panelButtons";
+            this.panelButtons.Padding = new System.Windows.Forms.Padding(0, 0, 0, 6);
+            this.panelButtons.Size = new System.Drawing.Size(569, 35);
+            this.panelButtons.TabIndex = 1;
+            //
             // labelObjColorNote
             //
             this.labelObjColorNote.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -918,16 +955,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(569, 705);
-            this.Controls.Add(this.flowLayoutPanelOptions);
-            this.Controls.Add(this.button_savename_browse);
-            this.Controls.Add(this.textBox_save_as);
-            this.Controls.Add(this.label45);
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.label14);
-            this.Controls.Add(this.button_cancel);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.button_finish);
+            this.Controls.Add(this.panelContent);
+            this.Controls.Add(this.panelButtons);
             this.Name = "PartExportForm";
             this.Text = "SolidWorks Part to URDF Link Exporter";
             this.Load += new System.EventHandler(this.PartExportFormLoad);
@@ -940,6 +969,10 @@
             this.flowLayoutPanelOptions.ResumeLayout(false);
             this.flowLayoutPanelOptions.PerformLayout();
             this.panelObjColorNote.ResumeLayout(false);
+            this.panelContent.ResumeLayout(false);
+            this.panelContent.PerformLayout();
+            this.panelButtons.ResumeLayout(false);
+            this.panelButtons.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1032,6 +1065,8 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelOptions;
         private System.Windows.Forms.Label labelObjColorNote;
         private System.Windows.Forms.Panel panelObjColorNote;
+        private System.Windows.Forms.Panel panelContent;
+        private System.Windows.Forms.Panel panelButtons;
         private System.Windows.Forms.CheckBox checkBox_rotate;
     }
 }
