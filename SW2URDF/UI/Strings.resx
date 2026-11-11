@@ -580,4 +580,10 @@
   <data xml:space="preserve" name="open a part or an assembly to use the urdf exporter.">
     <value>Open a part or an assembly to use the URDF exporter.</value>
   </data>
+  <data xml:space="preserve" name="exporting the urdf failed unexpectedly.">
+    <value>Exporting the URDF failed unexpectedly.</value>
+  </data>
+  <data xml:space="preserve" name="the mesh of these links could not be exported: {0}. the urdf was not written and the package is incomplete (see {1}). check the log and the output folder, then export again.">
+    <value>The mesh of these links could not be exported: {0}. The URDF was not written and the package is incomplete (see {1}). Check the log and the output folder, then export again.</value>
+  </data>
 </root>

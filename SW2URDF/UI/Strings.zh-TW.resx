@@ -580,4 +580,10 @@
   <data xml:space="preserve" name="open a part or an assembly to use the urdf exporter.">
     <value>請開啟零件或組合件以使用 URDF 匯出工具。</value>
   </data>
+  <data xml:space="preserve" name="exporting the urdf failed unexpectedly.">
+    <value>匯出 URDF 時發生未預期的錯誤。</value>
+  </data>
+  <data xml:space="preserve" name="the mesh of these links could not be exported: {0}. the urdf was not written and the package is incomplete (see {1}). check the log and the output folder, then export again.">
+    <value>下列連桿的網格無法匯出：{0}。URDF 未寫入，套件不完整（請見 {1}）。請檢查記錄檔與輸出資料夾後再重新匯出。</value>
+  </data>
 </root>
