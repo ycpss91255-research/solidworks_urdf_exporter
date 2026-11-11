@@ -24,6 +24,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using SW2URDF.UI;
 using SW2URDF.URDF;
 using SW2URDF.Utilities;
 using System;
@@ -58,6 +59,62 @@ namespace SW2URDF.URDFExport
             //Each Robot contains a single base link, build this link
             Link baseLink = CreateBaseLinkFromActiveModel();
             URDFRobot.SetBaseLink(baseLink);
+        }
+
+        /// <summary>
+        /// Name of the active SolidWorks configuration of the exported model, null if unknown.
+        /// </summary>
+        public string ActiveConfigurationName
+        {
+            get
+            {
+                try
+                {
+                    string name = ActiveSWModel?.ConfigurationManager?.ActiveConfiguration?.Name;
+                    return string.IsNullOrEmpty(name) ? null : name;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Part exporter: replaces the inertial, visual and collision values of the freshly built
+        /// base link by the ones saved for the active configuration (own attribute, else the
+        /// shared legacy one). Returns false, leaving the link as computed, when nothing is saved.
+        /// </summary>
+        public bool LoadPartSettings()
+        {
+            LinkNode saved = ConfigurationSerialization.LoadBaseNodeFromModel(
+                ActiveSWModel, out bool error, UiText.FromSolidWorks(iSwApp));
+            if (error || saved == null)
+            {
+                return false;
+            }
+            ApplySavedSettings(URDFRobot.BaseLink, saved.Link);
+            return true;
+        }
+
+        /// <summary>
+        /// Part exporter: saves the current base link for the active configuration, silently.
+        /// </summary>
+        public void SavePartSettings()
+        {
+            ConfigurationSerialization.SaveConfigTreeXML(
+                (SldWorks)iSwApp, ActiveSWModel, new LinkNode(URDFRobot.BaseLink), false, UiText.FromSolidWorks(iSwApp));
+        }
+
+        public static void ApplySavedSettings(Link target, Link saved)
+        {
+            if (target == null || saved == null)
+            {
+                return;
+            }
+            target.Inertial.SetElement(saved.Inertial);
+            target.Visual.SetElement(saved.Visual);
+            target.Collision.SetElement(saved.Collision);
         }
 
         // This method now only works for the part exporter
