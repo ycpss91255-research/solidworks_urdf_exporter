@@ -292,10 +292,17 @@
             // labelConfigurationStatus
             //
             // Text is set at run time (active configuration and where its settings came from).
-            this.labelConfigurationStatus.AutoSize = true;
-            this.labelConfigurationStatus.Location = new System.Drawing.Point(22, 50);
+            this.labelConfigurationStatus.AutoSize = false;
+            this.labelConfigurationStatus.BackColor = System.Drawing.Color.FromArgb(255, 241, 196);
+            this.labelConfigurationStatus.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.labelConfigurationStatus.Font = new System.Drawing.Font(this.Font, System.Drawing.FontStyle.Bold);
+            this.labelConfigurationStatus.ForeColor = System.Drawing.Color.FromArgb(64, 40, 0);
+            this.labelConfigurationStatus.Padding = new System.Windows.Forms.Padding(6, 3, 6, 3);
+            this.labelConfigurationStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.labelConfigurationStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelConfigurationStatus.Location = new System.Drawing.Point(360, 4);
             this.labelConfigurationStatus.Name = "labelConfigurationStatus";
-            this.labelConfigurationStatus.Size = new System.Drawing.Size(308, 12);
+            this.labelConfigurationStatus.Size = new System.Drawing.Size(690, 40);
             this.labelConfigurationStatus.TabIndex = 95;
             this.labelConfigurationStatus.Text = "";
             //
