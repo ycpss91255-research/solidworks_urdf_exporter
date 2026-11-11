@@ -625,6 +625,19 @@ namespace SW2URDF.URDFExport
             return success;
         }
 
+        /// <summary>
+        /// The texture reference written to the URDF, or null (no texture element) when the part
+        /// has no texture file. A directory alone is not a texture.
+        /// </summary>
+        public static string TextureUrdfFilename(string textureFile, string texturesDirectory)
+        {
+            if (string.IsNullOrWhiteSpace(textureFile))
+            {
+                return null;
+            }
+            return texturesDirectory + Path.GetFileName(textureFile);
+        }
+
         public void ExportLink(bool zIsUp)
         {
             ExportLink(zIsUp, MeshExportFormat.STL);
@@ -700,8 +713,8 @@ namespace SW2URDF.URDFExport
             URDFRobot.BaseLink.Visual.Geometry.Mesh.Filename = meshFileName;
             URDFRobot.BaseLink.Collision.Geometry.Mesh.Filename = meshFileName;
 
-            URDFRobot.BaseLink.Visual.Material.Texture.Filename =
-                package.TexturesDirectory + Path.GetFileName(URDFRobot.BaseLink.Visual.Material.Texture.wFilename);
+            URDFRobot.BaseLink.Visual.Material.Texture.Filename = TextureUrdfFilename(
+                URDFRobot.BaseLink.Visual.Material.Texture.wFilename, package.TexturesDirectory);
             string textureSavePath =
                 package.WindowsTexturesDirectory + Path.GetFileName(URDFRobot.BaseLink.Visual.Material.Texture.wFilename);
             if (!String.IsNullOrWhiteSpace(URDFRobot.BaseLink.Visual.Material.Texture.wFilename))
