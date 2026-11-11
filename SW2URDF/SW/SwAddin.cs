@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2015 Stephen Brawner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -298,30 +298,62 @@ namespace SW2URDF.SW
                 return;
             }
             logger.Info("Assembly export called for file " + modeldoc.GetTitle());
-            bool saveAndRebuild = false;
-            if (modeldoc.GetSaveFlag())
+            if (PrepareDocument(modeldoc, true))
             {
-                saveAndRebuild = true;
-                logger.Info("Save is required");
-            }
-            else if (modeldoc.Extension.NeedsRebuild2 !=
-                (int)swModelRebuildStatus_e.swModelRebuildStatus_FullyRebuilt)
-            {
-                saveAndRebuild = true;
-                logger.Info("A rebuild is required");
-            }
-            if (saveAndRebuild ||
-                MessageBox.Show(ui.Get("The SW to URDF exporter requires saving and/or rebuilding before continuing"),
-                ui.Get("Save and rebuild document?"), MessageBoxButtons.YesNo) == DialogResult.Yes)
-            {
-                int options = (int)swSaveAsOptions_e.swSaveAsOptions_SaveReferenced |
-                        (int)swSaveAsOptions_e.swSaveAsOptions_Silent;
-                logger.Info("Saving assembly");
-                modeldoc.Save3(options, 0, 0);
-
                 logger.Info("Opening property manager");
                 SetupPropertyManager();
             }
+        }
+
+        /// <summary>
+        /// Before the exporter opens: the document is saved (a never saved one through Save As),
+        /// then every SolidWorks configuration gets its URDF attribute in the feature tree
+        /// folder, and the document is saved once more. What the exporter writes later therefore
+        /// builds on a saved document. Returns false when the user did not save a new document.
+        /// </summary>
+        private bool PrepareDocument(ModelDoc2 modeldoc, bool saveReferenced)
+        {
+            bool hasPath = !string.IsNullOrEmpty(modeldoc.GetPathName());
+            bool needsRebuild = modeldoc.Extension.NeedsRebuild2 !=
+                (int)swModelRebuildStatus_e.swModelRebuildStatus_FullyRebuilt;
+            SaveBeforeExport action = DocumentPersistence.DecideBeforeExport(hasPath, modeldoc.GetSaveFlag(), needsRebuild);
+            logger.Info("Save before opening the exporter: " + action);
+            int errors = 0;
+            int warnings = 0;
+            if (action == SaveBeforeExport.SaveAs)
+            {
+                // Not silent: SolidWorks asks for a file name
+                modeldoc.Save3(0, ref errors, ref warnings);
+                if (string.IsNullOrEmpty(modeldoc.GetPathName()))
+                {
+                    logger.Info("The document was not saved, the exporter is not opened");
+                    MessageBox.Show(DocumentPersistence.SaveFirstText(ui), DocumentPersistence.WarningTitle(ui));
+                    return false;
+                }
+            }
+            else if (action == SaveBeforeExport.Save)
+            {
+                int options = (int)swSaveAsOptions_e.swSaveAsOptions_Silent;
+                if (saveReferenced)
+                {
+                    options |= (int)swSaveAsOptions_e.swSaveAsOptions_SaveReferenced;
+                }
+                modeldoc.Save3(options, ref errors, ref warnings);
+            }
+
+            try
+            {
+                if (ConfigurationSerialization.EnsureConfigurationAttributes((SldWorks)SwApp, modeldoc))
+                {
+                    ConfigurationSerialization.PersistDocument(modeldoc, ui);
+                }
+            }
+            catch (Exception e)
+            {
+                // Never keep the exporter from opening because the entries could not be prepared.
+                logger.Warn("Could not prepare the URDF configuration entries", e);
+            }
+            return true;
         }
 
         /// <summary>
@@ -386,25 +418,13 @@ namespace SW2URDF.SW
             {
                 return;
             }
-            if ((modeldoc.Extension.NeedsRebuild2 == 0) ||
-                MessageBox.Show(ui.Get("Save and rebuild document?"),
-                ui.Get("The SW to URDF exporter requires saving before continuing"),
-                MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (PrepareDocument(modeldoc, false))
             {
-                if (modeldoc.Extension.NeedsRebuild2 != 0)
-                {
-                    int options = (int)swSaveAsOptions_e.swSaveAsOptions_SaveReferenced |
-                        (int)swSaveAsOptions_e.swSaveAsOptions_Silent;
-                    logger.Info("Saving part");
-                    modeldoc.Save3(options, 0, 0);
-                }
-
                 PartExportForm exportForm = new PartExportForm((SldWorks)SwApp);
                 logger.Info("Showing part");
                 exportForm.Show();
             }
         }
-
         public void PartURDFExporter()
         {
             try
