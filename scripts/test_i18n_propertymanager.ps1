@@ -87,7 +87,17 @@ if (-not $StaticOnly) {
         if ($tw.ComboValue($tw.ComboDisplay($v)) -cne $v) { Fail "zh-TW display of '$v' does not map back to the protocol value" }
         if ($en.ComboValue($v) -cne $v) { Fail "English value of '$v' changed" }
     }
-    foreach ($v in 'continuous', 'revolute', 'prismatic', 'fixed', 'Origin_global', 'Link 1', 'base_link') {
+    # Every URDF joint type: zh-TW shows "中文 (identifier)", English is unchanged, and the
+    # display always maps back to the exact English identifier (the stored/written value).
+    foreach ($v in 'revolute', 'continuous', 'prismatic', 'fixed', 'floating', 'planar') {
+        if ($en.ComboDisplay($v) -cne $v -or $en.ComboValue($v) -cne $v) { Fail "English joint type '$v' changed" }
+        $shown = $tw.ComboDisplay($v)
+        if ($shown -ceq $v -or -not $shown.EndsWith(" ($v)")) { Fail "zh-TW joint type '$v' is not shown as '中文 ($v)': '$shown'" }
+        if ($tw.ComboValue($shown) -cne $v) { Fail "zh-TW joint type '$v' does not map back to the identifier" }
+        if ($tw.ComboValue($v) -cne $v) { Fail "stored identifier '$v' must pass through ComboValue unchanged" }
+        if ($en.ComboValue($shown) -cne $shown) { Fail "English must not remap the zh-TW caption '$shown'" }
+    }
+    foreach ($v in 'Origin_global', 'Link 1', 'base_link') {
         if ($tw.ComboDisplay($v) -cne $v -or $tw.ComboValue($v) -cne $v) { Fail "'$v' must never be translated or remapped" }
     }
     if ([Threading.Thread]::CurrentThread.CurrentCulture.Name -ne $cultureBefore) { Fail 'thread culture changed' }

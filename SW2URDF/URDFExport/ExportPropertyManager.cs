@@ -823,7 +823,8 @@ namespace SW2URDF.URDFExport
             PMComboBoxJointType.Style =
                 (int)swPropMgrPageComboBoxStyle_e.swPropMgrPageComboBoxStyle_EditBoxReadOnly;
             PMComboBoxJointType.AddItems(new string[] {
-                ui.ComboDisplay("Automatically Detect"), "continuous", "revolute", "prismatic", "fixed" });
+                ui.ComboDisplay("Automatically Detect"), ui.ComboDisplay("continuous"),
+                ui.ComboDisplay("revolute"), ui.ComboDisplay("prismatic"), ui.ComboDisplay("fixed") });
 
             //Create the selection box label
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;

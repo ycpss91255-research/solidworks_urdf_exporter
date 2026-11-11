@@ -460,6 +460,24 @@
   <data xml:space="preserve" name="automatically detect">
     <value>Automatically Detect</value>
   </data>
+  <data xml:space="preserve" name="revolute">
+    <value>revolute</value>
+  </data>
+  <data xml:space="preserve" name="continuous">
+    <value>continuous</value>
+  </data>
+  <data xml:space="preserve" name="prismatic">
+    <value>prismatic</value>
+  </data>
+  <data xml:space="preserve" name="fixed">
+    <value>fixed</value>
+  </data>
+  <data xml:space="preserve" name="floating">
+    <value>floating</value>
+  </data>
+  <data xml:space="preserve" name="planar">
+    <value>planar</value>
+  </data>
   <data xml:space="preserve" name="none">
     <value>None</value>
   </data>
