@@ -573,6 +573,14 @@ namespace SW2URDF.URDFExport
 
         private static bool RegroupFolder(ModelDoc2 model, string active)
         {
+            bool changed = ResolveFolderNameCollision(model, out bool blocked);
+            changed |= DeleteStrayFolders(model);
+            if (blocked)
+            {
+                logger.Warn("A feature that is not ours is named \"" + ConfigurationAttributeFolderName +
+                    "\", so the URDF features are left where they are");
+                return changed;
+            }
             string[] inFolder = GetNamesInFolder(model, ConfigurationAttributeFolderName);
             string[] existing = GetConfigurationAttributeFeatures(model).Select(feature =>
                 ((SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2()).GetName()).ToArray();
@@ -582,10 +590,110 @@ namespace SW2URDF.URDFExport
             bool legacyFolder = GetNamesInFolder(model, LegacyItemsFolderName).Length > 0 || LegacyFolderExists(model);
             if (!DocumentPersistence.NeedsRegroup(inFolder, toShow, folderExisted) && !legacyFolder)
             {
-                return false;
+                return changed;
             }
             TryGroupConfigurationAttributes(model, toShow);
             return true;
+        }
+
+        /// <summary>Type and name of every feature in tree order (folder end tags included).</summary>
+        private static void ReadFeatureChain(ModelDoc2 model, out string[] types, out string[] names)
+        {
+            List<string> typeList = new List<string>();
+            List<string> nameList = new List<string>();
+            Feature feature = model.FirstFeature() as Feature;
+            while (feature != null)
+            {
+                typeList.Add(feature.GetTypeName2());
+                nameList.Add(feature.Name);
+                feature = feature.GetNextFeature() as Feature;
+            }
+            types = typeList.ToArray();
+            names = nameList.ToArray();
+        }
+
+        /// <summary>
+        /// Feature names are unique, so an old exporter attribute called like the folder
+        /// ("URDF Export Configuration") would leave the folder with its default name. That attribute
+        /// is renamed (its data stays, it is still read as an old shared attribute). A feature of the
+        /// user with the name is never touched: <paramref name="blocked"/> is then true.
+        /// True when the document changed.
+        /// </summary>
+        private static bool ResolveFolderNameCollision(ModelDoc2 model, out bool blocked)
+        {
+            blocked = false;
+            ReadFeatureChain(model, out string[] types, out string[] names);
+            FolderNameCollision collision =
+                DocumentPersistence.DecideFolderNameCollision(types, names, ConfigurationAttributeFolderName);
+            if (collision == FolderNameCollision.Blocked)
+            {
+                blocked = true;
+                return false;
+            }
+            if (collision == FolderNameCollision.None)
+            {
+                return false;
+            }
+            Feature feature = model.FirstFeature() as Feature;
+            while (feature != null)
+            {
+                if (feature.GetTypeName2() == "Attribute" && feature.Name == ConfigurationAttributeFolderName)
+                {
+                    string target = DocumentPersistence.FreeName(DocumentPersistence.LegacyAttributeRenamedName, names);
+                    try
+                    {
+                        feature.Name = target;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Warn("Could not rename the old URDF attribute", e);
+                    }
+                    if (feature.Name == target)
+                    {
+                        logger.Info("Renamed the old URDF attribute to \"" + target + "\"");
+                        return true;
+                    }
+                    blocked = true;
+                    return false;
+                }
+                feature = feature.GetNextFeature() as Feature;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Removes the default-named folders ("Folder1") that earlier versions left around the URDF
+        /// features. Only folders holding nothing but exporter features; their contents are kept.
+        /// True when the document changed.
+        /// </summary>
+        private static bool DeleteStrayFolders(ModelDoc2 model)
+        {
+            ReadFeatureChain(model, out string[] types, out string[] names);
+            List<string> ours = new List<string>(GetOtherUrdfFeatureNames(model));
+            foreach (Feature feature in GetConfigurationAttributeFeatures(model))
+            {
+                ours.Add(feature.Name);
+            }
+            string[] strays = DocumentPersistence.FindStrayFolders(types, names, (t, n) => ours.Contains(n));
+            bool changed = false;
+            foreach (string name in strays)
+            {
+                Feature folder = model.FirstFeature() as Feature;
+                while (folder != null)
+                {
+                    if (folder.GetTypeName2() == "FtrFolder" && folder.Name == name)
+                    {
+                        model.ClearSelection2(true);
+                        folder.Select2(false, 0);
+                        // 0 = delete only the folder, its contents are kept
+                        changed |= model.Extension.DeleteSelection2(0);
+                        break;
+                    }
+                    folder = folder.GetNextFeature() as Feature;
+                }
+            }
+            model.ClearSelection2(true);
+            return changed;
         }
 
         /// <summary>
@@ -749,7 +857,22 @@ namespace SW2URDF.URDFExport
                     (int)swFeatureTreeFolderType_e.swFeatureTreeFolder_Containing) as Feature;
                 if (newFolder != null)
                 {
-                    newFolder.Name = ConfigurationAttributeFolderName;
+                    try
+                    {
+                        newFolder.Name = ConfigurationAttributeFolderName;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Warn("Could not name the URDF feature tree folder", e);
+                    }
+                    if (newFolder.Name != ConfigurationAttributeFolderName)
+                    {
+                        // Never leave a default-named folder behind: delete it, its contents stay
+                        logger.Warn("The URDF feature tree folder kept the name \"" + newFolder.Name + "\", removing it");
+                        model.ClearSelection2(true);
+                        newFolder.Select2(false, 0);
+                        model.Extension.DeleteSelection2(0);
+                    }
                 }
                 else
                 {

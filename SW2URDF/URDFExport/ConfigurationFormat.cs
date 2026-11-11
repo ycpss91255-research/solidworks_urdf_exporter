@@ -39,7 +39,9 @@ namespace SW2URDF.URDFExport
         public static readonly IList<string> PreviousSharedAttributeNames = new List<string>
         {
             "URDF Export Configuration (v1.3)",
-            "URDF Export Configuration"
+            "URDF Export Configuration",
+            // What the oldest attribute is renamed to so the feature tree folder can take its name
+            "URDF Export Configuration (legacy)"
         };
 
         public static ConfigurationFormatKind Classify(double version)
