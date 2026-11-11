@@ -583,7 +583,4 @@
   <data xml:space="preserve" name="open a part or an assembly to use the urdf exporter.">
     <value>請開啟零件或組合件以使用 URDF 匯出工具。</value>
   </data>
-  <data xml:space="preserve" name="adds/removes child links">
-    <value>增減子連桿</value>
-  </data>
 </root>
