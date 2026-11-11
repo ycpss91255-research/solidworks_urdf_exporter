@@ -51,6 +51,8 @@ namespace SW2URDF.URDFExport
         public URDFPackage(string name, string dir, UiText displayText = null)
         {
             ui = displayText ?? new UiText(null);
+            // The name ends up in directory names, package:// URIs, CMakeLists.txt and a YAML file name
+            name = FileNames.SanitizePackageName(name);
             PackageName = name;
             PackageDirectory = @"package://" + name + @"/";
             MeshesDirectory = PackageDirectory + @"meshes/";
