@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015 Stephen Brawner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -121,6 +121,15 @@ namespace SW2URDF.URDFExport
             ComputeVisualCollision = true;
             ComputeJointKinematics = true;
             ComputeJointLimits = true;
+        }
+
+        /// <summary>
+        /// Whether a group of values is computed from the model for one link: the export setting
+        /// must allow it and the link must not carry values loaded from a CSV (issue #83).
+        /// </summary>
+        internal static bool ShouldCompute(bool computeSetting, bool linkUsesCsvValues)
+        {
+            return computeSetting && !linkUsesCsvValues;
         }
 
         public void SetComputeInertial(bool computeInertial)

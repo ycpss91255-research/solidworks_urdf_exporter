@@ -44,6 +44,13 @@ namespace SW2URDF.URDF
         [DataMember]
         public bool isFixedFrame;
 
+        // Which groups of this link hold values loaded from a CSV (not computed from the model).
+        // Set by the CSV merge, honored by the export, never stored in the model.
+        public bool UsesCsvInertial;
+        public bool UsesCsvVisualCollision;
+        public bool UsesCsvJointKinematics;
+        public bool UsesCsvJointLimits;
+
         public Component2 SWMainComponent;
 
         public List<Component2> SWComponents;
@@ -180,6 +187,10 @@ namespace SW2URDF.URDF
             SWMainComponentPID = externalLink.SWMainComponentPID;
 
             isFixedFrame = externalLink.isFixedFrame;
+            UsesCsvInertial = externalLink.UsesCsvInertial;
+            UsesCsvVisualCollision = externalLink.UsesCsvVisualCollision;
+            UsesCsvJointKinematics = externalLink.UsesCsvJointKinematics;
+            UsesCsvJointLimits = externalLink.UsesCsvJointLimits;
         }
 
         public string[] GetJointNames(bool includeFixed)

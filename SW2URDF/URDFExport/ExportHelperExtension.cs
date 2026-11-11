@@ -538,7 +538,7 @@ namespace SW2URDF.URDFExport
                 node.Link.SWMainComponent = components[0];
             }
 
-            if (parent != null && ComputeJointKinematics)
+            if (parent != null && ShouldCompute(ComputeJointKinematics, node.Link.UsesCsvJointKinematics))
             {
                 logger.Info("Creating joint " + node.Link.Name);
                 bool error = CreateJoint(parent, node.Link);
@@ -550,12 +550,12 @@ namespace SW2URDF.URDFExport
                 }
             }
 
-            if (ComputeInertialValues)
+            if (ShouldCompute(ComputeInertialValues, node.Link.UsesCsvInertial))
             {
                 ComputeInertialProperties(node.Link);
             }
 
-            if (ComputeVisualCollision)
+            if (ShouldCompute(ComputeVisualCollision, node.Link.UsesCsvVisualCollision))
             {
                 ComputeVisualCollisionProperties(node.Link);
             }
@@ -1095,7 +1095,7 @@ namespace SW2URDF.URDFExport
                 child.Joint.Origin.SetXYZ(MathOps.Threshold(child.Joint.Origin.GetXYZ(), 0.00001));
                 child.Joint.Origin.SetRPY(MathOps.Threshold(child.Joint.Origin.GetRPY(), 0.00001));
                 UnsuppressLimitMates(limitMates);
-                if (limitMates.Count > 0 && ComputeJointLimits)
+                if (limitMates.Count > 0 && ShouldCompute(ComputeJointLimits, child.UsesCsvJointLimits))
                 {
                     AddLimits(child.Joint, limitMates, parent.SWMainComponent, child.SWMainComponent);
                 }
