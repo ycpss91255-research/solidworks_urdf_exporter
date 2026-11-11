@@ -800,7 +800,12 @@ namespace SW2URDF.Test
                     link.Inertial.Inertia.Iyy + link.Inertial.Inertia.Izz;
                 Assert.Equal(expectedTrace, actualTrace, 12);
 
-                Assert.True(link.Inertial.Mass.Value > 0.0, "link " + link.Name + " has no mass");
+                // A link whose parts carry no mass in the model (for example no material assigned) is
+                // legitimately massless. The equality check above already proves it matches SolidWorks.
+                if (expected.Mass > 0.0)
+                {
+                    Assert.True(link.Inertial.Mass.Value > 0.0, "link " + link.Name + " has no mass");
+                }
 
                 // An ignored or empty selection degrades into the whole document's properties.
                 // No single link of these robots is the entire assembly.
