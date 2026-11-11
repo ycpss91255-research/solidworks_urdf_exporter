@@ -328,6 +328,8 @@
     <Compile Include="Test\TestConfigurationFormat.cs" />
     <Compile Include="Test\TestCSVImportExport.cs" />
     <Compile Include="Test\TestCsvColumnCheck.cs" />
+    <Compile Include="Test\TestCsvPerLink.cs" />
+    <Compile Include="Test\TestCsvLoadProblems.cs" />
     <Compile Include="Test\TestCsvInvariant.cs" />
     <Compile Include="Test\TestExportHelper.cs" />
     <Compile Include="Test\TestFileNames.cs" />
@@ -379,6 +381,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="URDFExport\CSV\ContextToColumns.cs" />
+    <Compile Include="URDFExport\CSV\CsvLoadReport.cs" />
     <Compile Include="URDFExport\CSV\CSVImportExport.cs" />
     <Compile Include="URDFExport\ConfigurationSerialization.cs" />
     <Compile Include="URDFExport\ExportHelper.cs" />

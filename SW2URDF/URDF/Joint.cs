@@ -150,10 +150,16 @@ namespace SW2URDF.URDF
             string contextString = string.Join(".", context);
 
             string coordSysContext = contextString + ".CoordSysName";
-            CoordinateSystemName = dictionary[coordSysContext];
+            if (dictionary.ContainsKey(coordSysContext))
+            {
+                CoordinateSystemName = dictionary[coordSysContext];
+            }
 
             string axisContext = contextString + ".AxisName";
-            AxisName = dictionary[axisContext];
+            if (dictionary.ContainsKey(axisContext))
+            {
+                AxisName = dictionary[axisContext];
+            }
 
             base.SetElementFromData(context, dictionary);
         }
