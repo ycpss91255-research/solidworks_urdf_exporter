@@ -580,4 +580,7 @@
   <data xml:space="preserve" name="open a part or an assembly to use the urdf exporter.">
     <value>請開啟零件或組合件以使用 URDF 匯出工具。</value>
   </data>
+  <data xml:space="preserve" name="saving the document did not finish cleanly (solidworks error code {0}, warning code {1}). the exporter continues, but its settings may not be stored in the file. save the document yourself, otherwise they can be lost when it is closed.">
+    <value>儲存文件時未能順利完成（SolidWorks 錯誤碼 {0}，警告碼 {1}）。匯出器會繼續執行，但其設定可能未存入檔案。請自行儲存文件，否則關閉文件時設定可能遺失。</value>
+  </data>
 </root>

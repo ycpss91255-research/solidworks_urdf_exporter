@@ -865,26 +865,31 @@ namespace SW2URDF.URDFExport
         /// </summary>
         public static void PersistDocument(ModelDoc2 model, UiText ui)
         {
+            int saveErrors = 0;
+            int saveWarnings = 0;
             bool saved = false;
             PersistAction action = DocumentPersistence.Decide(
                 true, !string.IsNullOrEmpty(model.GetPathName()), model.IsOpenedReadOnly());
             if (action == PersistAction.Save)
             {
-                int errors = 0;
-                int warnings = 0;
                 try
                 {
-                    saved = model.Save3((int)swSaveAsOptions_e.swSaveAsOptions_Silent, ref errors, ref warnings);
+                    saved = model.Save3((int)swSaveAsOptions_e.swSaveAsOptions_Silent, ref saveErrors, ref saveWarnings);
                 }
                 catch (Exception e)
                 {
                     logger.Warn("Saving the document after storing the URDF settings failed", e);
                 }
-                logger.Info("Saved the document after storing the URDF settings: " + saved + " (errors " + errors + ", warnings " + warnings + ")");
+                logger.Info("Saved the document after storing the URDF settings: " + saved + " (errors " + saveErrors + ", warnings " + saveWarnings + ")");
             }
             if (action == PersistAction.WarnNotSaved || (action == PersistAction.Save && !saved))
             {
                 MessageBox.Show(DocumentPersistence.WarningText(ui), DocumentPersistence.WarningTitle(ui));
+            }
+            else if (action == PersistAction.Save)
+            {
+                // Saved, but SolidWorks reported errors or warnings: do not pretend all is well
+                DocumentPersistence.ReportSaveProblem(ui, saved, saveErrors, saveWarnings);
             }
         }
 

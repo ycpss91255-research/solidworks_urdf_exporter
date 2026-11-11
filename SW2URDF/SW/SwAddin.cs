@@ -323,13 +323,14 @@ namespace SW2URDF.SW
             if (action == SaveBeforeExport.SaveAs)
             {
                 // Not silent: SolidWorks asks for a file name
-                modeldoc.Save3(0, ref errors, ref warnings);
+                bool savedAs = modeldoc.Save3(0, ref errors, ref warnings);
                 if (string.IsNullOrEmpty(modeldoc.GetPathName()))
                 {
                     logger.Info("The document was not saved, the exporter is not opened");
                     MessageBox.Show(DocumentPersistence.SaveFirstText(ui), DocumentPersistence.WarningTitle(ui));
                     return false;
                 }
+                DocumentPersistence.ReportSaveProblem(ui, savedAs, errors, warnings);
             }
             else if (action == SaveBeforeExport.Save)
             {
@@ -338,7 +339,8 @@ namespace SW2URDF.SW
                 {
                     options |= (int)swSaveAsOptions_e.swSaveAsOptions_SaveReferenced;
                 }
-                modeldoc.Save3(options, ref errors, ref warnings);
+                bool saved = modeldoc.Save3(options, ref errors, ref warnings);
+                DocumentPersistence.ReportSaveProblem(ui, saved, errors, warnings);
             }
 
             try
