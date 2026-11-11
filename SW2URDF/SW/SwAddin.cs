@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2015 Stephen Brawner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -293,6 +293,10 @@ namespace SW2URDF.SW
         public void SetupAssemblyExporter()
         {
             ModelDoc2 modeldoc = SwApp.ActiveDoc;
+            if (RouteToOtherExporter(modeldoc, ExporterKind.Assembly))
+            {
+                return;
+            }
             logger.Info("Assembly export called for file " + modeldoc.GetTitle());
             if (PrepareDocument(modeldoc, true))
             {
@@ -337,12 +341,49 @@ namespace SW2URDF.SW
                 modeldoc.Save3(options, ref errors, ref warnings);
             }
 
-            if (ConfigurationSerialization.EnsureConfigurationAttributes((SldWorks)SwApp, modeldoc))
+            try
             {
-                ConfigurationSerialization.PersistDocument(modeldoc, ui);
+                if (ConfigurationSerialization.EnsureConfigurationAttributes((SldWorks)SwApp, modeldoc))
+                {
+                    ConfigurationSerialization.PersistDocument(modeldoc, ui);
+                }
+            }
+            catch (Exception e)
+            {
+                // Never keep the exporter from opening because the entries could not be prepared.
+                logger.Warn("Could not prepare the URDF configuration entries", e);
             }
             return true;
         }
+
+        /// <summary>
+        /// True when the active document does not belong to the exporter that was asked for: the
+        /// right exporter is opened for it instead (a part form on an assembly cannot work), or the
+        /// user is told that there is no exporter for this kind of document.
+        /// </summary>
+        private bool RouteToOtherExporter(ModelDoc2 modeldoc, ExporterKind requested)
+        {
+            ExporterKind kind = modeldoc == null ? ExporterKind.None : ExporterRouting.Decide(modeldoc.GetType());
+            if (kind == requested)
+            {
+                return false;
+            }
+            logger.Info("The active document needs the " + kind + " exporter, not the " + requested + " exporter");
+            if (kind == ExporterKind.Assembly)
+            {
+                SetupAssemblyExporter();
+            }
+            else if (kind == ExporterKind.Part)
+            {
+                SetupPartExporter();
+            }
+            else
+            {
+                MessageBox.Show(ui.Get("Open a part or an assembly to use the URDF exporter."));
+            }
+            return true;
+        }
+
         public void AssemblyURDFExporter()
         {
             try
@@ -373,6 +414,10 @@ namespace SW2URDF.SW
         {
             logger.Info("Part export called");
             ModelDoc2 modeldoc = SwApp.ActiveDoc;
+            if (RouteToOtherExporter(modeldoc, ExporterKind.Part))
+            {
+                return;
+            }
             if (PrepareDocument(modeldoc, false))
             {
                 PartExportForm exportForm = new PartExportForm((SldWorks)SwApp);
