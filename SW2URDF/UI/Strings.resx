@@ -598,4 +598,7 @@
   <data xml:space="preserve" name="the mesh of these links could not be exported: {0}. the urdf was not written and the package is incomplete (see {1}). check the log and the output folder, then export again.">
     <value>The mesh of these links could not be exported: {0}. The URDF was not written and the package is incomplete (see {1}). Check the log and the output folder, then export again.</value>
   </data>
+  <data xml:space="preserve" name="select an existing reference coordinate system for empty link {0}">
+    <value>Select an existing reference coordinate system for empty link {0}</value>
+  </data>
 </root>

@@ -129,6 +129,29 @@ namespace SW2URDF.URDFExport
             throw new InvalidOperationException("No free name found for " + baseName);
         }
 
+        /// <summary>
+        /// The name a joint should use for a frame or axis its saved settings already name. A frame
+        /// the exporter generated earlier is only right for the geometry it was generated in, which
+        /// is no longer the case after another SolidWorks configuration was activated or after the
+        /// model was edited: then <see cref="ChooseName"/> picks (or creates) the one for the
+        /// current geometry and the old one is left alone. A frame the user made, or one at the
+        /// wanted place, is kept. <paramref name="changed"/> tells that the name is not the saved one.
+        /// </summary>
+        public static string RefreshName(
+            string savedName, string baseName, Func<string, bool> exists, Func<string, bool> isGenerated,
+            Func<string, bool> sameGeometry, out bool reuse, out bool changed)
+        {
+            reuse = true;
+            changed = false;
+            if (!isGenerated(savedName) || sameGeometry(savedName))
+            {
+                return savedName;
+            }
+            string name = ChooseName(baseName, exists, sameGeometry, out reuse);
+            changed = name != savedName;
+            return name;
+        }
+
         /// <summary>True when two vectors run along the same line, in either direction.</summary>
         public static bool SameDirection(double[] first, double[] second, double tolerance)
         {
