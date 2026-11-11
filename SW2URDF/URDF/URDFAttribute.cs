@@ -94,10 +94,49 @@ namespace SW2URDF.URDF
         public void SetValueFromData(List<string> context, StringDictionary dictionary)
         {
             string contextString = string.Join(".", context) + "." + AttributeType;
+            if (Value is double[] && SetArrayValueFromComponentColumns(contextString, dictionary))
+            {
+                return;
+            }
             if (dictionary.ContainsKey(contextString))
             {
                 SetValueFromText(contextString, dictionary[contextString]);
             }
+        }
+
+        /// <summary>
+        /// The CSV writer stores an array attribute in one column per component (for the color: rgba.r,
+        /// rgba.g, rgba.b, rgba.a, shown as Color Red .. Color Alpha), not in one column. Reads those
+        /// columns; a component that is missing or is not a number keeps its current value.
+        /// Returns false when the CSV has none of the component columns.
+        /// </summary>
+        private bool SetArrayValueFromComponentColumns(string contextString, StringDictionary dictionary)
+        {
+            double[] current = (double[])Value;
+            double[] numbers = (double[])current.Clone();
+            bool found = false;
+            for (int i = 0; i < numbers.Length && i < AttributeType.Length; i++)
+            {
+                string column = contextString + "." + AttributeType[i];
+                if (!dictionary.ContainsKey(column))
+                {
+                    continue;
+                }
+                found = true;
+                if (TryParseDouble(dictionary[column], out double number))
+                {
+                    numbers[i] = number;
+                }
+                else
+                {
+                    Utilities.Logger.GetLogger().Warn("Ignoring CSV field " + column + ": '" + dictionary[column] + "' is not a number");
+                }
+            }
+            if (found)
+            {
+                Value = numbers;
+            }
+            return found;
         }
 
         // Attributes whose value is text even when it is empty or not set yet
