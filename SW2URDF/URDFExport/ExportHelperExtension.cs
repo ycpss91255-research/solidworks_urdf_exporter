@@ -350,6 +350,7 @@ namespace SW2URDF.URDFExport
                 return null;
             }
 
+            EnsureCalculableModel();
             IMassProperty2 swMass = (IMassProperty2)ActiveSWModel.Extension.CreateMassProperty2();
             if (swMass == null)
             {
@@ -458,10 +459,24 @@ namespace SW2URDF.URDFExport
                 return;
             }
 
+            // Before the coordinate system transform is read: a rebuild afterwards could leave it stale
+            EnsureCalculableModel();
+
             // Get the SolidWorks MathTransform that corresponds to the child coordinate system
             MathTransform jointTransform = GetCoordinateSystemTransform(link.Joint.CoordinateSystemName);
 
             IMassProperty2 swMass = GetComponentsMassProperty(link.SWComponents, jointTransform);
+            if (swMass != null && MassNeedsRetry(swMass.Mass, ActiveSWModel.Extension.NeedsRebuild2))
+            {
+                // Using a coordinate system that was only just inserted can leave the model with a
+                // pending rebuild and then SolidWorks reports mass 0. Rebuild once and ask again,
+                // with the coordinate system read again.
+                logger.Info("Mass of link " + link.Name + " is 0 with a rebuild pending, " +
+                    "rebuilding the model and calculating it again");
+                ActiveSWModel.ForceRebuild3(true);
+                jointTransform = GetCoordinateSystemTransform(link.Joint.CoordinateSystemName);
+                swMass = GetComponentsMassProperty(link.SWComponents, jointTransform);
+            }
             if (swMass == null)
             {
                 logger.Warn("MassProperty2 is unavailable for link " + link.Name +
@@ -495,6 +510,7 @@ namespace SW2URDF.URDFExport
         /// </summary>
         private void ComputeInertialPropertiesFromBodies(Link link, MathTransform jointTransform)
         {
+            EnsureCalculableModel();
             List<Body2> bodies = GetBodies(link.SWComponents);
 
             double[] moment = GetComponentsMomentOfInertia(bodies, jointTransform);
@@ -869,9 +885,59 @@ namespace SW2URDF.URDFExport
             }
         }
 
+        /// <summary>
+        /// A mass of 0 together with a pending rebuild is not a result: SolidWorks has not built the
+        /// geometry yet. Free of SolidWorks calls so it can be tested.
+        /// </summary>
+        public static bool MassNeedsRetry(double mass, int rebuildStatus)
+        {
+            return mass == 0.0 && rebuildStatus != (int)swModelRebuildStatus_e.swModelRebuildStatus_FullyRebuilt;
+        }
+
+        // Mass properties are only valid for a model that is rebuilt and not in sketch edit mode.
+        // With a rebuild pending (the state right after opening a model, and again after a
+        // coordinate system was inserted) SolidWorks has not built the geometry of the components
+        // yet and reports volume 0 and mass 0 for them. A top level rebuild is enough.
+        private void EnsureCalculableModel()
+        {
+            EnsureNoActiveSketch();
+            if (ActiveSWModel.Extension.NeedsRebuild2 !=
+                (int)swModelRebuildStatus_e.swModelRebuildStatus_FullyRebuilt)
+            {
+                logger.Info("The model has a rebuild pending, rebuilding it before reading mass properties");
+                ActiveSWModel.ForceRebuild3(true);
+            }
+        }
+
+        // Leaves sketch edit mode when some sketch is in it. SolidWorks reports mass 0 for components
+        // while a sketch is being edited, so nothing that queries mass properties may run then. It
+        // also protects the Insert3DSketch(true) calls below, which only toggle: with a sketch
+        // already open the pair of calls in Setup3DSketch would end with the sketch still open.
+        private void EnsureNoActiveSketch()
+        {
+            for (int attempt = 0; attempt < 3; attempt++)
+            {
+                Sketch active = ActiveSWModel.SketchManager.ActiveSketch;
+                if (active == null)
+                {
+                    return;
+                }
+                logger.Warn("A sketch was in edit mode, leaving it");
+                if (active.Is3D())
+                {
+                    ActiveSWModel.SketchManager.Insert3DSketch(true);
+                }
+                else
+                {
+                    ActiveSWModel.SketchManager.InsertSketch(true);
+                }
+            }
+        }
+
         // Inserts a sketch into the main assembly and name it
         private string Setup3DSketch()
         {
+            EnsureNoActiveSketch();
             bool sketchExists =
                 ActiveSWModel.Extension.SelectByID2(
                     "URDF Reference", "SKETCH", 0, 0, 0, false, 0, null, 0);
