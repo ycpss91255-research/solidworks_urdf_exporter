@@ -31,6 +31,19 @@ built DLL without a runner:
 
 (`[Theory]` cases need the xUnit runner.)
 
+## Attribution guard (Claude Code hook)
+
+`.claude/hooks/attribution_guard.py`, registered in `.claude/settings.json` (`PreToolUse`, matcher
+`Bash|PowerShell|mcp__.*github.*`), refuses any tool call that would write AI attribution (a Co-Authored-By
+trailer naming the assistant, `Claude-Session:` lines, "Generated with ..." lines, claude.ai session URLs) into
+git commits/tags, or into PR, issue and release text through `gh`, including text read from `--body-file` / `-F`
+files. Read-only commands such as `git log --grep` or `grep -r` are not blocked. Test it (needs Python only):
+
+    py -3 scripts\test_attribution_guard.py
+
+A Claude Code session picks the hook up when it starts in a checkout that contains these files, so an older
+worktree needs the files (merge or rebase on master) and then a session restart.
+
 ## The TWO_BOXES example
 
 `examples/TWO_BOXES` is a minimal, abstract model for tests of configuration handling and mesh export
