@@ -520,14 +520,6 @@ namespace SW2URDF.URDFExport
             SetConfigTree(baseNode);
             RefreshConfigurationStatus();
 
-            IPropertyManagerPageControl loadConfigurationControl = (IPropertyManagerPageControl)PMButtonLoad;
-
-            if (baseNode == null || !baseNode.RebuildLink().AreRequiredFieldsSatisfied())
-            {
-                loadConfigurationControl.Tip = 
-                    ui.Get("Your configuration has not been fully exported. This feature may not work correctly");
-            }
-
             return true;
         }
 
