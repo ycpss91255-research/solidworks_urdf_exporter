@@ -17,7 +17,7 @@ URDF Export Configuration
 ```
 
 Each tree has a single `base_link` whose coordinate system is *Automatically Generate*. Open the assembly,
-activate a configuration and start the export: the link tree of that configuration is loaded. A configuration
+activate a configuration and start the export: the link tree of that configuration is loaded. The exporter creates the attribute of a configuration only when that configuration is active as the exporter opens (a configuration nobody used has none). A configuration
 without its own attribute falls back to the shared attribute of older files.
 
 ## Results

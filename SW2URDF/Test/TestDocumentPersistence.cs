@@ -60,6 +60,40 @@ namespace SW2URDF.Test
         }
 
         [Fact]
+        public void NewModelGetsAnEntryOnlyForTheActiveConfiguration()
+        {
+            string[] names = { "CFG_BOTH", "CFG_RED_ONLY" };
+            Assert.Equal(new[] { "CFG_BOTH" },
+                DocumentPersistence.NamesToCreate(names, "CFG_BOTH", new string[0]));
+        }
+
+        [Fact]
+        public void SwitchingConfigurationAddsOnlyTheNewActiveOne()
+        {
+            string[] names = { "CFG_BOTH", "CFG_RED_ONLY" };
+            Assert.Equal(new[] { "CFG_RED_ONLY" },
+                DocumentPersistence.NamesToCreate(names, "CFG_RED_ONLY", new[] { "CFG_BOTH" }));
+        }
+
+        [Fact]
+        public void ActiveConfigurationThatHasAnEntryCreatesNothing()
+        {
+            string[] names = { "CFG_BOTH", "CFG_RED_ONLY" };
+            Assert.Empty(DocumentPersistence.NamesToCreate(names, "CFG_BOTH", new[] { "CFG_BOTH" }));
+            // a deleted folder is rebuilt around the existing entries only: nothing new is created
+            Assert.Empty(DocumentPersistence.NamesToCreate(names, "CFG_RED_ONLY", new[] { "CFG_BOTH", "CFG_RED_ONLY" }));
+        }
+
+        [Fact]
+        public void UnknownOrMissingActiveConfigurationCreatesNothing()
+        {
+            string[] names = { "CFG_BOTH", "CFG_RED_ONLY" };
+            Assert.Empty(DocumentPersistence.NamesToCreate(names, null, new string[0]));
+            Assert.Empty(DocumentPersistence.NamesToCreate(names, "Other", new string[0]));
+            Assert.Empty(DocumentPersistence.NamesToCreate(null, "CFG_BOTH", new string[0]));
+        }
+
+        [Fact]
         public void TheFolderIsRebuiltWhenItIsMissingEvenIfNothingWasCreated()
         {
             // The user deleted the feature tree folder: the attributes survive (outside any
