@@ -36,6 +36,30 @@ namespace SW2URDF.Test
         }
 
         [Fact]
+        public void BeforeOpeningTheExporterAnUnsavedDocumentIsSaved()
+        {
+            Assert.Equal(SaveBeforeExport.SaveAs, DocumentPersistence.DecideBeforeExport(false, true, true));
+            Assert.Equal(SaveBeforeExport.SaveAs, DocumentPersistence.DecideBeforeExport(false, false, false));
+            Assert.Equal(SaveBeforeExport.Save, DocumentPersistence.DecideBeforeExport(true, true, false));
+            Assert.Equal(SaveBeforeExport.Save, DocumentPersistence.DecideBeforeExport(true, false, true));
+            Assert.Equal(SaveBeforeExport.None, DocumentPersistence.DecideBeforeExport(true, false, false));
+        }
+
+        [Fact]
+        public void MissingConfigurationAttributeIsCreatedBlankOrCopiedFromTheSharedOne()
+        {
+            Assert.Equal(AttributeInit.Blank, DocumentPersistence.DecideAttribute(false, false));
+            Assert.Equal(AttributeInit.CopyShared, DocumentPersistence.DecideAttribute(false, true));
+        }
+
+        [Fact]
+        public void ExistingConfigurationAttributeIsNeverTouched()
+        {
+            Assert.Equal(AttributeInit.None, DocumentPersistence.DecideAttribute(true, false));
+            Assert.Equal(AttributeInit.None, DocumentPersistence.DecideAttribute(true, true));
+        }
+
+        [Fact]
         public void WarningsAreLocalizedAndTellTheUserToSave()
         {
             Assert.Equal(
