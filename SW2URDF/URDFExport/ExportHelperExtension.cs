@@ -660,7 +660,7 @@ namespace SW2URDF.URDFExport
                 if (coordSysName == "Automatically Generate")
                 {
                     ExportErrorWhy = string.Format(
-                        ui.Get("Select an existing reference coordinate system for empty link {0}"), child.Name);
+                        UiText.FromSolidWorks(iSwApp).Get("Select an existing reference coordinate system for empty link {0}"), child.Name);
                     return false;
                 }
                 axisName = "";

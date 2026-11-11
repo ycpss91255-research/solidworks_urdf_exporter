@@ -223,8 +223,7 @@ namespace SW2URDF.URDFExport
             {
                 node.IsIncomplete = true;
                 node.WhyIncomplete +=
-                    "        " + ui.Get("The origin reference coordinate system cannot be automatically generated without components. Either select an origin or at least one component.") + "
-";
+                    "        " + ui.Get("The origin reference coordinate system cannot be automatically generated without components. Either select an origin or at least one component.") + "\r\n";
             }
         }
 
