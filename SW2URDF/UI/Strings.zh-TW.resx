@@ -303,11 +303,11 @@
   <data xml:space="preserve" name="enter the number of child links and they will be automatically added">
     <value>輸入子連桿數量以自動新增</value>
   </data>
-  <data xml:space="preserve" name="load configuration...">
-    <value>載入設定…</value>
+  <data xml:space="preserve" name="load from csv...">
+    <value>從 CSV 載入…</value>
   </data>
-  <data xml:space="preserve" name="import values from a csv file">
-    <value>從 CSV 檔案匯入數值</value>
+  <data xml:space="preserve" name="merge values from the csv written by an earlier export (links are matched by name)">
+    <value>合併先前匯出所寫出 CSV 檔中的數值（依連桿名稱配對）</value>
   </data>
   <data xml:space="preserve" name="imported file: ">
     <value>匯入檔案：</value>
@@ -508,20 +508,17 @@
   <data xml:space="preserve" name="merging the loaded csv configuration with the assembly&apos;s configuration failed. check your csv file. if you continue to run into errors, delete the configuration in the assembly and load a proper csv.">
     <value>將載入的 CSV 設定與組合件的設定合併失敗。請檢查 CSV 檔案。若仍持續發生錯誤，請刪除組合件中的設定，再載入正確的 CSV。</value>
   </data>
-  <data xml:space="preserve" name="this model has not been fully exported and saved. merging may result in an incomplete urdf, would you like to continue?">
-    <value>此模型尚未完整匯出並儲存，合併可能產生不完整的 URDF，是否繼續？</value>
+  <data xml:space="preserve" name="some links in the current tree are incomplete. merging may result in an incomplete urdf, would you like to continue?">
+    <value>目前連桿樹中仍有未填完的連桿，合併可能產生不完整的 URDF，是否繼續？</value>
   </data>
-  <data xml:space="preserve" name="continue with incomplete export?">
-    <value>要在匯出不完整的情況下繼續嗎？</value>
+  <data xml:space="preserve" name="continue with incomplete links?">
+    <value>要在連桿不完整的情況下繼續嗎？</value>
   </data>
   <data xml:space="preserve" name="csv (.csv)|*.csv|all files (*.*)|*.*">
     <value>CSV (.csv)|*.csv|所有檔案 (*.*)|*.*</value>
   </data>
   <data xml:space="preserve" name="an error occurred loading an existing configuration. either resolve the issue or delete the configuration from the feature manager">
     <value>載入既有設定時發生錯誤。請排除問題，或從特徵管理員刪除該設定。</value>
-  </data>
-  <data xml:space="preserve" name="your configuration has not been fully exported. this feature may not work correctly">
-    <value>您的設定尚未完整匯出，此功能可能無法正常運作</value>
   </data>
   <data xml:space="preserve" name="the following nodes are incomplete. you need to fix them before continuing.">
     <value>下列節點尚未完成，請先修正才能繼續。</value>
