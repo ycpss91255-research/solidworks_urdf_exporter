@@ -1,8 +1,10 @@
+using SolidWorks.Interop.sldworks;
 using SW2URDF.URDF;
 using SW2URDF.URDFExport;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using PrivateObject = Microsoft.VisualStudio.TestTools.UnitTesting.PrivateObject;
 
 namespace SW2URDF.Test
 {
@@ -178,6 +180,113 @@ namespace SW2URDF.Test
 
             Assert.Equal("Origin_mine", tree.Link.Joint.CoordinateSystemName);
             Assert.Equal("Coordinate System1", child.Link.Joint.CoordinateSystemName);
+        }
+    }
+
+    /// <summary>
+    /// What cancelling the preview does to the model, with a fake SolidWorks document. The live
+    /// check against SolidWorks itself is described in the pull request.
+    /// </summary>
+    public class TestDiscardGeneratedFeatures
+    {
+        private class FakeModel
+        {
+            public ExportHelper Helper;
+            public Moq.Mock<ModelDocExtension> Extension = new Moq.Mock<ModelDocExtension>();
+            public List<string> Selected = new List<string>();
+            public List<string> Deleted = new List<string>();
+            private string current;
+
+            public FakeModel()
+            {
+                Helper = (ExportHelper)System.Runtime.Serialization.FormatterServices
+                    .GetUninitializedObject(typeof(ExportHelper));
+                var document = new Moq.Mock<ModelDoc2>();
+                var sketchManager = new Moq.Mock<SketchManager>();
+                document.SetupGet(d => d.Extension).Returns(Extension.Object);
+                document.SetupGet(d => d.SketchManager).Returns(sketchManager.Object);
+                Extension.Setup(e => e.DeleteSelection2(0)).Returns(true).Callback(() => Deleted.Add(current));
+                Helper.ActiveSWModel = document.Object;
+            }
+
+            public Feature Feature(string name, string currentName = null, object[] children = null)
+            {
+                var feature = new Moq.Mock<Feature>();
+                feature.SetupProperty(f => f.Name, currentName ?? name);
+                feature.Setup(f => f.GetChildren()).Returns(children);
+                feature.Setup(f => f.Select2(false, 0)).Returns(true).Callback(() => current = name);
+                return feature.Object;
+            }
+        }
+
+        [Fact]
+        public void OnlyTheFeaturesOfTheRunAreDeleted()
+        {
+            var model = new FakeModel();
+            GeneratedFeatureLog log = model.Helper.GeneratedFeatures;
+            log.AddCreated(GeneratedKind.CoordinateSystem, "Origin_arm", model.Feature("Origin_arm"));
+            log.AddCreated(GeneratedKind.Sketch, "URDF Reference", model.Feature("URDF Reference"));
+            model.Feature("Origin_from_before");   // exists in the model but is not in the log
+
+            model.Helper.DiscardGeneratedFeatures();
+
+            Assert.Equal(new[] { "Origin_arm", "URDF Reference" }, model.Deleted.ToArray());
+            Assert.True(log.IsEmpty);
+        }
+
+        [Fact]
+        public void ReusedFramesAreNotDeleted()
+        {
+            var model = new FakeModel();
+            model.Helper.GeneratedFeatures.AddReused(GeneratedKind.CoordinateSystem, "Origin_arm");
+
+            model.Helper.DiscardGeneratedFeatures();
+
+            Assert.Empty(model.Deleted);
+        }
+
+        [Fact]
+        public void ARenamedOrAlreadyDeletedFeatureIsSkipped()
+        {
+            var model = new FakeModel();
+            // the object still answers to its name, but the user renamed it since
+            model.Helper.GeneratedFeatures.AddCreated(
+                GeneratedKind.CoordinateSystem, "Origin_arm", model.Feature("Origin_arm", "My own name"));
+
+            model.Helper.DiscardGeneratedFeatures();
+
+            Assert.Empty(model.Deleted);
+        }
+
+        [Fact]
+        public void AFeatureUsedByOthersIsKept()
+        {
+            var model = new FakeModel();
+            model.Helper.GeneratedFeatures.AddCreated(GeneratedKind.Sketch, "URDF Reference",
+                model.Feature("URDF Reference", null, new object[] { new object() }));
+
+            model.Helper.DiscardGeneratedFeatures();
+
+            Assert.Empty(model.Deleted);
+        }
+
+        [Fact]
+        public void TheJointNamesComeBackAndASecondDiscardDoesNothing()
+        {
+            var model = new FakeModel();
+            Link root = new Link { Name = "base_link" };
+            root.Joint.CoordinateSystemName = "Automatically Generate";
+            LinkNode tree = new LinkNode(root);
+            new PrivateObject(model.Helper).SetField("jointNames", JointNameSnapshot.Take(tree));
+            model.Helper.GeneratedFeatures.AddCreated(
+                GeneratedKind.CoordinateSystem, "Origin_global", model.Feature("Origin_global"));
+            root.Joint.CoordinateSystemName = "Origin_global";
+
+            model.Helper.DiscardGeneratedFeatures();
+            model.Helper.DiscardGeneratedFeatures();
+
+            Assert.Equal("Automatically Generate", root.Joint.CoordinateSystemName);
+            Assert.Single(model.Deleted);
         }
     }
 }
