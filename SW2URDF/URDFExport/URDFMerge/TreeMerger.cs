@@ -1,4 +1,4 @@
-﻿using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.sldworks;
 using SW2URDF.URDF;
 using System.Collections.Generic;
 using System.Windows.Controls;
@@ -82,12 +82,14 @@ namespace SW2URDF.URDFExport.URDFMerge
             if (UseCSVInertial)
             {
                 mergedLink.Inertial.SetElement(csvLink.Inertial);
+                mergedLink.UsesCsvInertial = true;
             }
 
             if (UseCSVVisualCollision)
             {
                 mergedLink.Visual.SetElement(csvLink.Visual);
                 mergedLink.Collision.SetElement(csvLink.Collision);
+                mergedLink.UsesCsvVisualCollision = true;
             }
 
             if (UseCSVJointKinematics)
@@ -99,6 +101,7 @@ namespace SW2URDF.URDFExport.URDFMerge
                 mergedLink.Joint.AxisName = csvLink.Joint.AxisName;
 
                 mergedLink.Joint.Type = csvLink.Joint.Type;
+                mergedLink.UsesCsvJointKinematics = true;
             }
 
             if (UseCSVJointOther)
@@ -107,6 +110,7 @@ namespace SW2URDF.URDFExport.URDFMerge
                 mergedLink.Joint.Calibration.SetElement(csvLink.Joint.Calibration);
                 mergedLink.Joint.Dynamics.SetElement(csvLink.Joint.Dynamics);
                 mergedLink.Joint.Safety.SetElement(csvLink.Joint.Safety);
+                mergedLink.UsesCsvJointLimits = true;
             }
 
             return mergedLink;

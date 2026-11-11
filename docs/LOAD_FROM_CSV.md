@@ -70,11 +70,10 @@ These were checked in SolidWorks 2023 with a two-box assembly.
 - **A group is taken completely.** Every cell of the group comes from the CSV, and an empty cell becomes 0 or empty. A CSV
   that has only `Link Name` and `Mass` gives that link an inertia of 0 if *Mass and Inertia* uses the CSV. Keep whole rows, or
   choose the model for that group.
-- **The choice applies to every link, not only the matched ones.** For a group that uses the CSV, the exporter no longer
-  computes that group for any link. A link that is not in the CSV keeps what the tree holds (the values of its last export),
-  and a link that was never exported gets 0, for example a mass of 0. This also happens when a CSV from another
-  SolidWorks configuration lacks a link of this one, or when nothing matches at all. For a CSV that does not cover all links,
-  choose the model's values for the groups where that matters.
+- **The choice applies to the matched links only.** For a group that uses the CSV, only the links that were matched
+  with a CSV row take the CSV values and are not computed for that group. Every other link (not in the CSV, for example when
+  a CSV from another SolidWorks configuration lacks a link of this one, or when nothing matches at all) is still computed
+  from the model on export, so it never ends up with a mass of 0 because of the CSV.
 - **Mesh file names from the CSV are not kept.** On every export, also **Export URDF Only**, the mesh file names are set to
   `package://<package>/meshes/<link>.STL`. Use the CSV for numbers, colors and joint values.
 - **Number format.** The loader reads a comma-separated file with `.` as decimal point, the format the exporter writes.
@@ -83,16 +82,16 @@ These were checked in SolidWorks 2023 with a two-box assembly.
   and check the values in the properties list before you merge.
 - A row with fewer cells than the header is accepted, the missing cells are empty. The `Parent` column is informational,
   the tree is not rebuilt from it.
-- After a merge the exporter page no longer computes the groups you took from the CSV (its "compute" checkboxes for them
-  are cleared); tick one again if you want that group recomputed from the model, which overwrites the CSV values.
+- After a merge the "compute" checkboxes of the exporter page stay ticked: links without CSV values are computed. Untick
+  one only if you want that group not to be computed for any link.
 
 ### Common problems
 
 - *Nothing is matched*: the link names differ. Pair them in the merge window or edit the names in the CSV.
 - *All values are 0 after the merge*: the CSV was saved with a decimal comma or `;`, or the group was taken from a CSV
   that does not match. Check the properties list, and see above.
-- *A link has mass 0 after the export*: it is not in the CSV and was never exported before. Choose the model's values for
-  *Mass and Inertia*.
+- *A link has mass 0 after the export*: check that the model has a body for it; links that are not in the CSV are computed
+  from the model.
 
 ## 繁體中文
 
@@ -153,20 +152,20 @@ These were checked in SolidWorks 2023 with a two-box assembly.
 
 - **整個分組一併採用。** 該分組的每個儲存格都取自 CSV，空白儲存格會變成 0 或空值。若 *Mass and Inertia* 用 CSV，而
   CSV 只有 `Link Name` 與 `Mass`，該連桿的慣量會變成 0。請保留完整的列，或讓該分組使用模型的值。
-- **選擇對所有連桿生效，不只是已配對的。** 某分組使用 CSV 時，匯出器不再為任何連桿計算該分組。不在 CSV 中的連桿保留
-  樹中的值（上次匯出的值），從未匯出過的連桿則為 0，例如質量 0。當另一個 SolidWorks 組態的 CSV 缺少本組態的某個連桿，
-  或完全沒有配對時，也會如此。CSV 沒有涵蓋所有連桿時，請在需要的分組選用模型的值。
+- **選擇只對已配對的連桿生效。** 某分組使用 CSV 時，只有與 CSV 列配對成功的連桿採用 CSV 的值，且不再為該分組計算；
+  其他連桿（不在 CSV 中，例如另一個 SolidWorks 組態的 CSV 缺少本組態的某個連桿，或完全沒有配對）匯出時仍由模型計算，
+  不會因為 CSV 而得到質量 0。
 - **CSV 中的 mesh 檔名不會保留。** 每次匯出（包括 **只匯出 URDF**）都會把 mesh 檔名設為
   `package://<套件>/meshes/<連桿>.STL`。CSV 請用於數值、顏色與關節值。
 - **數字格式。** 載入器讀取以逗號分隔、以 `.` 為小數點的檔案，也就是匯出器寫出的格式。若試算表存成小數逗號或以 `;`
   分隔，不會有任何提示：數字變成 0，或連桿名稱為空而完全沒有配對。數字儲存格中的文字同樣會無訊息地變成 0。
   合併前請選取連桿，檢查右側清單的值。
 - 儲存格數少於標題列的列可以接受，缺少的儲存格視為空白。`Parent` 欄僅供參考，不會據以重建樹。
-- 合併後，匯出頁面不再計算你選用 CSV 的分組（對應的「計算」核取方塊會被取消勾選）；若要讓該分組重新由模型計算，
-  請再勾選，這會覆蓋 CSV 的值。
+- 合併後，匯出頁面的「計算」核取方塊維持勾選：沒有 CSV 值的連桿會被計算。只有在你希望某分組對所有連桿都不計算時，
+  才取消勾選。
 
 ### 常見問題
 
 - *完全沒有配對*：連桿名稱不同。在合併視窗內配對，或直接改 CSV 內的名稱。
 - *合併後所有值都是 0*：CSV 存成小數逗號或 `;`，或該分組取自不相符的 CSV。請檢查右側清單，並參考上文。
-- *匯出後某連桿質量為 0*：它不在 CSV 中，且先前從未匯出。請讓 *Mass and Inertia* 使用模型的值。
+- *匯出後某連桿質量為 0*：請檢查模型中該連桿是否有實體；不在 CSV 中的連桿由模型計算。

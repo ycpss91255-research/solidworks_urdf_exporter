@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015 Stephen Brawner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -304,18 +304,20 @@ namespace SW2URDF.URDFExport
                 Tree.SelectedNode = Tree.Nodes[0];
             }
 
-            PMComputeMassInertia.Checked = !e.UsedCSVInertial;
-            PMComputeVisualCollision.Checked = !e.UsedCSVVisualCollision;
-            PMComputeJointKinematics.Checked = !e.UsedCSVJointKinematics;
-            PMComputeJointLimits.Checked = !e.UsedCSVJointOther;
+            // The links that took values from the CSV carry a flag (Link.UsesCsv...) and are skipped by
+            // the computation one by one; every other link is still computed from the model.
+            PMComputeMassInertia.Checked = true;
+            PMComputeVisualCollision.Checked = true;
+            PMComputeJointKinematics.Checked = true;
+            PMComputeJointLimits.Checked = true;
             PMLabelCSVFilename.Caption = ui.Get("Filename: ") + e.CSVFilename;
 
-            // Make the controls visible, but only enable them if values have been loaded from the CSV
-            // otherwise they do need to be computed.
-            EnableControl((IPropertyManagerPageControl)PMComputeMassInertia, e.UsedCSVInertial);
-            EnableControl((IPropertyManagerPageControl)PMComputeVisualCollision, e.UsedCSVVisualCollision);
-            EnableControl((IPropertyManagerPageControl)PMComputeJointKinematics, e.UsedCSVJointKinematics);
-            EnableControl((IPropertyManagerPageControl)PMComputeJointLimits, e.UsedCSVJointOther);
+            // Make the controls visible. They stay checked (links without CSV values are computed)
+            // and can be unchecked to skip a computation for all links.
+            EnableControl((IPropertyManagerPageControl)PMComputeMassInertia);
+            EnableControl((IPropertyManagerPageControl)PMComputeVisualCollision);
+            EnableControl((IPropertyManagerPageControl)PMComputeJointKinematics);
+            EnableControl((IPropertyManagerPageControl)PMComputeJointLimits);
             EnableControl((IPropertyManagerPageControl)PMLabelCSVFilename);
         }
 
