@@ -83,5 +83,28 @@ namespace SW2URDF.Test
             string resaved = (string)InvokeSerialization("SerializeToString", loaded);
             Assert.Equal(saved, resaved);
         }
+
+        [Fact]
+        public void NonAsciiNamesSurviveSavingAndLoading()
+        {
+            // Link and joint names may contain any characters (for example CJK part names).
+            string linkName = "\u6e2c\u8a66_caf\u00e9";
+            string jointName = "\u95dc\u7bc0_1";
+            Link root = new Link();
+            root.Name = "base_link";
+            Link child = new Link();
+            child.Name = linkName;
+            child.Joint.Name = jointName;
+            root.Children.Add(child);
+            LinkNode node = new LinkNode(root);
+
+            string saved = (string)InvokeSerialization("SerializeToString", node);
+            LinkNode loaded = (LinkNode)InvokeSerialization("DeserializeFromString", saved);
+
+            Assert.NotNull(loaded);
+            LinkNode loadedChild = (LinkNode)loaded.Nodes[0];
+            Assert.Equal(linkName, loadedChild.Link.Name);
+            Assert.Equal(jointName, loadedChild.Link.Joint.Name);
+        }
     }
 }
