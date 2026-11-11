@@ -123,7 +123,10 @@ namespace SW2URDF.URDFExport
                     MessageBox.Show(ui.Get("The configuration has changed, would you like to save?"),
                     ui.Get("Save Export Configuration"), MessageBoxButtons.YesNo) == DialogResult.Yes))
                 {
-                    SaveDataToModelDoc(swApp, model, newData, ui);
+                    if (SaveDataToModelDoc(swApp, model, newData, ui))
+                    {
+                        PersistDocument(model, ui);
+                    }
                 }
             }
         }
@@ -603,7 +606,7 @@ namespace SW2URDF.URDFExport
         /// <param name="model">ModelDoc model to save data string to</param>
         /// <param name="data">string to save</param>
         /// <param name="attributeName">Name of attribute to save to</param>
-        private static void SaveDataToModelDoc(SldWorks swApp, ModelDoc2 model,
+        private static bool SaveDataToModelDoc(SldWorks swApp, ModelDoc2 model,
             string data, UiText ui)
         {
             string configurationName = GetActiveConfigurationName(model);
@@ -637,7 +640,7 @@ namespace SW2URDF.URDFExport
                 logger.Error("SolidWorks did not create the URDF configuration attribute" +
                     (configurationName == null ? "" : " for configuration \"" + configurationName + "\""));
                 MessageBox.Show(ui.Get("The URDF configuration could not be saved to this model."));
-                return;
+                return false;
             }
 
             Parameter param = saveExporterAttribute.GetParameter("data");
@@ -652,6 +655,37 @@ namespace SW2URDF.URDFExport
             if (created)
             {
                 TryGroupConfigurationAttributes(model);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// The settings live in the open document: without saving it they are lost as soon as the
+        /// document is closed. Saves a document that has a file (silently, only this document, not
+        /// its references); otherwise tells the user to save it.
+        /// </summary>
+        private static void PersistDocument(ModelDoc2 model, UiText ui)
+        {
+            bool saved = false;
+            PersistAction action = DocumentPersistence.Decide(
+                true, !string.IsNullOrEmpty(model.GetPathName()), model.IsOpenedReadOnly());
+            if (action == PersistAction.Save)
+            {
+                int errors = 0;
+                int warnings = 0;
+                try
+                {
+                    saved = model.Save3((int)swSaveAsOptions_e.swSaveAsOptions_Silent, ref errors, ref warnings);
+                }
+                catch (Exception e)
+                {
+                    logger.Warn("Saving the document after storing the URDF settings failed", e);
+                }
+                logger.Info("Saved the document after storing the URDF settings: " + saved + " (errors " + errors + ", warnings " + warnings + ")");
+            }
+            if (action == PersistAction.WarnNotSaved || (action == PersistAction.Save && !saved))
+            {
+                MessageBox.Show(DocumentPersistence.WarningText(ui), DocumentPersistence.WarningTitle(ui));
             }
         }
 
