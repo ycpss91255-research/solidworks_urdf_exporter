@@ -88,6 +88,20 @@ namespace SW2URDF.URDF
             Izz = array[8];
         }
 
+        /// <summary>
+        /// Sets the tensor from a row-major 3x3 array that already follows URDF's sign convention
+        /// (what GetMoment returns), unlike SetMomentMatrix which takes SolidWorks' signs.
+        /// </summary>
+        public void SetUrdfMomentMatrix(double[] array)
+        {
+            Ixx = array[0];
+            Ixy = array[1];
+            Ixz = array[2];
+            Iyy = array[4];
+            Iyz = array[5];
+            Izz = array[8];
+        }
+
         public void FillBoxes(TextBox boxIxx, TextBox boxIxy, TextBox boxIxz,
             TextBox boxIyy, TextBox boxIyz, TextBox boxIzz, string format)
         {

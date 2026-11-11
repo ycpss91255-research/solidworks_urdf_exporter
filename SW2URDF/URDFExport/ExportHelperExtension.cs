@@ -205,25 +205,22 @@ namespace SW2URDF.URDFExport
             Matrix<double> linkCoMTransform = MathOps.GetTranslation(Link.Inertial.Origin.GetXYZ());
             Matrix<double> localLinkCoMTransform = GlobalTransformInverse * linkCoMTransform;
 
-            // The linear array in Link.Inertial.Inertia.Moment is in row major order, but this
-            // matrix constructor uses column major order. It's a rotation matrix, so this
-            // shouldn't matter. If it does, just transpose linkGlobalMomentInertia. These three
-            // matrices are 3x3 as opposed to the 4x4 transformation matrices above.
-            // You're welcome for the confusion.
+            // The inertia is kept in URDF's sign convention already (see SetMomentMatrix) and is given
+            // in the global frame. GlobalTransform takes link coordinates to global ones, so the
+            // tensor in the link frame is R^T * I * R. GetMoment returns a symmetric matrix, so the
+            // column-major constructor below reads it correctly.
             Matrix<double> linkGlobalMomentInertia =
                 new DenseMatrix(3, 3, Link.Inertial.Inertia.GetMoment());
             Matrix<double> GlobalRotMat =
                 GlobalTransform.SubMatrix(0, 3, 0, 3);
             Matrix<double> linkLocalMomentInertia =
-                GlobalRotMat * linkGlobalMomentInertia * GlobalRotMat.Transpose();
+                GlobalRotMat.Transpose() * linkGlobalMomentInertia * GlobalRotMat;
 
             Link.Inertial.Origin.SetXYZ(MathOps.GetXYZ(localLinkCoMTransform));
             Link.Inertial.Origin.SetRPY(new double[] { 0, 0, 0 });
 
-            // Wait are you saying that even though the matrix was trasposed from column major
-            // order, you are writing it in row-major order here. Yes, yes I am.
-            double[] moment = linkLocalMomentInertia.ToRowMajorArray();
-            Link.Inertial.Inertia.SetMomentMatrix(moment);
+            // Already in URDF's sign convention: written as it is, not converted a second time
+            Link.Inertial.Inertia.SetUrdfMomentMatrix(linkLocalMomentInertia.ToRowMajorArray());
 
             LocalizeMeshOrigins(Link, GlobalTransform);
         }
