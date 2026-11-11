@@ -117,11 +117,8 @@ namespace SW2URDF.URDFExport.CSV
             }
 
             writer.NextRecord();
-            HashSet<string> keys1 = new HashSet<string>(ContextToColumns.Dictionary.Keys.Cast<string>());
-            HashSet<string> keys2 = new HashSet<string>(dictionary.Keys.Cast<string>());
-
             StringBuilder missingColumns = new StringBuilder();
-            foreach (string missing in keys2.Except(keys1))
+            foreach (string missing in UnwrittenColumns(dictionary.Keys.Cast<string>()))
             {
                 missingColumns.Append(missing).Append(",");
             }
@@ -129,6 +126,18 @@ namespace SW2URDF.URDFExport.CSV
             {
                 logger.Error("The following columns were not written to the CSV: " + missingColumns.ToString());
             }
+        }
+
+        // The child of a joint is the link itself, whose name is the "Link Name" column,
+        // so this element deliberately has no column of its own.
+        private const string ChildLinkContext = "Link.Joint.ChildLink.link";
+
+        /// <summary>Keys of a link's values that have no CSV column and are not deliberately omitted.</summary>
+        public static IEnumerable<string> UnwrittenColumns(IEnumerable<string> contexts)
+        {
+            HashSet<string> columns = new HashSet<string>(ContextToColumns.Dictionary.Keys.Cast<string>());
+            columns.Add(ChildLinkContext);
+            return contexts.Where(context => !columns.Contains(context)).ToList();
         }
 
         /// <summary>
