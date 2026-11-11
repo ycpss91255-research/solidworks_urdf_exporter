@@ -93,7 +93,7 @@ namespace SW2URDF.UI
                 // Axis values are required, except for a fixed joint
                 AxisRequiredLabel.Visible = (joint.Type != "fixed");
 
-                joint.FillBoxes(textBoxJointName, comboBoxJointType);
+                joint.FillBoxes(textBoxJointName, comboBoxJointType, ui);
                 joint.Parent.FillBoxes(labelParent);
                 joint.Child.FillBoxes(labelChild);
 
@@ -274,7 +274,7 @@ namespace SW2URDF.UI
         //Saves data from text boxes back into a joint
         public void SaveJointDataFromPropertyBoxes(Joint Joint)
         {
-            Joint.Update(textBoxJointName, comboBoxJointType);
+            Joint.Update(textBoxJointName, comboBoxJointType, ui);
 
             Joint.Parent.Update(labelParent);
             Joint.Child.Update(labelChild);
