@@ -40,6 +40,12 @@ See the [ROS Wiki](http://wiki.ros.org/sw_urdf_exporter) and associated [tutoria
     1. Ensure `Configuration:` is set to `Debug`
     1. Ensure `Start external program:` is pointing to the SolidWorks executable. For example `C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\SLDWORKS.exe`
 
+## Testing
+
+See [TESTING.md](TESTING.md). How to test the interplay of SolidWorks configurations with the per-configuration
+URDF export settings (manual checklist and an automated live script) is in
+[Testing configurations](TESTING.md#testing-configurations-solidworks-configuration-x-urdf-export-configuration).
+
 ## Converting mesh format from 3dxml to dae
 
 Executing the following command will convert the format of the exported mesh from 3DXML to DAE, and rewrite the URDF, allowing you to display colored meshes in visualization tools like RViz:

@@ -245,8 +245,16 @@ namespace SW2URDF.UI
         {
             loadedConfiguration = Exporter.ActiveConfigurationName;
             Exporter.CreateRobotFromActiveModel();
-            Exporter.LoadPartSettings();
             RefreshConfigurationStatus();
+            try
+            {
+                Exporter.LoadPartSettings();
+            }
+            catch (Exception ex)
+            {
+                // Settings that cannot be read leave the values computed from the part.
+                logger.Warn("Could not load the saved part settings", ex);
+            }
             textBox_save_as.Text = Exporter.SavePath + "\\" + Exporter.PackageName;
 
             Exporter.URDFRobot.BaseLink.Visual.Origin.FillBoxes(textBox_collision_origin_x,
