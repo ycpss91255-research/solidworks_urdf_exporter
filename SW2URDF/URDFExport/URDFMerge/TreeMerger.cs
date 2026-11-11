@@ -68,6 +68,11 @@ namespace SW2URDF.URDFExport.URDFMerge
             return mergedLink;
         }
 
+        private static bool HasValue(StringDictionary data, string key)
+        {
+            return data.ContainsKey(key) && !string.IsNullOrWhiteSpace(data[key]);
+        }
+
         private Link MergeLink(Link cadLink, Link csvLink)
         {
             if (csvLink == null)
@@ -110,6 +115,8 @@ namespace SW2URDF.URDFExport.URDFMerge
                 {
                     mergedLink.Visual.SetElementFromData(linkContext, data);
                     mergedLink.Collision.SetElementFromData(linkContext, data);
+                    mergedLink.UsesCsvVisualMesh = mergedLink.UsesCsvVisualMesh || HasValue(data, "Link.Visual.Geometry.Mesh.filename");
+                    mergedLink.UsesCsvCollisionMesh = mergedLink.UsesCsvCollisionMesh || HasValue(data, "Link.Collision.Geometry.Mesh.filename");
                 }
                 mergedLink.UsesCsvVisualCollision = true;
             }

@@ -51,6 +51,11 @@ namespace SW2URDF.URDF
         public bool UsesCsvJointKinematics;
         public bool UsesCsvJointLimits;
 
+        // The mesh file name of the visual / collision geometry came from the CSV (an existing mesh):
+        // the export keeps it instead of writing the name of the mesh it exports (issue #85).
+        public bool UsesCsvVisualMesh;
+        public bool UsesCsvCollisionMesh;
+
         // The cells that were read from the CSV for this link (context -> text), set by the CSV loader.
         // Cells that were blank or unreadable are absent, so a merge keeps the model's value for them.
         public StringDictionary CsvData;
@@ -195,6 +200,8 @@ namespace SW2URDF.URDF
             UsesCsvVisualCollision = externalLink.UsesCsvVisualCollision;
             UsesCsvJointKinematics = externalLink.UsesCsvJointKinematics;
             UsesCsvJointLimits = externalLink.UsesCsvJointLimits;
+            UsesCsvVisualMesh = externalLink.UsesCsvVisualMesh;
+            UsesCsvCollisionMesh = externalLink.UsesCsvCollisionMesh;
         }
 
         public string[] GetJointNames(bool includeFixed)

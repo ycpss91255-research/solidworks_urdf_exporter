@@ -330,6 +330,7 @@
     <Compile Include="Test\TestCsvColumnCheck.cs" />
     <Compile Include="Test\TestCsvPerLink.cs" />
     <Compile Include="Test\TestCsvLoadProblems.cs" />
+    <Compile Include="Test\TestCsvMeshFilename.cs" />
     <Compile Include="Test\TestCsvInvariant.cs" />
     <Compile Include="Test\TestExportHelper.cs" />
     <Compile Include="Test\TestFileNames.cs" />

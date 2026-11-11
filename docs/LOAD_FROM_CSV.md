@@ -7,7 +7,7 @@
 **When to use it.** Use **Load from CSV...** when you keep numbers outside the model (a spreadsheet, or the CSV of an
 earlier export) and want them in the next export: tuned masses and inertias, joint limits, colors. **You do not need it**
 to repeat an export: the exporter already stores its settings in the model, per SolidWorks configuration, and loads
-them when it opens. It also cannot bring in meshes: mesh file names are always rewritten on export (see
+them when it opens. It can also name existing meshes: a mesh file name in the CSV is kept on export (see
 [Things to know](#things-to-know)).
 
 ### What it does
@@ -74,8 +74,11 @@ These were checked in SolidWorks 2023 with a two-box assembly.
   with a CSV row take the CSV values and are not computed for that group. Every other link (not in the CSV, for example when
   a CSV from another SolidWorks configuration lacks a link of this one, or when nothing matches at all) is still computed
   from the model on export, so it never ends up with a mass of 0 because of the CSV.
-- **Mesh file names from the CSV are not kept.** On every export, also **Export URDF Only**, the mesh file names are set to
-  `package://<package>/meshes/<link>.STL`. Use the CSV for numbers, colors and joint values.
+- **Mesh file names from the CSV are kept.** If *Visual Properties* uses the CSV and a matched link has a `Mesh Filename`
+  (or `Collision Mesh Filename`) in the CSV, the export writes that name into the URDF and the CSV instead of
+  `package://<package>/meshes/<link>.STL`. When both names of a link come from the CSV, no mesh is exported for that link
+  (the file must already exist where the name points). A link without such a name, or with *Visual Properties* set to the
+  model, gets the exported mesh as before. The choice is not stored in the model: load the CSV again for the next export.
 - **Number format and unreadable cells.** Numbers must use `.` as decimal point, the format the exporter writes. The
   separator may be a comma, a semicolon or a tab (it is detected from the header row; Excel in some regions saves
   `;`). Before the merge window opens, the exporter lists the cells it could not read (a decimal comma such as `0,5`, text
@@ -99,7 +102,7 @@ These were checked in SolidWorks 2023 with a two-box assembly.
 
 **什麼時候用。** 當你在模型之外維護數值（試算表，或先前匯出的 CSV），想讓下一次匯出使用它們（調好的質量與慣量、
 關節限制、顏色）時，使用 **從 CSV 載入…**。**只是重複匯出時不需要**：匯出器已依 SolidWorks 組態把設定存在模型內，
-開啟時自動載入。它也無法帶入 mesh：匯出時 mesh 檔名一律重新產生（見[注意事項](#注意事項)）。
+開啟時自動載入。它也能指定既有的 mesh：CSV 中的 mesh 檔名在匯出時會保留（見[注意事項](#注意事項)）。
 
 ### 作用
 
@@ -157,8 +160,10 @@ These were checked in SolidWorks 2023 with a two-box assembly.
 - **選擇只對已配對的連桿生效。** 某分組使用 CSV 時，只有與 CSV 列配對成功的連桿採用 CSV 的值，且不再為該分組計算；
   其他連桿（不在 CSV 中，例如另一個 SolidWorks 組態的 CSV 缺少本組態的某個連桿，或完全沒有配對）匯出時仍由模型計算，
   不會因為 CSV 而得到質量 0。
-- **CSV 中的 mesh 檔名不會保留。** 每次匯出（包括 **只匯出 URDF**）都會把 mesh 檔名設為
-  `package://<套件>/meshes/<連桿>.STL`。CSV 請用於數值、顏色與關節值。
+- **CSV 中的 mesh 檔名會保留。** 若 *Visual Properties* 使用 CSV，且已配對連桿在 CSV 中有 `Mesh Filename`（或
+  `Collision Mesh Filename`），匯出時會把該名稱寫入 URDF 與 CSV，而不是 `package://<套件>/meshes/<連桿>.STL`。
+  當連桿的兩個名稱都來自 CSV 時，不會為該連桿匯出 mesh（檔案必須已存在於名稱所指的位置）。沒有這類名稱的連桿，或
+  *Visual Properties* 設為模型時，仍照原來方式取得匯出的 mesh。此選擇不會存入模型：下次匯出要再載入 CSV。
 - **數字格式與無法讀取的儲存格。** 數字必須以 `.` 為小數點，也就是匯出器寫出的格式。分隔符號可以是逗號、分號或
   Tab（由標題列自動判斷；部分地區的 Excel 會存成 `;`）。在合併視窗開啟之前，匯出器會列出無法讀取的儲存格（小數逗號如
   `0,5`、數字欄中的文字、沒有連桿名稱的列）與其列號、欄位，並詢問是否繼續。這些儲存格會被忽略，因此保留模型的值，
