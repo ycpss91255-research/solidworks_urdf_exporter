@@ -138,6 +138,28 @@ namespace SW2URDF.URDFExport
             return ui.Get("Settings not saved");
         }
 
+        /// <summary>
+        /// A save that returned false, or reported an error or a warning code, did not go as planned.
+        /// The exporter carries on, but tells the user.
+        /// </summary>
+        public static bool SaveHadProblem(bool saved, int errors, int warnings)
+        {
+            return !saved || errors != 0 || warnings != 0;
+        }
+
+        public static string SaveProblemText(UiText ui, int errors, int warnings)
+        {
+            return string.Format(ui.Get("Saving the document did not finish cleanly (SolidWorks error code {0}, warning code {1}). The exporter continues, but its settings may not be stored in the file. Save the document yourself, otherwise they can be lost when it is closed."), errors, warnings);
+        }
+
+        /// <summary>Shows the warning when a save had a problem; returns whether it did.</summary>
+        public static bool ReportSaveProblem(UiText ui, bool saved, int errors, int warnings)
+        {
+            if (!SaveHadProblem(saved, errors, warnings)) return false;
+            URDFPackage.MessageBox.Show(SaveProblemText(ui, errors, warnings), WarningTitle(ui), System.Windows.MessageBoxButton.OK);
+            return true;
+        }
+
         public static string WarningText(UiText ui)
         {
             return ui.Get("The exporter settings were stored in the open document but could not be saved with it (it has never been saved, is read-only, or saving failed). Save the document yourself, otherwise the settings are lost when it is closed.");

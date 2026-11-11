@@ -171,5 +171,28 @@ namespace SW2URDF.Test
             Assert.DoesNotContain("exporter", zh);
             Assert.NotEqual("Settings not saved", DocumentPersistence.WarningTitle(new UiText("chinese")));
         }
+
+        [Fact]
+        public void ASaveWithAFailureErrorOrWarningIsAProblem()
+        {
+            Assert.False(DocumentPersistence.SaveHadProblem(true, 0, 0));
+            Assert.True(DocumentPersistence.SaveHadProblem(false, 0, 0));
+            Assert.True(DocumentPersistence.SaveHadProblem(true, 1, 0));
+            Assert.True(DocumentPersistence.SaveHadProblem(true, 0, 2));
+            Assert.True(DocumentPersistence.SaveHadProblem(false, 4, 0));
+        }
+
+        [Fact]
+        public void SaveProblemTextIsLocalizedAndGivesTheCodes()
+        {
+            string en = DocumentPersistence.SaveProblemText(new UiText(null), 8, 2);
+            Assert.Contains("8", en);
+            Assert.Contains("2", en);
+            Assert.Contains("Save the document yourself", en);
+            string zh = DocumentPersistence.SaveProblemText(new UiText("chinese"), 8, 2);
+            Assert.Contains("儲存", zh);
+            Assert.Contains("8", zh);
+            Assert.DoesNotContain("Save the document", zh);
+        }
     }
 }
