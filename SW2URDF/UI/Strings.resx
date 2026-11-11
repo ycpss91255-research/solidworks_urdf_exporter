@@ -580,4 +580,7 @@
   <data xml:space="preserve" name="new: nothing stored yet">
     <value>New: nothing stored yet</value>
   </data>
+  <data xml:space="preserve" name="open a part or an assembly to use the urdf exporter.">
+    <value>Open a part or an assembly to use the URDF exporter.</value>
+  </data>
 </root>
