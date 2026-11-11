@@ -568,17 +568,17 @@
   <data xml:space="preserve" name="(none)">
     <value>(none)</value>
   </data>
-  <data xml:space="preserve" name="settings saved for this configuration.">
-    <value>Settings saved for this configuration.</value>
+  <data xml:space="preserve" name="active configuration: {0}">
+    <value>Active configuration: {0}</value>
   </data>
-  <data xml:space="preserve" name="settings loaded from the shared (legacy) data; they are saved to this configuration on the next save.">
-    <value>Settings loaded from the shared (legacy) data; they are saved to this configuration on the next save.</value>
+  <data xml:space="preserve" name="stored for this configuration">
+    <value>Stored for this configuration</value>
   </data>
-  <data xml:space="preserve" name="new settings: nothing is saved for this configuration yet.">
-    <value>New settings: nothing is saved for this configuration yet.</value>
+  <data xml:space="preserve" name="using shared (legacy) settings">
+    <value>Using shared (legacy) settings</value>
   </data>
-  <data xml:space="preserve" name="configuration: {0}. {1}">
-    <value>Configuration: {0}. {1}</value>
+  <data xml:space="preserve" name="new: nothing stored yet">
+    <value>New: nothing stored yet</value>
   </data>
   <data xml:space="preserve" name="open a part or an assembly to use the urdf exporter.">
     <value>Open a part or an assembly to use the URDF exporter.</value>

@@ -227,10 +227,25 @@ namespace SW2URDF.UI
             }
         }
 
+        // Shows the active configuration and where its settings come from.
+        private void RefreshConfigurationStatus()
+        {
+            try
+            {
+                UiLayout.SetStatusBannerText(labelConfigurationStatus,
+                    ConfigurationSerialization.DescribeSettings(Exporter.ActiveSWModel, ui));
+            }
+            catch (Exception ex)
+            {
+                logger.Warn("Could not update the configuration status", ex);
+            }
+        }
+
         private void LoadFormForActiveConfiguration()
         {
             loadedConfiguration = Exporter.ActiveConfigurationName;
             Exporter.CreateRobotFromActiveModel();
+            RefreshConfigurationStatus();
             try
             {
                 Exporter.LoadPartSettings();
