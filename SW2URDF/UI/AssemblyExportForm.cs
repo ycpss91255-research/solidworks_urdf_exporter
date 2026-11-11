@@ -114,6 +114,11 @@ namespace SW2URDF.UI
             InitializeComponent();
             ui = UiText.FromSolidWorks(SwApp);
             ui.Apply(this);
+            // The mesh format captions are bare names; what each format keeps is in the tooltip.
+            var meshFormatTips = new ToolTip();
+            meshFormatTips.SetToolTip(radioButtonStl, ui.Get("Geometry only, no colour."));
+            meshFormatTips.SetToolTip(radioButton3dxml, ui.Get("Geometry with colour."));
+            meshFormatTips.SetToolTip(radioButtonObj, ui.Get("Geometry with colour and materials, as .obj and .mtl files."));
             // Items show the localized caption; the stored/compared value is mapped back by ui.ComboValue.
             comboBoxJointType.Items.Clear();
             foreach (string type in SW2URDF.URDF.Joint.AvailableTypes)
