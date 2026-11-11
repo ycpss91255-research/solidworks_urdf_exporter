@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace SW2URDF.UI
@@ -14,6 +15,40 @@ namespace SW2URDF.UI
             {
                 return g.DpiY;
             }
+        }
+
+        internal const int WM_DPICHANGED = 0x02E0;
+
+        [DllImport("user32.dll")]
+        private static extern uint GetDpiForWindow(IntPtr hwnd);
+
+        // DPI the window is actually drawn at. In a per-monitor DPI aware host (SOLIDWORKS) this is the
+        // DPI of the monitor the window sits on, which need not equal the primary screen's DPI
+        // (ScreenDpi), and it changes when the window is moved to another monitor.
+        internal static float WindowDpi(Control control)
+        {
+            if (control != null && control.IsHandleCreated)
+            {
+                try
+                {
+                    uint dpi = GetDpiForWindow(control.Handle);
+                    if (dpi > 0)
+                    {
+                        return dpi;
+                    }
+                }
+                catch (EntryPointNotFoundException)
+                {
+                    // Windows older than 10 1607: fall through to the process-wide value.
+                }
+            }
+            return ScreenDpi();
+        }
+
+        // Same fit, using the DPI the (already created) form really has.
+        internal static void FitButtonHeightsToWindow(Control root)
+        {
+            FitButtonHeights(root, WindowDpi(root));
         }
 
         // The designer gives push buttons a fixed height, but the visual theme draws the
