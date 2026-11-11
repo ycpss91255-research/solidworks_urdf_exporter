@@ -23,7 +23,7 @@ $assembly = [Reflection.Assembly]::LoadFrom($AssemblyPath)
 
 $flags = [Reflection.BindingFlags]'Instance,NonPublic,Public'
 
-function New-Form([Type]$type, [System.Drawing.Font]$font) {
+function New-Form([Type]$type, [System.Drawing.Font]$font, [single]$dpi) {
     $form = [System.Runtime.Serialization.FormatterServices]::GetUninitializedObject($type)
     [void][System.Windows.Forms.Form].GetConstructor($flags, $null, [Type[]]@(), $null).Invoke($form, @())
     if ($font) { $form.Font = $font }
@@ -31,10 +31,10 @@ function New-Form([Type]$type, [System.Drawing.Font]$font) {
     $events = [System.ComponentModel.Component].GetProperty('Events', $flags).GetValue($form, @())
     $loadKey = [System.Windows.Forms.Form].GetField('EVENT_LOAD', [Reflection.BindingFlags]'Static,NonPublic').GetValue($null)
     $events.RemoveHandler($loadKey, $events[$loadKey])
-    # The constructors also grow too-short push buttons (UiLayout); check that state at 150% DPI.
+    # The constructors also grow too-short push buttons (UiLayout); check that state at the DPI being simulated.
     $layoutType = $assembly.GetType('SW2URDF.UI.UiLayout')
     $fit = if ($layoutType) { $layoutType.GetMethod('FitButtonHeights', [Reflection.BindingFlags]'Static,NonPublic,Public') }
-    if ($fit) { [void]$fit.Invoke($null, @($form, [single]144)) }
+    if ($fit) { [void]$fit.Invoke($null, @($form, $dpi)) }
     return $form
 }
 
@@ -69,6 +69,11 @@ function Test-Container([System.Windows.Forms.Control]$parent, [string]$path, [b
         $b = Get-Box $c
         if (-not $parent.AutoScroll -and ($b.Right -gt $client.Width + 1 -or $b.Bottom -gt $client.Height + 1 -or $b.Left -lt -1 -or $b.Top -lt -1)) {
             [void]$problems.Add("outside ${path}: $($c.Name) $b in $client")
+        }
+        # A scrolling container may extend past the window, but its navigation buttons must not scroll away
+        # with the content: they belong in a fixed (non-scrolling) panel that is always visible.
+        if ($parent.AutoScroll -and ($c -is [System.Windows.Forms.Button]) -and $c.Name -match 'Cancel|Finish|Next|Previous|ExportUrdfOnly') {
+            [void]$problems.Add("button scrolls away ${path}: $($c.Name) is inside the scrolling container $($parent.Name)")
         }
         if (Test-TextClipped $c) { [void]$problems.Add("text clipped ${path}: $($c.Name) '$($c.Text)' $b") }
         # Fonts must follow the form font (system UI font, display scaling) so text sizes stay
@@ -116,7 +121,7 @@ $formTypes = @('SW2URDF.UI.AssemblyExportForm', 'SW2URDF.UI.PartExportForm')
 $fonts = @(
     @('Microsoft Sans Serif', 8.25), @('Microsoft JhengHei UI', 9), @('PMingLiU', 9)
 )
-$scales = @(1.0, 1.25, 1.5)
+$scales = @(1.0, 1.25, 1.5, 1.75, 2.0)
 $total = 0
 $report = New-Object System.Collections.ArrayList
 foreach ($typeName in $formTypes) {
@@ -125,7 +130,7 @@ foreach ($typeName in $formTypes) {
         foreach ($scale in $scales) {
             $font = New-Object System.Drawing.Font($f[0], [single]($f[1] * $scale), [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Point)
             $script:baseFont = $font
-            $form = New-Form $type $font
+            $form = New-Form $type $font ([single](96 * $scale))
             try {
                 $form.StartPosition = 'Manual'; $form.Location = New-Object System.Drawing.Point(-32000, -32000)
                 $wasVisible = @{}; foreach ($c in $form.Controls) { $wasVisible[$c.Name] = (Test-Shown $c) }
