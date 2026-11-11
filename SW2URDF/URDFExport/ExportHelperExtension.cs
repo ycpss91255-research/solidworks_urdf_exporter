@@ -775,10 +775,7 @@ namespace SW2URDF.URDFExport
                 }
                 Joint.Origin.SetXYZ(new double[] { 0, 0, 0 });
                 Joint.CoordinateSystemName = "Origin_global";
-                if (referenceSketchName == null)
-                {
-                    referenceSketchName = Setup3DSketch();
-                }
+                EnsureReferenceSketch();
                 CreateRefOrigin(Joint);
             }
         }
@@ -860,6 +857,18 @@ namespace SW2URDF.URDFExport
             return null;
         }
 
+        // The auto-generated coordinate systems and axes are built from the points and lines of
+        // the "URDF Reference" 3D sketch, so every one of them needs it. It is created the first
+        // time one is needed, which is not only for Origin_global: when the user picks their own
+        // global origin, the sketch is still needed for the joints set to "Automatically Generate".
+        private void EnsureReferenceSketch()
+        {
+            if (referenceSketchName == null)
+            {
+                referenceSketchName = Setup3DSketch();
+            }
+        }
+
         // Inserts a sketch into the main assembly and name it
         private string Setup3DSketch()
         {
@@ -883,6 +892,7 @@ namespace SW2URDF.URDFExport
             //Find if the sketch exists first
             if (ActiveSWModel.SketchManager.ActiveSketch == null)
             {
+                EnsureReferenceSketch();
                 bool sketchExists =
                     ActiveSWModel.Extension.SelectByID2(
                         referenceSketchName, "SKETCH", 0, 0, 0, false, 0, null, 0);
@@ -939,6 +949,7 @@ namespace SW2URDF.URDFExport
         {
             if (ActiveSWModel.SketchManager.ActiveSketch == null)
             {
+                EnsureReferenceSketch();
                 ActiveSWModel.Extension.SelectByID2(
                     referenceSketchName, "SKETCH", 0, 0, 0, false, 0, null, 0);
                 ActiveSWModel.SketchManager.Insert3DSketch(true);
