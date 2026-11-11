@@ -681,7 +681,7 @@
             this.radioButton3dxml.Size = new System.Drawing.Size(90, 16);
             this.radioButton3dxml.TabIndex = 1;
             this.radioButton3dxml.TabStop = true;
-            this.radioButton3dxml.Text = "3dxml (color)";
+            this.radioButton3dxml.Text = "3DXML";
             this.radioButton3dxml.UseVisualStyleBackColor = true;
             // 
             // flowLayoutPanelMeshFormat
@@ -736,7 +736,7 @@
             this.radioButtonStl.Size = new System.Drawing.Size(104, 16);
             this.radioButtonStl.TabIndex = 0;
             this.radioButtonStl.TabStop = true;
-            this.radioButtonStl.Text = "STL (grayscale)";
+            this.radioButtonStl.Text = "STL";
             this.radioButtonStl.UseVisualStyleBackColor = true;
             // 
             // label19
