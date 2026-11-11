@@ -580,4 +580,10 @@
   <data xml:space="preserve" name="new: nothing is stored for this configuration yet.">
     <value>新設定：此組態尚未儲存任何內容。</value>
   </data>
+  <data xml:space="preserve" name="settings not saved">
+    <value>設定尚未儲存</value>
+  </data>
+  <data xml:space="preserve" name="the exporter settings were stored in the open document but could not be saved with it (it has never been saved, is read-only, or saving failed). save the document yourself, otherwise the settings are lost when it is closed.">
+    <value>匯出設定已寫入開啟中的文件，但無法隨文件一併儲存（文件尚未存檔、為唯讀，或儲存失敗）。請自行儲存文件，否則關閉文件時這些設定會遺失。</value>
+  </data>
 </root>
