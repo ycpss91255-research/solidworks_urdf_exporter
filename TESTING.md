@@ -189,6 +189,146 @@ After the first open every model has the `URDF Export Configuration` folder with
 configuration, generated features (`URDF Reference`, `Origin_*`, `Axis_*`) at the root of the tree and no leftover
 legacy attributes; no message box or exception dialog appeared.
 
+## OBJ + MTL export regression (`scripts/regress_obj_export.py`)
+
+One entry point for re-testing the OBJ + MTL export (see `OBJ_EXPORT.md`). Both modes print one `PASS`, `FAIL`,
+`INFO` or `SKIP` line per check, then a summary table, and exit with a non-zero code when any check failed
+(`INFO` lines are observations that do not fail the run; `SKIP` names a case that could not run). Both can write
+the result as JSON (`--json <file>`) and as a Markdown table (`--markdown <file>`); the JSON holds
+`mode`, `build`, `date`, `seconds`, `failed` and a list of `checks` (`case`, `check`, `status`, `detail`).
+
+### Offline mode (no SolidWorks)
+
+    python scripts/regress_obj_export.py --offline
+
+Needs Python 3 and nothing else (standard library only). It finds the repository root from the script location, so
+it can run from any directory and on a hosted CI runner (layer 2 of issue 123). It takes about a second. It reads
+every committed package under `examples/` (every `urdf/*.urdf`) and checks:
+
+* the URDF is well formed, joints connect existing links, there is one root link, every `package://` mesh path
+  exists and the file is not empty;
+* every OBJ parses, has vertices and faces, every face points at an existing vertex, the bounding box is finite
+  and between 0.1 mm and 100 m; the OBJ files written equal the OBJ files the URDF references;
+* the MTL file named by the OBJ exists, every `usemtl` has a material in it, `Kd` is within 0 to 1;
+* the CSV has the same link names as the URDF, the URDF mass equals the CSV mass (1e-9 relative), the MTL `Kd`
+  equals the CSV colour for links with one material, every mass is positive;
+* the centre of mass lies inside the mesh box in the link frame (OBJ packages);
+* where a model has an STL and an OBJ package (`3_DOF_ARM`), the links and the box and centre of each mesh in the
+  link frame agree (0.2 mm plus 0.5 % of the size, because the two formats are tessellated separately).
+
+`--examples <folder>` validates another folder with the same layout (this is how the checks themselves were tried
+against deliberately broken copies).
+
+### Live mode (your own SolidWorks)
+
+    powershell -File scripts\test_build.ps1 -OutputDirectory <build folder>
+    python scripts/regress_obj_export.py --live --dll <build folder> --launcher <launch_solidworks.py> ^
+        --json result.json --markdown result.md
+
+Requirements: Windows, SolidWorks 2023 or later with a licence, Python 3 with pywin32, the .NET Framework 4
+`csc.exe` (it compiles `scripts/ObjRegressProbe.cs` against a copy of the build), and a build of `SW2URDF.dll` in
+`<build folder>` (not registered). Expected run time: about 2.5 minutes (the first start of SolidWorks included).
+
+* `--launcher` is the script that starts a new SolidWorks and writes `{"pid": ...}` to `--output` (it is called
+  with `--launch --session-file <file> --output <file>`; `--launcher-python` names the Python that runs it).
+  Alternatively `--pid <pid>` uses an instance you own that holds no documents; it is left running. The script
+  never touches another instance.
+* SolidWorks is hidden (`Visible = false`) for the whole run. Every message box of the exporter is recorded by
+  the host program instead of being shown, the progress dialog is created off-screen, and no step needs a click.
+  `--timeout` (default 1800 s) stops the run and kills what the script started; `--case-timeout` (default 300 s)
+  limits one scenario.
+* Everything happens in a scratch folder on copies of the repository examples and of the models the script builds
+  (a textured box, a 3 mm box, a two-level assembly). Nothing in `examples/` is changed or saved. The scratch
+  folder is deleted unless `--keep` is given; `--artifacts <folder>` copies the exported packages, each
+  scenario's `probe.tsv` and the dialog screenshot out first. At the end only the instance the script started is
+  closed.
+* `--exe-hook <command>` runs a command on each program the script compiles before starting it (`{exe}` stands
+  for the file), for machines that only run programs prepared in a particular way.
+* `--build-commit <hash>` sets the commit written into the result (default: the checkout's `HEAD`).
+
+Cases:
+
+| Case | Content |
+|------|---------|
+| `TWO_BOXES assembly OBJ` | `TWO_BOXES_PER_CONFIG.SLDASM` (red and blue box), one link, two materials; also exported twice and with a cancelled run |
+| `3_DOF_ARM assembly OBJ` | `3_DOF_ARM.SLDASM`, 4 links; also exported twice and with a cancelled run |
+| `BOX_RED part OBJ`, `BOX_BLUE part OBJ` | the two parts, compared with the committed `*_description_obj` packages |
+| `nested sub-assembly frame` | `SUB` (both boxes, coordinate system `Origin_sub` inside it) placed and turned by 90 degrees in `TOP`; one link whose frame is `Origin_sub <SUB-1>` |
+| `very small model (3 mm box)` | part export of a 3 mm cube |
+| `texture error path` | a box with an image texture appearance; exported into a fresh folder and into a folder that already holds an export |
+| `OBJ progress dialog` | the real progress dialog at the process DPI (screenshot through `PrintWindow`, text measured against the controls, the Cancel button pressed) |
+
+Checks per exported package (`PASS` or `FAIL` each):
+
+* the URDF exists, its `package://` mesh paths exist and equal the files written (OBJ and MTL; the intermediate
+  `.3dxml` is documented as left beside the OBJ, issue 130);
+* vertex and face counts above 0, faces reference existing vertices, bounding box finite and plausible;
+* every `usemtl` has a material in the MTL and `Kd` equals the SolidWorks colour (and the committed example MTL
+  where there is one);
+* OBJ volume and bounding box equal SolidWorks' own values (mass properties of the link's components, `GetBox` or
+  `GetPartBox`) within 0.5 %;
+* the URDF mass equals SolidWorks' mass; the centre of mass equals the one SolidWorks reports in the link frame
+  and the centroid of the OBJ in the link frame;
+* the mesh centre in the link frame equals the one of the STL export of the same link (0.2 mm plus 0.5 % of the
+  size) and, for the nested case, the expected value;
+* repeat: the second export into the same folder is the same (OBJ, MTL and the rest byte for byte, URDF and CSV
+  equal to 1e-9 relative, because SolidWorks' mass properties carry noise near 1e-19);
+* cancel: a cancelled export keeps the previous output byte for byte and leaves no temporary file;
+* texture: no exception, a message in the SolidWorks language that names the link, no URDF, OBJ, MTL or CSV
+  written into a fresh folder, the failure marker written, an existing OBJ, MTL and URDF kept byte for byte, and
+  the converter's own message for the left-over 3DXML says that image textures are not supported.
+
+How the host drives the export: it makes the same calls as the add-in (`ConfigurationSerialization`,
+`ExportHelper`, `ObjConverter`, the progress dialog class). Two things the property page does before exporting have
+to be done by a host that skips the page, and the host does them: it refreshes the parent references of the loaded
+link tree and it generates the base frame `Origin_global` (and writes that name into the tree) before the robot
+is built. A fresh tree and robot are built for every export, because an export rewrites the visual origins of the
+robot it is given.
+
+### What it does not cover
+
+* Cancelling while a conversion is running: the models are small and the conversion finishes in milliseconds, so
+  the live mode cancels with a token that is already cancelled (the previous output is kept) and checks that the
+  dialog's Cancel button requests cancellation, but it does not click Cancel in the middle of a long conversion.
+* The progress dialog is checked at the display scale of the machine it runs on (the result records it). The
+  dialog uses a fixed pixel layout (issue 131); a run at 125 % or 150 % needs a machine with that setting. The
+  clipping result is recorded as an observation and never fails the run.
+* The property page and the export forms themselves (the example regression above drove them by hand);
+  SolidWorks configurations other than the one saved active in the example; models with mirrored components; a very
+  large model.
+* Colour spaces and viewers (RViz, Gazebo): only the values in the MTL are compared.
+* The hosted CI runner cannot run the live mode (no licence). Only `--offline` can.
+
+### Result of a run
+
+Master `48bb75f` (the private build was made from the next commit, which differs only in repository housekeeping
+files), SolidWorks 2023 SP5, display scale 96 %, instance started by the script with the guarded launcher:
+187 checks `PASS`, 0 `FAIL`, 13 `INFO`, run time 153 s. The offline mode ran 125 checks, all `PASS`.
+
+| Case | Checks | Result |
+|------|--------|--------|
+| `TWO_BOXES assembly OBJ` | files and paths, counts, faces, MTL, volume and bounding box equal SolidWorks, mass, centre of mass (link frame and mesh centroid), colours red and blue, frame placement equals the STL export, repeat, cancel | 22 `PASS` |
+| `3_DOF_ARM assembly OBJ` | the same for 4 links (volume within 0.4 % of SolidWorks because of tessellation, bounding box within 0.02 mm), bounding box and volume equal the committed `3_DOF_ARM_description_obj`, MTL colours, repeat, cancel | 69 `PASS` |
+| `BOX_RED part OBJ` | the same for a part, committed example comparison | 22 `PASS` |
+| `BOX_BLUE part OBJ` | the same for a part, committed example comparison | 22 `PASS` |
+| `nested sub-assembly frame` | mesh in the link frame (centre 0.04375, 0, 0.0125 m, equal to the expected value and to the STL export), not empty, two materials, volume, box, mass, centre of mass | 20 `PASS` |
+| `very small model (3 mm box)` | the same checks on a 27 mm3 part | 19 `PASS` |
+| `texture error path` | clean failure, localized message naming the link, no half package, failure marker written, existing output kept, converter says textures are not supported | 8 `PASS` |
+| `OBJ progress dialog` | dialog shown and captured, Cancel requests cancellation | 2 `PASS`; the text fits at 96 dpi (observation; issue 131 covers other scales) |
+| setup | host program builds, instance started and hidden, extra models built | 3 `PASS` |
+
+Observations (`INFO`, not failures):
+
+* Every export shows the "Creating URDF Package ... at ..." message box of the exporter (the host records it).
+* A cancelled assembly export shows the generic "Exporting the URDF failed unexpectedly" message, not one that
+  says it was cancelled; the previous output is kept as required.
+* The failed texture export tells the user that the mesh could not be exported and points to the log; the reason
+  (image textures are not supported) is only in the converter's message and the log.
+* A host that does not generate the base frame before building the robot gets the base link's inertia in the
+  global frame while the mesh is in the link frame (the `TWO_BOXES` centre of mass then differs from SolidWorks'
+  by a 90 degree turn). The add-in's property page generates the frame first, so the add-in itself is not
+  affected. Any other caller that builds a robot without the page has to do the same.
+
 ## Known limitations
 
 - Existing export tests (`TestExportHelper`) still write into the home folder and the example folders;
