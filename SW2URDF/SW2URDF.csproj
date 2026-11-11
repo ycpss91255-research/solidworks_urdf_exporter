@@ -344,6 +344,7 @@
     <Compile Include="Test\TestGeneratedFeatureLog.cs" />
     <Compile Include="Test\TestExporterRouting.cs" />
     <Compile Include="Test\TestOrphanAttributes.cs" />
+    <Compile Include="Test\TestSharedAttributeCleanup.cs" />
     <Compile Include="Test\TestPartPerConfiguration.cs" />
     <Compile Include="Test\TestPartSettings.cs" />
     <Compile Include="Test\TestPerConfiguration.cs" />
@@ -402,6 +403,7 @@
     <Compile Include="URDFExport\GeneratedFeatureLog.cs" />
     <Compile Include="URDFExport\ExporterRouting.cs" />
     <Compile Include="URDFExport\OrphanAttributes.cs" />
+    <Compile Include="URDFExport\SharedAttributeCleanup.cs" />
     <Compile Include="URDFExport\ConfigurationFormat.cs" />
     <Compile Include="URDFExport\MissingComponentPolicy.cs" />
     <Compile Include="URDFExport\ExportPropertyManagerExtension.cs" />
