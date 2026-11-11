@@ -40,6 +40,21 @@ namespace SW2URDF.URDFExport
             return dirty || needsRebuild ? SaveBeforeExport.Save : SaveBeforeExport.None;
         }
 
+        /// <summary>
+        /// Entries are created only for the active configuration, when the user works with it, not
+        /// for all configurations at once. Returns the names that need a new entry.
+        /// </summary>
+        public static string[] NamesToCreate(string[] allConfigurations, string active, string[] existing)
+        {
+            if (allConfigurations == null || string.IsNullOrEmpty(active) ||
+                System.Array.IndexOf(allConfigurations, active) < 0 ||
+                existing != null && System.Array.IndexOf(existing, active) >= 0)
+            {
+                return new string[0];
+            }
+            return new[] { active };
+        }
+
         /// <summary>What to put into the attribute of a configuration when the exporter opens.</summary>
         public static AttributeInit DecideAttribute(bool hasOwnAttribute, bool hasSharedData)
         {
