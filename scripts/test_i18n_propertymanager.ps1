@@ -38,7 +38,17 @@ $identifiers = @{
 # Static COM (un)registration runs under regasm, outside SolidWorks: no SolidWorks language exists
 # there, so those two messages stay English (raw source text, backslashes included).
 $registrationOnly = @('There was a problem unregistering this dll: \n\"', '\"\nEmail your maintainer with the log file found at ')
-$literal = '"((?:[^"\\]|\\.)*)"'
+# A label whose caption is prepared (caption = ui.Get(...)) must also be added to the page
+# (AddControl2); otherwise the control that follows has no label or description.
+$setup = Get-Content -LiteralPath (Join-Path $Root 'SW2URDF/URDFExport/ExportPropertyManager.cs') -Raw -Encoding UTF8
+$setupBody = $setup.Substring($setup.IndexOf('private void SetupPropertyManagerPage'))
+$blocks = [regex]::Split($setupBody, '(?=controlType = \(int\)swPropertyManagerPageControlType_e\.)')
+foreach ($block in $blocks) {
+    if ($block -match '^controlType = \(int\)swPropertyManagerPageControlType_e\.swControlType_Label' -and
+        $block -match 'caption = ui\.Get\("([^"]+)"\)' -and $block -notmatch 'AddControl2') {
+        Fail "PropertyManager label '$($Matches[1])' is prepared but never added to the page"
+    }
+}$literal = '"((?:[^"\\]|\\.)*)"'
 $files = 'SW2URDF/URDFExport/ExportPropertyManager.cs', 'SW2URDF/URDFExport/ExportPropertyManagerExtension.cs', 'SW2URDF/SW/SwAddin.cs'
 foreach ($rel in $files) {
     $text = Get-Content -LiteralPath (Join-Path $Root $rel) -Raw -Encoding UTF8
