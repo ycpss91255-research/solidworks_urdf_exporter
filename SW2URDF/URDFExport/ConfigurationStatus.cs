@@ -26,23 +26,29 @@ namespace SW2URDF.URDFExport
             return hasSharedData ? SettingsSource.Shared : SettingsSource.New;
         }
 
-        public static string Describe(UiText ui, string configurationName, SettingsSource source)
+        public static string Headline(UiText ui, string configurationName)
         {
             string name = string.IsNullOrEmpty(configurationName) ? ui.Get("(none)") : configurationName;
-            string detail;
+            return string.Format(ui.Get("Active configuration: {0}"), name);
+        }
+
+        public static string Detail(UiText ui, SettingsSource source)
+        {
             switch (source)
             {
                 case SettingsSource.Configuration:
-                    detail = ui.Get("Settings saved for this configuration.");
-                    break;
+                    return ui.Get("These settings are stored for this configuration.");
                 case SettingsSource.Shared:
-                    detail = ui.Get("Settings loaded from the shared (legacy) data; they are saved to this configuration on the next save.");
-                    break;
+                    return ui.Get("Using the shared (legacy) settings; they are stored for this configuration on the next save.");
                 default:
-                    detail = ui.Get("New settings: nothing is saved for this configuration yet.");
-                    break;
+                    return ui.Get("New: nothing is stored for this configuration yet.");
             }
-            return string.Format(ui.Get("Configuration: {0}. {1}"), name, detail);
+        }
+
+        /// <summary>Headline and detail on two lines.</summary>
+        public static string Describe(UiText ui, string configurationName, SettingsSource source)
+        {
+            return Headline(ui, configurationName) + "\r\n" + Detail(ui, source);
         }
     }
 }

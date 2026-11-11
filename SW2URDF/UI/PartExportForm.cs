@@ -32,6 +32,7 @@ namespace SW2URDF.UI
     {
         public ExportHelper Exporter;
         private readonly UiText ui;
+        private static readonly log4net.ILog logger = SW2URDF.Utilities.Logger.GetLogger();
         private string loadedConfiguration;
 
         private void AlignFieldLabels()
@@ -226,11 +227,26 @@ namespace SW2URDF.UI
             }
         }
 
+        // Shows the active configuration and where its settings come from.
+        private void RefreshConfigurationStatus()
+        {
+            try
+            {
+                UiLayout.SetStatusBannerText(labelConfigurationStatus,
+                    ConfigurationSerialization.DescribeSettings(Exporter.ActiveSWModel, ui));
+            }
+            catch (Exception ex)
+            {
+                logger.Warn("Could not update the configuration status", ex);
+            }
+        }
+
         private void LoadFormForActiveConfiguration()
         {
             loadedConfiguration = Exporter.ActiveConfigurationName;
             Exporter.CreateRobotFromActiveModel();
             Exporter.LoadPartSettings();
+            RefreshConfigurationStatus();
             textBox_save_as.Text = Exporter.SavePath + "\\" + Exporter.PackageName;
 
             Exporter.URDFRobot.BaseLink.Visual.Origin.FillBoxes(textBox_collision_origin_x,
