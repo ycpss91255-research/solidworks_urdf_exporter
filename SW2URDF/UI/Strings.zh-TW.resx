@@ -553,15 +553,6 @@
   <data xml:space="preserve" name="the following links have joint names that conflict:">
     <value>下列連桿的關節名稱重複：</value>
   </data>
-  <data xml:space="preserve" name="the sw to urdf exporter requires saving and/or rebuilding before continuing">
-    <value>SW 轉 URDF 匯出工具需要先儲存及／或重建才能繼續</value>
-  </data>
-  <data xml:space="preserve" name="save and rebuild document?">
-    <value>要儲存並重建文件嗎？</value>
-  </data>
-  <data xml:space="preserve" name="the sw to urdf exporter requires saving before continuing">
-    <value>SW 轉 URDF 匯出工具需要先儲存才能繼續</value>
-  </data>
   <data xml:space="preserve" name="an exception occurred setting up the export form, please email your maintainer with the log file found at {0}">
     <value>設定匯出表單時發生例外，請將位於 {0} 的記錄檔寄給維護人員</value>
   </data>
@@ -585,5 +576,8 @@
   </data>
   <data xml:space="preserve" name="the exporter settings were stored in the open document but could not be saved with it (it has never been saved, is read-only, or saving failed). save the document yourself, otherwise the settings are lost when it is closed.">
     <value>匯出設定已寫入開啟中的文件，但無法隨文件一併儲存（文件尚未存檔、為唯讀，或儲存失敗）。請自行儲存文件，否則關閉文件時這些設定會遺失。</value>
+  </data>
+  <data xml:space="preserve" name="the document has to be saved before the exporter can be opened.">
+    <value>開啟匯出器之前必須先儲存文件。</value>
   </data>
 </root>

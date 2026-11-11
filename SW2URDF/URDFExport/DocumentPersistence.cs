@@ -12,6 +12,10 @@ namespace SW2URDF.URDFExport
         WarnNotSaved
     }
 
+    public enum SaveBeforeExport { None, Save, SaveAs }
+
+    public enum AttributeInit { None, Blank, CopyShared }
+
     /// <summary>
     /// The exporter settings are stored as attributes inside the open SolidWorks document, so they
     /// are lost when the document is closed without saving. Free of SolidWorks types so the
@@ -23,6 +27,29 @@ namespace SW2URDF.URDFExport
         {
             if (!settingsWritten) return PersistAction.None;
             return hasFilePath && !readOnly ? PersistAction.Save : PersistAction.WarnNotSaved;
+        }
+
+        /// <summary>
+        /// Before the exporter opens the document is saved, so what the exporter writes builds on a
+        /// saved document: unsaved changes or a pending rebuild are saved, a never saved document
+        /// goes through Save As.
+        /// </summary>
+        public static SaveBeforeExport DecideBeforeExport(bool hasFilePath, bool dirty, bool needsRebuild)
+        {
+            if (!hasFilePath) return SaveBeforeExport.SaveAs;
+            return dirty || needsRebuild ? SaveBeforeExport.Save : SaveBeforeExport.None;
+        }
+
+        /// <summary>What to put into the attribute of a configuration when the exporter opens.</summary>
+        public static AttributeInit DecideAttribute(bool hasOwnAttribute, bool hasSharedData)
+        {
+            if (hasOwnAttribute) return AttributeInit.None;
+            return hasSharedData ? AttributeInit.CopyShared : AttributeInit.Blank;
+        }
+
+        public static string SaveFirstText(UiText ui)
+        {
+            return ui.Get("The document has to be saved before the exporter can be opened.");
         }
 
         public static string WarningTitle(UiText ui)

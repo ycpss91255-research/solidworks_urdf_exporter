@@ -553,15 +553,6 @@
   <data xml:space="preserve" name="the following links have joint names that conflict:">
     <value>The following links have JOINT names that conflict:</value>
   </data>
-  <data xml:space="preserve" name="the sw to urdf exporter requires saving and/or rebuilding before continuing">
-    <value>The SW to URDF exporter requires saving and/or rebuilding before continuing</value>
-  </data>
-  <data xml:space="preserve" name="save and rebuild document?">
-    <value>Save and rebuild document?</value>
-  </data>
-  <data xml:space="preserve" name="the sw to urdf exporter requires saving before continuing">
-    <value>The SW to URDF exporter requires saving before continuing</value>
-  </data>
   <data xml:space="preserve" name="an exception occurred setting up the export form, please email your maintainer with the log file found at {0}">
     <value>An exception occurred setting up the export form, please email your maintainer with the log file found at {0}</value>
   </data>
@@ -585,5 +576,8 @@
   </data>
   <data xml:space="preserve" name="the exporter settings were stored in the open document but could not be saved with it (it has never been saved, is read-only, or saving failed). save the document yourself, otherwise the settings are lost when it is closed.">
     <value>The exporter settings were stored in the open document but could not be saved with it (it has never been saved, is read-only, or saving failed). Save the document yourself, otherwise the settings are lost when it is closed.</value>
+  </data>
+  <data xml:space="preserve" name="the document has to be saved before the exporter can be opened.">
+    <value>The document has to be saved before the exporter can be opened.</value>
   </data>
 </root>
