@@ -441,6 +441,24 @@ namespace SW2URDF.UI
         {
             CommonSwOperations.RetrieveSWComponentPIDs(model, BaseNode);
             ConfigurationSerialization.SaveConfigTreeXML(swApp, model, BaseNode, warnUser, ui);
+            RefreshConfigurationStatus();
+        }
+
+        /// <summary>Shows the active configuration and where its settings come from.</summary>
+        private void RefreshConfigurationStatus()
+        {
+            try
+            {
+                if (ActiveSWModel != null)
+                {
+                    labelConfigurationStatus.Text =
+                        ConfigurationSerialization.DescribeSettings(ActiveSWModel, ui);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not update the configuration status", e);
+            }
         }
 
         public void ChangeAllNodeFont(LinkNode node, Font font)
