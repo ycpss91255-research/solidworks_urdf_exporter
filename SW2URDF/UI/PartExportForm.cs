@@ -32,6 +32,7 @@ namespace SW2URDF.UI
     {
         public ExportHelper Exporter;
         private readonly UiText ui;
+        private string loadedConfiguration;
 
         private void AlignFieldLabels()
         {
@@ -175,6 +176,10 @@ namespace SW2URDF.UI
                                                              textBox_collision_origin_pitch,
                                                              textBox_collision_origin_yaw);
 
+            // Remember these settings for the active SolidWorks configuration before the link is
+            // localized for the export
+            Exporter.SavePartSettings();
+
             Exporter.ExportLink(checkBox_rotate.Checked, objExport.Checked ? MeshExportFormat.OBJ : MeshExportFormat.STL);
             Close();
         }
@@ -207,7 +212,25 @@ namespace SW2URDF.UI
 
         private void PartExportFormLoad(object sender, EventArgs e)
         {
+            LoadFormForActiveConfiguration();
+        }
+
+        // The form is not modal: when another configuration became active meanwhile, show the
+        // settings of that configuration.
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+            if (loadedConfiguration != null && Exporter.ActiveConfigurationName != loadedConfiguration)
+            {
+                LoadFormForActiveConfiguration();
+            }
+        }
+
+        private void LoadFormForActiveConfiguration()
+        {
+            loadedConfiguration = Exporter.ActiveConfigurationName;
             Exporter.CreateRobotFromActiveModel();
+            Exporter.LoadPartSettings();
             textBox_save_as.Text = Exporter.SavePath + "\\" + Exporter.PackageName;
 
             Exporter.URDFRobot.BaseLink.Visual.Origin.FillBoxes(textBox_collision_origin_x,
