@@ -336,6 +336,7 @@
     <Compile Include="Test\TestMathOps.cs" />
     <Compile Include="Test\TestObjConverter.cs" />
     <Compile Include="Test\TestConfigurationStatus.cs" />
+    <Compile Include="Test\TestStlOutputCoordinateSystem.cs" />
     <Compile Include="Test\TestSubAssemblyVisibility.cs" />
     <Compile Include="Test\TestTreeKeyActions.cs" />
     <Compile Include="Test\TestDocumentPersistence.cs" />
