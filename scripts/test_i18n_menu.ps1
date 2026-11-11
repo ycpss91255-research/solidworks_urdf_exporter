@@ -20,7 +20,11 @@ $en = New-Ui 'english'
 $zh = New-Ui 'chinese'
 Require ($en.ExportMenuPath -ceq 'Export as URDF@&Tools') 'English menu path'
 Require ($zh.ExportMenuPath -cne $en.ExportMenuPath) 'Traditional Chinese menu path is translated'
-Require ($zh.ExportMenuPath.EndsWith('@&Tools', [StringComparison]::Ordinal)) 'menu parent stays the Tools menu'
+# The parent is the caption of SOLIDWORKS' own Tools menu, which is localized. A caption that does
+# not match makes SOLIDWORKS create a second, English submenu instead of using the real Tools menu.
+Require ($en.ExportMenuPath.EndsWith('@&Tools', [StringComparison]::Ordinal)) 'English menu parent is the Tools menu'
+$zhTools = "$([char]0x5DE5)$([char]0x5177)(&T)"
+Require ($zh.ExportMenuPath.EndsWith("@$zhTools", [StringComparison]::Ordinal)) 'zh-TW menu parent is the localized Tools menu'
 Require ($zh.ExportMenuPath.Split('@').Count -eq 2) 'menu caption contains no extra @'
 Require ($en.ExportAssemblyHint -ceq 'Export assembly as URDF file' -and $en.ExportPartHint -ceq 'Export part as URDF file') 'English hints'
 Require ($zh.ExportAssemblyHint -cne $en.ExportAssemblyHint -and $zh.ExportPartHint -cne $en.ExportPartHint) 'hints are translated'
