@@ -8,12 +8,24 @@ This document describes how that data is versioned.
 | Location | Attribute / folder name | Notes |
 |---|---|---|
 | One per SolidWorks configuration | instance named after the configuration (definition `URDF Export Configuration Data`), grouped in the feature tree folder `URDF Export Configuration` | Preferred when it exists and is not empty. |
-| Shared by all configurations | `URDF Export Configuration (v1.4)` | Fallback. Written by exporters before per-configuration storage. |
+| Shared by all configurations | `URDF Export Configuration (v1.4)` | Fallback. Written by exporters before per-configuration storage. Deleted once every configuration has its own entry (see below). |
 | Older shared names | `URDF Export Configuration (v1.3)`, `URDF Export Configuration`, `URDF Export Configuration (legacy)` | Read-only fallback. The plain name is renamed to `(legacy)` the first time the exporter groups the feature tree, because the feature tree folder uses that name and feature names are unique. The data is kept. |
 
 The shared attribute name contains a version for historical reasons. It is **not renamed**:
 models saved by earlier exporters keep their data under that name, and renaming would hide it.
 The feature tree folder name carries no version.
+
+### Removal of the shared attributes
+
+The shared attributes are only a read fallback for a configuration that has no entry of its own. When the
+exporter opens, they are **deleted** once every SolidWorks configuration of the model has its own entry with
+data and each entry holds the same link/joint tree as the fallback (the deserialized trees are compared, not
+the strings, so different format versions compare equal). Nothing is deleted, and the reason is logged, when a
+configuration still lacks its entry, an entry differs from the fallback, or an attribute cannot be parsed.
+Only exporter attributes with the shared names are deleted, never other features. A model with one
+configuration is cleaned on its first open; with several, after the exporter was opened once in each
+configuration. Exporters from before per-configuration storage cannot read data written by this exporter
+anyway, so the old attributes are not kept for them.
 
 ## Generated coordinate systems and axes
 

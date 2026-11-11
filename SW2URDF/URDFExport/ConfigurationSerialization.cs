@@ -186,8 +186,146 @@ namespace SW2URDF.URDFExport
                 }
             }
 
+            bool removed = RemoveMigratedSharedAttributes(model);
             bool regrouped = RegroupFolder(model, active);
-            return created || regrouped;
+            return created || regrouped || removed;
+        }
+
+        /// <summary>
+        /// The old shared attributes are only a fallback for configurations without an entry of
+        /// their own. Once every configuration has its own entry with the same settings they are
+        /// deleted (see <see cref="SharedAttributeCleanup"/>). Never throws. True when the tree changed.
+        /// </summary>
+        private static bool RemoveMigratedSharedAttributes(ModelDoc2 model)
+        {
+            try
+            {
+                return SharedAttributeCleanup.Run(
+                    new ModelSharedAttributes(model), CanonicalTree, message => logger.Info(message)) ==
+                    SharedCleanupResult.Removed;
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Checking the old shared URDF attributes failed, they are kept", e);
+                return false;
+            }
+        }
+
+        /// <summary>Canonical text of the tree stored in <paramref name="data"/>, or null when it cannot be read.</summary>
+        private static string CanonicalTree(string data, double version)
+        {
+            try
+            {
+                ConfigurationFormatKind kind = ConfigurationFormat.Classify(version);
+                LinkNode node = kind == ConfigurationFormatKind.DataContract ? DeserializeFromString(data) :
+                    kind == ConfigurationFormatKind.LegacyXml ? LoadConfigFromStringXML(data) : null;
+                return node == null ? null : SerializeToString(node);
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not read URDF settings while comparing them", e);
+                return null;
+            }
+        }
+
+        private sealed class ModelSharedAttributes : ISharedAttributeDocument
+        {
+            private readonly ModelDoc2 model;
+
+            public ModelSharedAttributes(ModelDoc2 model)
+            {
+                this.model = model;
+            }
+
+            public string[] ConfigurationNames()
+            {
+                return model.GetConfigurationNames() as string[];
+            }
+
+            public bool HasEntry(string configuration)
+            {
+                return FindConfigurationAttributeFeature(model, configuration) != null;
+            }
+
+            public AttributeData GetEntry(string configuration)
+            {
+                Feature feature = FindConfigurationAttributeFeature(model, configuration);
+                if (feature == null)
+                {
+                    return null;
+                }
+                // SolidWorks only reads an attribute value for the active configuration, so the
+                // configuration is shown for a moment and the previous one restored right after
+                string active = GetActiveConfigurationName(model);
+                bool switched = configuration != active;
+                try
+                {
+                    if (switched && !model.ShowConfiguration2(configuration))
+                    {
+                        return null;
+                    }
+                    return Read((SolidWorks.Interop.sldworks.Attribute)
+                        FindConfigurationAttributeFeature(model, configuration).GetSpecificFeature2());
+                }
+                finally
+                {
+                    if (switched && active != null)
+                    {
+                        model.ShowConfiguration2(active);
+                    }
+                }
+            }
+
+            public AttributeData GetSharedFallback()
+            {
+                return Read(FindSWSaveAttribute(model, UrdfConfigurationSwAttributeName) ?? CheckForOldAttributes(model));
+            }
+
+            private static AttributeData Read(SolidWorks.Interop.sldworks.Attribute attribute)
+            {
+                return attribute == null ? null : new AttributeData(
+                    attribute.GetParameter("data").GetStringValue(),
+                    attribute.GetParameter("exporterVersion").GetDoubleValue());
+            }
+
+            public bool DeleteSharedAttributes()
+            {
+                // Only attributes of the exporter's own definition (they carry data and a format
+                // version), found by their shared names. Features of the user are never touched.
+                List<string> names = new List<string>();
+                foreach (Feature feature in GetConfigurationAttributeFeatures(model))
+                {
+                    string name = ((SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2()).GetName();
+                    if (name != null && IsSharedAttributeName(name))
+                    {
+                        names.Add(feature.Name);
+                    }
+                }
+                foreach (string name in names)
+                {
+                    Feature feature = model.FirstFeature() as Feature;
+                    while (feature != null && !(feature.GetTypeName2() == "Attribute" && feature.Name == name))
+                    {
+                        feature = feature.GetNextFeature() as Feature;
+                    }
+                    if (feature != null)
+                    {
+                        model.ClearSelection2(true);
+                        feature.Select2(false, 0);
+                        model.Extension.DeleteSelection2(0);
+                    }
+                }
+                model.ClearSelection2(true);
+                foreach (Feature feature in GetConfigurationAttributeFeatures(model))
+                {
+                    string name = ((SolidWorks.Interop.sldworks.Attribute)feature.GetSpecificFeature2()).GetName();
+                    if (name != null && IsSharedAttributeName(name))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
         /// <summary>
         /// Where the settings for the active SolidWorks configuration come from (what
