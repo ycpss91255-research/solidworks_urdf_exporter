@@ -45,6 +45,23 @@ coordinates, so they do not follow the components. They stay loose at the featur
 - A saved coordinate system that no longer exists (for example the sketch was deleted, which removes its
   frames) is generated again, for the base link as for the joints.
 
+## What the exporter manages and what it does not
+
+The exporter manages only **its own settings**: the link tree, joint settings and options of each SolidWorks
+configuration, one entry per configuration in the feature tree folder `URDF Export Configuration`. That
+folder contains nothing else.
+
+It does not manage joints and links themselves, nor the reference coordinate systems and axes they use:
+
+- A link is a selection of components and a joint is a pair of references plus values. The model owns the
+  components and geometry; the exporter only describes them and checks the names at every export.
+- Reference coordinate systems and axes may live in the top assembly, a sub-assembly or a part, so a folder of
+  the top assembly could never cover them all. Frames and axes the user made are never moved, renamed or deleted.
+- Only the helper features the exporter generates itself (`URDF Reference`, `Origin_global`, `Origin_<joint>`,
+  `Axis_<joint>`, `Origin_mesh_<link>`) are its own. They stay at the feature tree root where SolidWorks creates
+  them, are found by name for reuse, refresh and the cleanup of a cancelled preview, and hang on the
+  `URDF Reference` sketch, so they are not regrouped.
+
 ## Format version
 
 - The version is the `exporterVersion` parameter stored **inside** each attribute. It
