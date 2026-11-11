@@ -32,6 +32,7 @@ namespace SW2URDF.UI
     {
         public ExportHelper Exporter;
         private readonly UiText ui;
+        private static readonly log4net.ILog logger = SW2URDF.Utilities.Logger.GetLogger();
         private string loadedConfiguration;
 
         private void AlignFieldLabels()
@@ -230,7 +231,15 @@ namespace SW2URDF.UI
         {
             loadedConfiguration = Exporter.ActiveConfigurationName;
             Exporter.CreateRobotFromActiveModel();
-            Exporter.LoadPartSettings();
+            try
+            {
+                Exporter.LoadPartSettings();
+            }
+            catch (Exception ex)
+            {
+                // Settings that cannot be read leave the values computed from the part.
+                logger.Warn("Could not load the saved part settings", ex);
+            }
             textBox_save_as.Text = Exporter.SavePath + "\\" + Exporter.PackageName;
 
             Exporter.URDFRobot.BaseLink.Visual.Origin.FillBoxes(textBox_collision_origin_x,
