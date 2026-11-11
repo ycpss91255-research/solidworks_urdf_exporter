@@ -5,6 +5,7 @@ using SW2URDF.URDF;
 using SW2URDF.Utilities;
 using System;
 using System.Collections;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -32,7 +33,7 @@ namespace SW2URDF.URDFExport.CSV
             logger.Info("Writing CSV file " + filename);
             using (StreamWriter stream = new StreamWriter(filename))
             {
-                CsvWriter writer = new CsvWriter(stream);
+                CsvWriter writer = new CsvWriter(stream, new CsvHelper.Configuration.Configuration { CultureInfo = CultureInfo.InvariantCulture });
                 WriteHeaderToCSV(writer);
                 WriteLinkToCSV(writer, robot.BaseLink);
             }
@@ -108,7 +109,7 @@ namespace SW2URDF.URDFExport.CSV
                 if (dictionary.Contains(context))
                 {
                     object value = dictionary[context];
-                    writer.WriteField(value);
+                    writer.WriteField(FormatValue(value));
                 }
                 else
                 {
@@ -126,6 +127,13 @@ namespace SW2URDF.URDFExport.CSV
             {
                 logger.Error("The following columns were not written to the CSV: " + missingColumns.ToString());
             }
+        }
+
+        // Numbers are written the way URDF writes them, whatever the culture of this machine
+        private static string FormatValue(object value)
+        {
+            if (value is double number) return number.ToString("R", CultureInfo.InvariantCulture);
+            return Convert.ToString(value, CultureInfo.InvariantCulture);
         }
 
         // The child of a joint is the link itself, whose name is the "Link Name" column,
