@@ -853,8 +853,21 @@ namespace SW2URDF.URDFExport
         //If the user selected something specific for a particular link, that is handled here.
         private void SetLinkSpecificSTLPreferences(string CoordinateSystemName, ModelDoc2 doc)
         {
-            doc.Extension.SetUserPreferenceString((int)swUserPreferenceStringValue_e.swExportOutputCoordinateSystem,
-                (int)swUserPreferenceOption_e.swDetailingNoOptionSpecified, CoordinateSystemName);
+            int option = (int)swUserPreferenceOption_e.swDetailingNoOptionSpecified;
+            bool accepted = doc.Extension.SetUserPreferenceString(
+                (int)swUserPreferenceStringValue_e.swExportOutputCoordinateSystem, option, CoordinateSystemName);
+            if (!accepted)
+            {
+                // SolidWorks 2023 rejects the newer setting (it returns false and the mesh is saved in
+                // the global frame); the older "save as coordinate system" setting is the one it reads.
+                accepted = doc.Extension.SetUserPreferenceString(
+                    (int)swUserPreferenceStringValue_e.swFileSaveAsCoordinateSystem, option, CoordinateSystemName);
+            }
+            if (!accepted && !string.IsNullOrEmpty(CoordinateSystemName))
+            {
+                logger.Warn("SolidWorks did not accept the export coordinate system " + CoordinateSystemName +
+                    "; the mesh is saved in the global frame");
+            }
         }
 
         #endregion STL Preference shuffling
