@@ -347,6 +347,7 @@
     <Compile Include="Test\TestOrphanAttributes.cs" />
     <Compile Include="Test\TestSharedAttributeCleanup.cs" />
     <Compile Include="Test\TestPartPerConfiguration.cs" />
+    <Compile Include="Test\TestPartTexture.cs" />
     <Compile Include="Test\TestPartSettings.cs" />
     <Compile Include="Test\TestPerConfiguration.cs" />
     <Compile Include="Test\TestMissingComponentPolicy.cs" />
