@@ -15,8 +15,8 @@
   <data xml:space="preserve" name="* field group is required">
     <value>* 此欄位群組為必填</value>
   </data>
-  <data xml:space="preserve" name="3dxml (color)">
-    <value>3DXML（彩色）</value>
+  <data xml:space="preserve" name="3dxml">
+    <value>3DXML</value>
   </data>
   <data xml:space="preserve" name="alpha">
     <value>不透明度</value>
@@ -165,8 +165,17 @@
   <data xml:space="preserve" name="rotate global origin to make z-axis vertical">
     <value>旋轉全域座標系，使 Z 軸垂直</value>
   </data>
-  <data xml:space="preserve" name="stl (grayscale)">
-    <value>STL（灰階）</value>
+  <data xml:space="preserve" name="stl">
+    <value>STL</value>
+  </data>
+  <data xml:space="preserve" name="geometry only, no colour.">
+    <value>僅幾何形狀，無顏色。</value>
+  </data>
+  <data xml:space="preserve" name="geometry with colour.">
+    <value>幾何形狀含顏色。</value>
+  </data>
+  <data xml:space="preserve" name="geometry with colour and materials, as .obj and .mtl files.">
+    <value>幾何形狀含顏色與材質，輸出為 .obj 與 .mtl 檔。</value>
   </data>
   <data xml:space="preserve" name="safety controller">
     <value>安全控制器</value>
