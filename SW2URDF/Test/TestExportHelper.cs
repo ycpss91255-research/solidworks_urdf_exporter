@@ -91,6 +91,55 @@ namespace SW2URDF.Test
                 Assert.Equal(expected[i], link.Inertial.Origin.GetXYZ()[i], 12);
         }
 
+        // SolidWorks reports the products of inertia with the opposite sign of URDF's ixy, ixz and iyz;
+        // SetMomentMatrix converts them once. Moving the link into its own frame must keep that
+        // sign (an identity rotation changes nothing but the sign convention applied once).
+        [Fact]
+        public void PartLocalizationKeepsTheUrdfSignOfTheProductsOfInertia()
+        {
+            var link = new Link();
+            link.Inertial.Inertia.SetMomentMatrix(new double[] { 4, 0.5, -0.3, 0.5, 5, 0.7, -0.3, 0.7, 6 });
+            var transform = MathOps.GetTranslation(new double[] { 0.1, 0.2, 0.3 });
+            InvokeLocalizeLink(link, transform);
+            Assert.Equal(4, link.Inertial.Inertia.Ixx, 12);
+            Assert.Equal(-0.5, link.Inertial.Inertia.Ixy, 12);
+            Assert.Equal(0.3, link.Inertial.Inertia.Ixz, 12);
+            Assert.Equal(5, link.Inertial.Inertia.Iyy, 12);
+            Assert.Equal(-0.7, link.Inertial.Inertia.Iyz, 12);
+            Assert.Equal(6, link.Inertial.Inertia.Izz, 12);
+        }
+
+        // The transform given to the part localization takes link coordinates to global ones, so the
+        // inertia tensor in the link frame is R^T * I * R (R: the rotation of that transform).
+        [Fact]
+        public void PartLocalizationRotatesInertiaIntoTheLinkFrame()
+        {
+            CheckInertiaInLinkFrame(-System.Math.PI / 2, 0, 0);
+            CheckInertiaInLinkFrame(0.4, -0.5, 0.6);
+        }
+
+        private static void CheckInertiaInLinkFrame(double roll, double pitch, double yaw)
+        {
+            var link = new Link();
+            link.Inertial.Inertia.SetMomentMatrix(new double[] { 4, 0.5, -0.3, 0.5, 5, 0.7, -0.3, 0.7, 6 });
+            double[] urdfGlobal = link.Inertial.Inertia.GetMoment();
+            var transform = MathOps.GetTransformation(new double[] { 0.1, 0.2, 0.3 }, new double[] { roll, pitch, yaw });
+            var rotation = transform.SubMatrix(0, 3, 0, 3);
+            double[] expected = (rotation.Transpose() *
+                new MathNet.Numerics.LinearAlgebra.Double.DenseMatrix(3, 3, urdfGlobal) * rotation).ToRowMajorArray();
+            InvokeLocalizeLink(link, transform);
+            double[] actual = link.Inertial.Inertia.GetMoment();
+            for (int i = 0; i < 9; i++)
+                Assert.Equal(expected[i], actual[i], 12);
+        }
+
+        private static void InvokeLocalizeLink(Link link, MathNet.Numerics.LinearAlgebra.Matrix<double> transform)
+        {
+            var method = typeof(ExportHelper).GetMethod("LocalizeLink",
+                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            method.Invoke(null, new object[] { link, transform });
+        }
+
         private static ExportHelper CreateHelper()
         {
             return (ExportHelper)System.Runtime.Serialization.FormatterServices
