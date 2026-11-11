@@ -55,6 +55,74 @@ namespace SW2URDF.Test
             Assert.True(reuse);
         }
 
+        // Saved settings name the frame a joint uses. A frame the exporter generated earlier is only
+        // right for the geometry it was generated in (another SolidWorks configuration, or the same
+        // one after an edit); a frame the user made is theirs and is never replaced.
+        [Fact]
+        public void SavedFrameMadeByTheUserIsKeptWhereverItIs()
+        {
+            string name = GeneratedFeatureLog.RefreshName(
+                "My_frame", "Origin_arm", n => true, n => false, Never, out bool reuse, out bool changed);
+            Assert.Equal("My_frame", name);
+            Assert.False(changed);
+        }
+
+        [Fact]
+        public void SavedGeneratedFrameAtTheWantedPlaceIsKept()
+        {
+            string name = GeneratedFeatureLog.RefreshName(
+                "Origin_arm", "Origin_arm", n => true, n => true, n => true, out bool reuse, out bool changed);
+            Assert.Equal("Origin_arm", name);
+            Assert.False(changed);
+        }
+
+        [Fact]
+        public void SavedGeneratedFrameElsewhereIsLeftAloneAndANewOneIsNamed()
+        {
+            var existing = new HashSet<string> { "Origin_arm" };
+            string name = GeneratedFeatureLog.RefreshName(
+                "Origin_arm", "Origin_arm", existing.Contains, n => true, Never, out bool reuse, out bool changed);
+            Assert.Equal("Origin_arm2", name);
+            Assert.False(reuse);
+            Assert.True(changed);
+        }
+
+        [Fact]
+        public void SavedGeneratedFrameElsewhereGivesWayToTheFrameAlreadyAtTheWantedPlace()
+        {
+            // Origin_arm was generated in one configuration, Origin_arm2 in the other, which is active
+            var existing = new HashSet<string> { "Origin_arm", "Origin_arm2" };
+            string name = GeneratedFeatureLog.RefreshName(
+                "Origin_arm", "Origin_arm", existing.Contains, n => true, n => n == "Origin_arm2",
+                out bool reuse, out bool changed);
+            Assert.Equal("Origin_arm2", name);
+            Assert.True(reuse);
+            Assert.True(changed);
+        }
+
+        [Fact]
+        public void SwitchingBackAndForthBetweenConfigurationsCreatesNothingAfterTheFirstRound()
+        {
+            // Frame positions by name: Origin_arm in configuration A, Origin_arm2 in B
+            var place = new Dictionary<string, string> { { "Origin_arm", "A" } };
+            string saved = "Origin_arm";
+            int created = 0;
+            foreach (string active in new[] { "B", "A", "B", "A" })
+            {
+                string chosen = GeneratedFeatureLog.RefreshName(
+                    saved, "Origin_arm", place.ContainsKey, n => true,
+                    n => place.ContainsKey(n) && place[n] == active, out bool reuse, out bool changed);
+                if (!reuse && changed)
+                {
+                    place[chosen] = active;
+                    created++;
+                }
+                saved = chosen;
+            }
+            Assert.Equal(1, created);
+            Assert.Equal(2, place.Count);
+        }
+
         [Fact]
         public void SameValuesUsesTheTolerance()
         {
