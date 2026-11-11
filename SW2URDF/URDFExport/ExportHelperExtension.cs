@@ -39,6 +39,17 @@ namespace SW2URDF.URDFExport
         private string referenceSketchName;
         private string ExportErrorWhy;
 
+        // What this run generated in the model (frames, axes, reference sketch) and the joint names
+        // from before it, so a cancelled preview can undo exactly that. Created on first use because
+        // some tests build an ExportHelper without running its constructor.
+        private GeneratedFeatureLog generatedFeatures;
+        private JointNameSnapshot jointNames;
+
+        public GeneratedFeatureLog GeneratedFeatures
+        {
+            get { return generatedFeatures ?? (generatedFeatures = new GeneratedFeatureLog()); }
+        }
+
         #region SW to Robot and link methods
 
         //Used right now only by the Part Exporter, but this starts the building of the robot
@@ -242,6 +253,10 @@ namespace SW2URDF.URDFExport
             ExportErrorWhy = "";
             URDFRobot = new Robot();
 
+            // A new run: forget the previous one and remember the joint names it starts with
+            GeneratedFeatures.Clear();
+            jointNames = JointNameSnapshot.Take(baseNode);
+
             progressBar.Start(0, CommonSwOperations.GetCount(baseNode.Nodes) + 1, "Building links");
             int count = 0;
 
@@ -254,6 +269,9 @@ namespace SW2URDF.URDFExport
                 MessageBox.Show(ExportErrorWhy);
                 logger.Warn(ExportErrorWhy);
                 progressBar.End();
+
+                // Nothing will be shown, so what was generated on the way is taken back
+                DiscardGeneratedFeatures();
                 return false;
             }
             URDFRobot.SetBaseLink(baseLink);
@@ -270,6 +288,12 @@ namespace SW2URDF.URDFExport
             if (node.Link.Joint.CoordinateSystemName == "Automatically Generate")
             {
                 CreateBaseRefOrigin(true);
+                if (!GeneratedFeatures.WasCreated(GeneratedKind.CoordinateSystem, "Origin_global"))
+                {
+                    // Already in the model: not ours to remove, but the joint's name still has to be
+                    // put back if the run is cancelled
+                    GeneratedFeatures.AddReused(GeneratedKind.CoordinateSystem, "Origin_global");
+                }
                 node.Link.Joint.CoordinateSystemName = "Origin_global";
                 link.Joint.CoordinateSystemName = node.Link.Joint.CoordinateSystemName;
             }
@@ -652,34 +676,34 @@ namespace SW2URDF.URDFExport
 
             if (coordSysName == "Automatically Generate")
             {
-                child.Joint.CoordinateSystemName = "Origin_" + child.Joint.Name;
-                ActiveSWModel.ClearSelection2(true);
-                int i = 2;
-                while (ActiveSWModel.Extension.SelectByID2(
-                    child.Joint.CoordinateSystemName, "COORDSYS", 0, 0, 0, false, 0, null, 0))
+                // An existing frame of the same name and place (from an earlier preview) is used
+                // again; any other existing frame is left alone and the next free name is used.
+                Origin wanted = child.Joint.Origin;
+                child.Joint.CoordinateSystemName = GeneratedFeatureLog.ChooseName(
+                    "Origin_" + child.Joint.Name, CoordinateSystemExists,
+                    name => CoordinateSystemIsAt(name, wanted), out bool reuse);
+                if (reuse)
                 {
-                    ActiveSWModel.ClearSelection2(true);
-                    child.Joint.CoordinateSystemName =
-                        "Origin_" + child.Joint.Name + i.ToString();
-                    i++;
+                    GeneratedFeatures.AddReused(
+                        GeneratedKind.CoordinateSystem, child.Joint.CoordinateSystemName);
                 }
-
-                CreateRefOrigin(child.Joint);
+                else
+                {
+                    CreateRefOrigin(child.Joint);
+                }
             }
 
             if (axisName == "Automatically Generate")
             {
-                child.Joint.AxisName = "Axis_" + child.Joint.Name;
-                ActiveSWModel.ClearSelection2(true);
-                int i = 2;
-                while (ActiveSWModel.Extension.SelectByID2(
-                    child.Joint.AxisName, "AXIS", 0, 0, 0, false, 0, null, 0))
+                double[] wantedAxis = child.Joint.Axis.GetXYZ();
+                child.Joint.AxisName = GeneratedFeatureLog.ChooseName(
+                    "Axis_" + child.Joint.Name, AxisExists,
+                    name => AxisPointsAlong(name, wantedAxis), out bool reuse);
+                if (reuse || child.Joint.Type == "fixed")
                 {
-                    ActiveSWModel.ClearSelection2(true);
-                    child.Joint.AxisName = "Axis_" + child.Joint.Name + i.ToString();
-                    i++;
+                    GeneratedFeatures.AddReused(GeneratedKind.Axis, child.Joint.AxisName);
                 }
-                if (child.Joint.Type != "fixed")
+                else
                 {
                     CreateRefAxis(child.Joint);
                 }
@@ -771,6 +795,8 @@ namespace SW2URDF.URDFExport
             if (coordinates != null)
             {
                 coordinates.Name = CoordinateSystemName;
+                GeneratedFeatures.AddCreated(
+                    GeneratedKind.CoordinateSystem, coordinates.Name, coordinates);
             }
         }
 
@@ -808,6 +834,7 @@ namespace SW2URDF.URDFExport
                 if (featAxis != null)
                 {
                     featAxis.Name = Joint.AxisName;
+                    GeneratedFeatures.AddCreated(GeneratedKind.Axis, featAxis.Name, featAxis);
                 }
             }
         }
@@ -941,16 +968,203 @@ namespace SW2URDF.URDFExport
             bool sketchExists =
                 ActiveSWModel.Extension.SelectByID2(
                     "URDF Reference", "SKETCH", 0, 0, 0, false, 0, null, 0);
+            if (sketchExists)
+            {
+                // From an earlier preview or made by the user: used as it is, nothing is added
+                ActiveSWModel.ClearSelection2(true);
+                return "URDF Reference";
+            }
             ActiveSWModel.SketchManager.Insert3DSketch(true);
             ActiveSWModel.SketchManager.CreatePoint(0, 0, 0);
             IFeature sketch = (IFeature)ActiveSWModel.SketchManager.ActiveSketch;
             ActiveSWModel.SketchManager.Insert3DSketch(true);
-            if (!sketchExists)
-            {
-                sketch.Name = "URDF Reference";
-            }
+            sketch.Name = "URDF Reference";
+            GeneratedFeatures.AddCreated(GeneratedKind.Sketch, sketch.Name, sketch);
             return sketch.Name;
         }
+
+        #region Generated features: lookups and clean-up
+
+        private bool CoordinateSystemExists(string name)
+        {
+            ActiveSWModel.ClearSelection2(true);
+            bool exists = ActiveSWModel.Extension.SelectByID2(
+                name, "COORDSYS", 0, 0, 0, false, 0, null, 0);
+            ActiveSWModel.ClearSelection2(true);
+            return exists;
+        }
+
+        private bool AxisExists(string name)
+        {
+            ActiveSWModel.ClearSelection2(true);
+            bool exists = ActiveSWModel.Extension.SelectByID2(
+                name, "AXIS", 0, 0, 0, false, 0, null, 0);
+            ActiveSWModel.ClearSelection2(true);
+            return exists;
+        }
+
+        // True when the existing coordinate system is where a freshly generated one would be put
+        private bool CoordinateSystemIsAt(string name, Origin wanted)
+        {
+            try
+            {
+                double[] existing = MathOps.GetTransformation(GetCoordinateSystemTransform(name))
+                    .ToRowMajorArray();
+                double[] expected = MathOps.GetTransformation(wanted.GetXYZ(), wanted.GetRPY())
+                    .ToRowMajorArray();
+                return GeneratedFeatureLog.SameValues(existing, expected, 1e-6);
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not compare the coordinate system " + name, e);
+                return false;
+            }
+        }
+
+        // True when the existing axis runs along the wanted direction (either way round)
+        private bool AxisPointsAlong(string name, double[] wanted)
+        {
+            try
+            {
+                return GeneratedFeatureLog.SameDirection(EstimateAxis(name), wanted, 1e-6);
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not compare the axis " + name, e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Undoes what this run of the exporter generated in the model: the joints get their earlier
+        /// coordinate system and axis names back and the coordinate systems, axes and reference
+        /// sketch that the run created are deleted. Features that were in the model before, and
+        /// anything the user made, are never touched. Does nothing a second time. Never throws.
+        /// </summary>
+        public void DiscardGeneratedFeatures()
+        {
+            GeneratedFeatureLog log = GeneratedFeatures;
+            try
+            {
+                if (jointNames != null)
+                {
+                    jointNames.Restore(log);
+                }
+                if (ActiveSWModel != null && !log.IsEmpty)
+                {
+                    logger.Info("Removing the " + log.Created.Count + " feature(s) generated for the preview");
+                    foreach (GeneratedFeature feature in log.RemovalOrder())
+                    {
+                        DeleteGeneratedFeature(feature);
+                    }
+                    if (!log.Created.Any(f => f.Kind == GeneratedKind.Sketch))
+                    {
+                        DeleteAddedSketchEntities(log);
+                    }
+                    ActiveSWModel.ClearSelection2(true);
+                    ActiveSWModel.ForceRebuild3(true);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not remove the features generated for the preview", e);
+            }
+            finally
+            {
+                log.Clear();
+                jointNames = null;
+                referenceSketchName = null;
+            }
+        }
+
+        private void DeleteGeneratedFeature(GeneratedFeature generated)
+        {
+            try
+            {
+                Feature feature = generated.Handle as Feature;
+                // The feature must still be the one that was created: not deleted, renamed or
+                // replaced since (undo, or the user's own edits)
+                if (feature == null || feature.Name != generated.Name)
+                {
+                    logger.Info("Generated feature " + generated.Name + " is no longer there, skipped");
+                    return;
+                }
+                object[] children = feature.GetChildren() as object[];
+                if (children != null && children.Length > 0)
+                {
+                    logger.Info("Generated feature " + generated.Name + " is used by other features, kept");
+                    return;
+                }
+                ActiveSWModel.ClearSelection2(true);
+                if (feature.Select2(false, 0))
+                {
+                    ActiveSWModel.Extension.DeleteSelection2(0);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not remove the generated feature " + generated.Name, e);
+            }
+        }
+
+        // The points and lines this run added to a reference sketch that was already there
+        private void DeleteAddedSketchEntities(GeneratedFeatureLog log)
+        {
+            if (log.AddedSketchEntities.Count == 0 || referenceSketchName == null)
+            {
+                return;
+            }
+            try
+            {
+                ActiveSWModel.ClearSelection2(true);
+                if (!ActiveSWModel.Extension.SelectByID2(
+                    referenceSketchName, "SKETCH", 0, 0, 0, false, 0, null, 0))
+                {
+                    return;
+                }
+                ActiveSWModel.SketchManager.Insert3DSketch(true);
+                SelectData data = ActiveSWModel.SelectionManager.CreateSelectData();
+                bool append = false;
+                foreach (GeneratedFeature entity in log.AddedSketchEntities)
+                {
+                    try
+                    {
+                        bool selected = false;
+                        if (entity.Handle is SketchPoint)
+                        {
+                            selected = ((SketchPoint)entity.Handle).Select4(append, data);
+                        }
+                        else if (entity.Handle is SketchSegment)
+                        {
+                            selected = ((SketchSegment)entity.Handle).Select4(append, data);
+                        }
+                        append = append || selected;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Warn("A sketch entity of the preview could not be selected", e);
+                    }
+                }
+                if (append)
+                {
+                    ActiveSWModel.Extension.DeleteSelection2(0);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not remove the sketch entities of the preview", e);
+            }
+            finally
+            {
+                ActiveSWModel.ClearSelection2(true);
+                if (ActiveSWModel.SketchManager.ActiveSketch != null)
+                {
+                    ActiveSWModel.SketchManager.Insert3DSketch(true);
+                }
+            }
+        }
+
+        #endregion Generated features: lookups and clean-up
 
         // Adds lines and a point to create the entities for a reference coordinates
         private object[] AddSketchGeometry(Origin Origin)
@@ -997,6 +1211,12 @@ namespace SW2URDF.URDFExport
                                                                          Origin.Z + tA[2, 1]);
             YAxis.ConstructionGeometry = true;
 
+            // Remembered so that a cancelled preview can take them out of a sketch that was already
+            // there (a sketch created by the run is deleted as a whole)
+            GeneratedFeatures.AddSketchEntity(OriginPoint);
+            GeneratedFeatures.AddSketchEntity(XAxis);
+            GeneratedFeatures.AddSketchEntity(YAxis);
+
             //Close the sketch
             if (ActiveSWModel.SketchManager.ActiveSketch != null)
             {
@@ -1038,6 +1258,7 @@ namespace SW2URDF.URDFExport
             }
             rotAxis.ConstructionGeometry = true;
             rotAxis.Width = 2;
+            GeneratedFeatures.AddSketchEntity(rotAxis);
 
             //Close sketch
             if (ActiveSWModel.SketchManager.ActiveSketch != null)

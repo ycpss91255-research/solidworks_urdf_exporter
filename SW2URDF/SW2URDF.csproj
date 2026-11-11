@@ -338,6 +338,7 @@
     <Compile Include="Test\TestConfigurationStatus.cs" />
     <Compile Include="Test\TestTreeKeyActions.cs" />
     <Compile Include="Test\TestDocumentPersistence.cs" />
+    <Compile Include="Test\TestGeneratedFeatureLog.cs" />
     <Compile Include="Test\TestExporterRouting.cs" />
     <Compile Include="Test\TestOrphanAttributes.cs" />
     <Compile Include="Test\TestPartPerConfiguration.cs" />
@@ -395,6 +396,7 @@
     <Compile Include="URDFExport\ConfigurationStatus.cs" />
     <Compile Include="URDFExport\TreeKeyActions.cs" />
     <Compile Include="URDFExport\DocumentPersistence.cs" />
+    <Compile Include="URDFExport\GeneratedFeatureLog.cs" />
     <Compile Include="URDFExport\ExporterRouting.cs" />
     <Compile Include="URDFExport\OrphanAttributes.cs" />
     <Compile Include="URDFExport\ConfigurationFormat.cs" />
