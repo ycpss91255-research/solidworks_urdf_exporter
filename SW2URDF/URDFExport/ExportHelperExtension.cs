@@ -47,18 +47,37 @@ namespace SW2URDF.URDFExport
             URDFRobot = new Robot();
             URDFRobot.Name = ActiveSWModel.GetTitle();
 
-            Configuration swConfig = ActiveSWModel.ConfigurationManager.ActiveConfiguration;
-            foreach (string state in swConfig.GetDisplayStates())
+            Configuration swConfig = ActiveSWModel.ConfigurationManager?.ActiveConfiguration;
+            string[] displayStates = swConfig?.GetDisplayStates() as string[];
+            if (displayStates != null)
             {
-                if (state.Equals("URDF Export"))
+                foreach (string state in displayStates)
                 {
-                    swConfig.ApplyDisplayState("URDF Export");
+                    if (state.Equals("URDF Export"))
+                    {
+                        swConfig.ApplyDisplayState("URDF Export");
+                    }
                 }
             }
 
             //Each Robot contains a single base link, build this link
             Link baseLink = CreateBaseLinkFromActiveModel();
             URDFRobot.SetBaseLink(baseLink);
+            EnsureBaseLink(URDFRobot, URDFRobot.Name);
+        }
+
+        /// <summary>
+        /// The part exporter needs a base link to show. When none could be built (for example the
+        /// active document is not a part) a default link is used instead of failing.
+        /// </summary>
+        public static void EnsureBaseLink(Robot robot, string name)
+        {
+            if (robot.BaseLink == null)
+            {
+                Link link = new Link(null);
+                link.Name = name;
+                robot.SetBaseLink(link);
+            }
         }
 
         /// <summary>
