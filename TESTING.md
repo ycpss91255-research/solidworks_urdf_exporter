@@ -179,6 +179,29 @@ decline it and check that nothing is lost in the open session.
 The live script cleans up after itself. After manual tests close the models without saving the copies and delete
 them. The log file and the private build folder are yours to delete.
 
+## Regression results of the example models
+
+Each example folder with a committed package was copied, opened in SolidWorks 2023 and exported through the real
+exporter forms (open with the saved link tree, next through the pages, export with meshes; OBJ+MTL for the OBJ
+examples; once per SolidWorks configuration for `TWO_BOXES_PER_CONFIG`). Numbers were compared with the committed
+files at 1e-9 relative tolerance, meshes by triangle count and bounding box. Build: master `ee4f946`; the two
+part rows marked * were repeated with the fixes of issues 124 and 126.
+
+| Model | Compared | Result |
+|-------|----------|--------|
+| `3_DOF_ARM` (STL) | URDF 146 numbers, CSV, 4 meshes | equivalent; mesh triangle counts differ by tessellation (volume within 0.04 %) |
+| `3_DOF_ARM` (OBJ) | URDF 130 numbers, CSV, 4 OBJ, MTL colours | equivalent; the intermediate `.3dxml` files stay beside the OBJ (documented) |
+| `4_WHEELER` | URDF 185 numbers, CSV, 5 meshes | equivalent |
+| `ORIGINAL_3_DOF_ARM` | URDF, CSV, 4 meshes | differs, new output correct: the committed link inertia and meshes are stale. The exported mass and principal moments equal SolidWorks' own for each link; joint values equal the committed ones up to their 5-digit rounding and a gimbal-lock equivalent rpy |
+| `TOY_BLOCK` (part)* | URDF, mesh | equivalent after the fixes; before them the products of inertia had wrong signs (issue 124) and an empty texture element was written (issue 126) |
+| `BOX_RED`, `BOX_BLUE` (part, OBJ)* | URDF values, OBJ, MTL | equivalent (link and file names follow the package name typed in the form) |
+| `TWO_BOXES_PER_CONFIG`, `CFG_RED_ONLY` | URDF, CSV, mesh | equivalent |
+| `TWO_BOXES_PER_CONFIG`, `CFG_BOTH` | URDF, CSV, mesh | differs, new output correct: the committed centre of mass and inertia do not match its own mesh (y and z swapped); the exported values equal the tensor computed from the exported mesh |
+
+After the first open every model has the `URDF Export Configuration` folder with one entry per SolidWorks
+configuration, generated features (`URDF Reference`, `Origin_*`, `Axis_*`) at the root of the tree and no leftover
+legacy attributes; no message box or exception dialog appeared.
+
 ## Known limitations
 
 - Existing export tests (`TestExportHelper`) still write into the home folder and the example folders;
