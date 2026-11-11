@@ -134,6 +134,7 @@ namespace SW2URDF.UI
             swApp = SwApp;
             BaseNode = node;
             ActiveSWModel = swApp.ActiveDoc;
+            RefreshConfigurationStatus();
             Exporter = exporter;
             AutoUpdatingForm = false;
 

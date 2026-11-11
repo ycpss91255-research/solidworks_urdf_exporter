@@ -128,6 +128,44 @@ namespace SW2URDF.URDFExport
             }
         }
 
+        /// <summary>
+        /// Where the settings for the active SolidWorks configuration come from (what
+        /// <see cref="LoadBaseNodeFromModel"/> loads), without loading them.
+        /// </summary>
+        public static SettingsSource GetSettingsSource(ModelDoc2 model)
+        {
+            bool hasOwn = false;
+            bool hasShared = false;
+            try
+            {
+                Feature configFeature = FindConfigurationAttributeFeature(model, GetActiveConfigurationName(model));
+                if (configFeature != null)
+                {
+                    SolidWorks.Interop.sldworks.Attribute att =
+                        (SolidWorks.Interop.sldworks.Attribute)configFeature.GetSpecificFeature2();
+                    hasOwn = !string.IsNullOrEmpty(att.GetParameter("data").GetStringValue());
+                }
+                if (!hasOwn)
+                {
+                    SolidWorks.Interop.sldworks.Attribute shared =
+                        FindSWSaveAttribute(model, UrdfConfigurationSwAttributeName) ?? CheckForOldAttributes(model);
+                    hasShared = shared != null && !string.IsNullOrEmpty(shared.GetParameter("data").GetStringValue());
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not determine where the URDF settings come from", e);
+            }
+            return ConfigurationStatus.Decide(hasOwn, hasShared);
+        }
+
+        /// <summary>Localized one-line status: active configuration and where its settings come from.</summary>
+        public static string DescribeSettings(ModelDoc2 model, UiText ui)
+        {
+            return ConfigurationStatus.Describe(
+                ui, GetActiveConfigurationName(model), GetSettingsSource(model));
+        }
+
         #endregion Public Methods
 
         #region Private Methods
@@ -389,7 +427,7 @@ namespace SW2URDF.URDFExport
                 ConfigurationFormat.PreviousSharedAttributeNames.Contains(name);
         }
 
-        private static string GetActiveConfigurationName(ModelDoc2 model)
+        public static string GetActiveConfigurationName(ModelDoc2 model)
         {
             try
             {

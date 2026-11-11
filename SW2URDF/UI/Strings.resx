@@ -565,4 +565,19 @@
   <data xml:space="preserve" name="an exception occurred setting up the export form, please email your maintainer with the log file found at {0}">
     <value>An exception occurred setting up the export form, please email your maintainer with the log file found at {0}</value>
   </data>
+  <data xml:space="preserve" name="(none)">
+    <value>(none)</value>
+  </data>
+  <data xml:space="preserve" name="settings saved for this configuration.">
+    <value>Settings saved for this configuration.</value>
+  </data>
+  <data xml:space="preserve" name="settings loaded from the shared (legacy) data; they are saved to this configuration on the next save.">
+    <value>Settings loaded from the shared (legacy) data; they are saved to this configuration on the next save.</value>
+  </data>
+  <data xml:space="preserve" name="new settings: nothing is saved for this configuration yet.">
+    <value>New settings: nothing is saved for this configuration yet.</value>
+  </data>
+  <data xml:space="preserve" name="configuration: {0}. {1}">
+    <value>Configuration: {0}. {1}</value>
+  </data>
 </root>
