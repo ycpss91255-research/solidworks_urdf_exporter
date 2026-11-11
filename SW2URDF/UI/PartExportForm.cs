@@ -78,6 +78,23 @@ namespace SW2URDF.UI
             Exporter = new ExportHelper(iSwApp);
         }
 
+        // The window DPI is only known once the handle exists, and changes when the form is moved to a
+        // monitor with another scale: fit the buttons again for the DPI the form is really drawn at.
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            UiLayout.FitButtonHeightsToWindow(this);
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            if (m.Msg == UiLayout.WM_DPICHANGED)
+            {
+                UiLayout.FitButtonHeightsToWindow(this);
+            }
+        }
+
         #region Basic event handelers
 
         private void ButtonSaveNameBrowseClick(object sender, EventArgs e)
