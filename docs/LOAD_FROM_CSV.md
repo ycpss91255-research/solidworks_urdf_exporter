@@ -8,7 +8,7 @@
 
 Every assembly export writes a CSV file next to the URDF (`<package>/urdf/<name>.csv`). It holds one row per
 link: mass properties, visual and collision poses, mesh file names, colors, and the joint to the parent.
-**Load Configuration...** in the exporter's PropertyManager page reads such a file and merges its values into
+**Load from CSV...** in the exporter's PropertyManager page reads such a file and merges its values into
 the link tree you are editing. Use it to
 - reuse the tuned values of an earlier export (masses, inertias, joint limits, colors) after the CAD model changed,
 - copy the setup from one assembly to a similar one,
@@ -19,7 +19,7 @@ opens, for the active SolidWorks configuration.
 
 ### Where the CSV comes from
 
-Export the assembly once (**Export URDF and Meshes** or **Export URDF Only**). The file
+Export the assembly once (**Export URDF and Meshes...** or **Export URDF Only...**). The file
 `<package>/urdf/<package>.csv` is created with the URDF. Columns (first row is the header):
 
 | Group | Columns |
@@ -38,19 +38,26 @@ the header row and save as CSV.
 
 1. Open the assembly and start **Tools > Export as URDF**.
 2. Build or check the link tree on the left as usual.
-3. Click **Load Configuration...** and choose the CSV file.
-4. The **URDF Tree Merge** window opens. Links are matched **by name**: a CSV row whose `Link Name` equals a link
+3. Click **Load from CSV...** and choose the CSV file.
+4. The merge window opens (its heading is **URDF Tree Merge**; the window itself is not translated). Links are matched **by name**: a CSV row whose `Link Name` equals a link
    of the current tree is *matched*, any other row is *unmatched*.
    - The left tree previews the result. The lists show the matched and the unmatched CSV links; click a link to see
      its CSV values.
    - Per property group (Mass and Inertia, Visual Properties, Joint Kinematics, Other Joint Values) choose
-     whether to **use the existing values** (from the model) or **the loaded values** (from the CSV). Joint Kinematics
+     whether to **use the existing values** (the button named after the assembly) or **the loaded values** (the
+     button named after the CSV file); the selected button is highlighted. Mass and Inertia, Visual Properties and
+     Other Joint Values start on the loaded values, Joint Kinematics starts on the existing values. Joint Kinematics
      covers the coordinate system, axis and joint type; Other Joint Values covers limits, calibration, dynamics and
      safety controller.
    - To pair a CSV link with a link of the tree, select the CSV link, type the tree link's name in the name box and
-     click **Change Name**. **Reset** restores the CSV name. A name must not be empty or already used by another CSV link.
+     click **Change Name**. The link moves to the matched list; the property list on the right keeps showing the
+     original CSV name. **Reset** restores the CSV name. A name must not be empty or already used by another CSV link.
 5. Click **Merge**. If CSV links are still unmatched you are asked to confirm; they are ignored.
-6. The merged values appear in the link tree on the left. Review them, then export as usual.
+6. The merged values appear in the link tree. The page now shows **Filename: <the CSV file>** and four check
+   boxes: **Compute Mass and Inertia**, **Compute Visual and Collision**, **Compute Joint Kinematics** and
+   **Compute Joint Limits**. A group that took the loaded values is unchecked, so the export keeps those values;
+   check the box to have the exporter compute that group from the model again instead. A group that kept the
+   existing values is shown checked and greyed out. Review the result, then export as usual.
 
 SolidWorks components are never taken from the CSV, they always come from the model. Links that exist only in the
 tree keep their values.
@@ -69,7 +76,7 @@ tree keep their values.
 
 每次匯出組合件時，會在 URDF 旁寫出一個 CSV 檔（`<套件>/urdf/<名稱>.csv`），每個連桿一列：質量特性、
 Visual／Collision 位姿、Mesh 檔名、顏色，以及連到父連桿的關節。匯出器 PropertyManager 頁面的
-**載入設定…** 會讀取這種檔案，把其中的值合併到目前正在編輯的連桿樹。適用情境：
+**從 CSV 載入…** 會讀取這種檔案，把其中的值合併到目前正在編輯的連桿樹。適用情境：
 - 模型修改後，沿用先前匯出調好的值（質量、慣量、關節限制、顏色）；
 - 把一個組合件的設定複製到相似的組合件；
 - 用試算表編輯數值後再帶回來。
@@ -78,7 +85,7 @@ Visual／Collision 位姿、Mesh 檔名、顏色，以及連到父連桿的關�
 
 ### CSV 從哪裡來
 
-先匯出一次組合件（**匯出 URDF 與 Mesh** 或 **只匯出 URDF**），`<套件>/urdf/<套件>.csv` 會和 URDF 一起產生。
+先匯出一次組合件（**匯出 URDF 與網格…** 或 **僅匯出 URDF…**），`<套件>/urdf/<套件>.csv` 會和 URDF 一起產生。
 第一列是欄名，欄位分組如下：
 
 | 分組 | 欄位 |
@@ -96,16 +103,19 @@ Visual／Collision 位姿、Mesh 檔名、顏色，以及連到父連桿的關�
 
 1. 開啟組合件，執行 **工具 > 匯出為 URDF**。
 2. 照常在左側建立或檢查連桿樹。
-3. 按 **載入設定…**，選擇 CSV 檔。
-4. 出現 **URDF Tree Merge** 視窗。連桿**依名稱**配對：CSV 中 `Link Name` 與目前連桿樹中某連桿同名者為「已配對」，
+3. 按 **從 CSV 載入…**，選擇 CSV 檔。
+4. 出現合併視窗（標題為 **URDF Tree Merge**，視窗本身沒有翻譯）。連桿**依名稱**配對：CSV 中 `Link Name` 與目前連桿樹中某連桿同名者為「已配對」，
    其餘為「未配對」。
    - 左側樹預覽合併結果；清單列出已配對與未配對的 CSV 連桿，點選連桿可看其 CSV 值。
-   - 每個屬性群組（質量與慣量、Visual 屬性、關節運動學、其他關節值）可選擇**使用現有值**（來自模型）或
-     **載入值**（來自 CSV）。關節運動學含座標系、軸與關節類型；其他關節值含限制、校準、動態與安全控制器。
+   - 每個屬性群組（質量與慣量、Visual 屬性、關節運動學、其他關節值）可選擇**使用現有值**（以組合件命名的按鈕）或
+     **載入值**（以 CSV 檔名命名的按鈕），選中的按鈕會反白。質量與慣量、Visual 屬性、其他關節值預設選載入值，
+     關節運動學預設選現有值。關節運動學含座標系、軸與關節類型；其他關節值含限制、校準、動態與安全控制器。
    - 要把某個 CSV 連桿對應到樹中的連桿：選取該 CSV 連桿，在名稱欄輸入樹中連桿的名稱，按 **Change Name**。
-     **Reset** 還原為 CSV 的名稱。名稱不可空白，也不可與其他 CSV 連桿重複。
+     連桿會移到已配對清單，右側的屬性清單仍顯示原本的 CSV 名稱。**Reset** 還原為 CSV 的名稱。名稱不可空白，也不可與其他 CSV 連桿重複。
 5. 按 **Merge**。若仍有未配對的 CSV 連桿，會要求確認，這些連桿會被忽略。
-6. 合併後的值會出現在左側連桿樹，確認後照常匯出。
+6. 合併後的值會出現在連桿樹。頁面會顯示 **檔案名稱：<CSV 檔名>** 與四個核取方塊：**計算質量與慣性**、
+   **計算外觀與碰撞**、**計算關節運動學**、**計算關節限制**。採用載入值的群組不打勾，匯出時保留這些值；
+   勾選則改由匯出器依模型重新計算該群組。維持現有值的群組會顯示為已勾選且灰色不可更改。確認後照常匯出。
 
 SolidWorks 元件不會從 CSV 取得，一律來自模型。只存在於樹中的連桿保留原值。
 
