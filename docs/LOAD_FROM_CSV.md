@@ -35,7 +35,7 @@ Values are in meters, kilograms and radians, as in the URDF.
 1. Open the assembly and start **Tools > Export as URDF**, then build or check the link tree as usual.
 2. Click **Load from CSV...** and choose the CSV file. If some links of the current tree are incomplete you are asked
    whether to continue; the merge still works, but check the result.
-3. The **URDF Tree Merge** window opens (its texts are in English in every language).
+3. The **URDF Tree Merge** window opens (its texts follow the SOLIDWORKS language, English or Traditional Chinese; the screenshot is English).
 
    ![The URDF Tree Merge window with one unmatched link selected](images/load_from_csv_merge_window.png)
 
@@ -127,7 +127,7 @@ These were checked in SolidWorks 2023 with a two-box assembly.
 
 1. 開啟組合件，執行 **工具 > 匯出為 URDF**，照常建立或檢查連桿樹。
 2. 按 **從 CSV 載入…**，選擇 CSV 檔。若目前連桿樹有未填完的連桿，會詢問是否繼續；仍可合併，但請檢查結果。
-3. 出現 **URDF Tree Merge** 視窗（視窗文字在所有語言下都是英文）。
+3. 出現 **URDF Tree Merge** 視窗（視窗文字依 SOLIDWORKS 語言顯示英文或繁體中文；截圖為英文版）。
 
    ![URDF Tree Merge 視窗，已選取一個未配對連桿](images/load_from_csv_merge_window.png)
 

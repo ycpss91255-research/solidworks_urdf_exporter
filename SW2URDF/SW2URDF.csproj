@@ -355,7 +355,8 @@
     <Compile Include="Test\TwoBoxesModel.cs" />
     <Compile Include="Test\TestSerialization.cs" />
     <Compile Include="Test\TestSWAttached.cs" />
-    <Compile Include="Test\TestURDFMerge.cs" />
+    <Compile Include="Test\TestTreeMerger.cs" />
+    <Compile Include="Test\TestTreeMergeWindowText.cs" />
     <Compile Include="Test\TestURDFPackage.cs" />
     <Compile Include="Test\TestVersioning.cs" />
     <Compile Include="URDF\Mimic.cs" />

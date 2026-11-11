@@ -1,4 +1,4 @@
-﻿using log4net;
+using log4net;
 using SW2URDF.URDF;
 using SW2URDF.URDFExport.CSV;
 using SW2URDF.URDFExport.URDFMerge;
@@ -33,6 +33,7 @@ namespace SW2URDF.UI
         private readonly string AssemblyName;
 
         private readonly URDFTreeCorrespondance TreeCorrespondance;
+        private readonly UiText ui;
 
         private readonly Link ExistingBaseLink;
         private readonly List<Link> LoadedCSVLinks;
@@ -40,8 +41,10 @@ namespace SW2URDF.UI
         private Link SelectedLink;
         public ObservableCollection<KeyValuePair<string, object>> SelectedLinkProperties { get; }
 
-        public TreeMergeWPF(Link existingLink, List<Link> loadedLinks, string csvFileName, string assemblyName)
+        public TreeMergeWPF(Link existingLink, List<Link> loadedLinks, string csvFileName, string assemblyName,
+            UiText uiText = null)
         {
+            ui = uiText ?? new UiText(null);
             DataContext = this;
             Resources["SelectedLinkProperties"] = SelectedLinkProperties;
             Dispatcher.UnhandledException += AppDispatcherUnhandledException;
@@ -67,9 +70,7 @@ namespace SW2URDF.UI
         private void AppDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             logger.Error("Exception encountered in TreeMerge form", e.Exception);
-            MessageBox.Show("There was a problem with the TreeMerge form: \n\"" +
-                e.Exception.Message + "\"\nEmail your maintainer with the log file found at " +
-                Logger.GetFileName());
+            MessageBox.Show(ui.ProblemMessage(ui.Get("There was a problem with the TreeMerge form:"), e.Exception.Message));
             e.Handled = true;
         }
 
@@ -125,8 +126,8 @@ namespace SW2URDF.UI
 
         private void CancelClick(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Do you wish to cancel? Any changes you have made will not be saved",
-                "Cancel Merge?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show(ui.Get("Do you wish to cancel? Any changes you have made will not be saved"),
+                ui.Get("Cancel Merge?"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 Close();
             }
@@ -144,12 +145,12 @@ namespace SW2URDF.UI
 
                 string unmatchedLinksStr = string.Join("\r\n", unmatchedLinkNames);
 
-                string message = "The follow links loaded from the CSV " + CSVFileName + " have not " +
-                    "been matched with links in the assembly configuration, would you like to " +
-                    "continue?\r\n\r\n" + unmatchedLinksStr;
+                string message = string.Format(
+                    ui.Get("The following links loaded from the CSV {0} have not been matched with links in the assembly configuration. Would you like to continue?"),
+                    CSVFileName) + "\r\n\r\n" + unmatchedLinksStr;
 
                 MessageBoxResult result =
-                    MessageBox.Show(message, "Merge with unmatched links?", MessageBoxButton.YesNo);
+                    MessageBox.Show(message, ui.Get("Merge with unmatched links?"), MessageBoxButton.YesNo);
                 if (result != MessageBoxResult.Yes)
                 {
                     return;
@@ -241,7 +242,7 @@ namespace SW2URDF.UI
             SelectedLink = link;
             FillSelectedLinkBoxes(link);
 
-            string labelText = (isLoadedFromCSV) ? "Properties loaded from CSV" : "Preview of Merged Properties";
+            string labelText = (isLoadedFromCSV) ? ui.Get("Properties loaded from CSV") : ui.Get("Preview of Merged Properties");
             PropertiesLoadedLabel.Content = new TextBlock { Text = labelText };
         }
 
@@ -255,7 +256,7 @@ namespace SW2URDF.UI
             {
                 SelectedLinkName.ToolTip = new ToolTip
                 {
-                    Content = "Link name cannot be empty",
+                    Content = ui.Get("Link name cannot be empty"),
                     IsOpen = true,
                     StaysOpen = false,
                 };
@@ -266,7 +267,7 @@ namespace SW2URDF.UI
             {
                 SelectedLinkName.ToolTip = new ToolTip
                 {
-                    Content = "\"" + updatedName + "\" already exists",
+                    Content = string.Format(ui.Get("\"{0}\" already exists"), updatedName),
                     IsOpen = true,
                     StaysOpen = false,
                 };
@@ -309,6 +310,32 @@ namespace SW2URDF.UI
             return block;
         }
 
+        private void ApplyTranslations()
+        {
+            Title = ui.Get("URDF Tree Merge");
+            MergeTitle.Content = ui.Get("URDF Tree Merge");
+            MergeDescription.Text = ui.Get("Match loaded CSV links to the Assembly configuration by renaming links in the \"Unmatched Links\" box");
+            ExistingTreeLabel.Content = ui.Get("Preview of Updated Configuration");
+            UnmatchedListLabel.Content = ui.Get("Unmatched Links");
+            MassInertiaGroup.Header = ui.Get("Mass and Inertia");
+            VisualGroup.Header = ui.Get("Visual Properties");
+            JointKinematicsGroup.Header = ui.Get("Joint Kinematics");
+            OtherJointGroup.Header = ui.Get("Other Joint Values");
+            foreach (Label useLabel in new[] { UseLabel1, UseLabel2, UseLabel3, UseLabel4, UseLabel5, UseLabel6, UseLabel7, UseLabel8 })
+            {
+                useLabel.Content = ui.Get("Use:");
+            }
+            SelectedLinkNameLabel.Content = ui.Get("Link: ");
+            UpdateSelectedLinkButton.Content = ui.Get("Change Name");
+            ResetSelectedLinkButton.Content = ui.Get("Reset");
+            PropertiesLoadedLabel.Content = new TextBlock { Text = ui.Get("Properties loaded from CSV") };
+            GridView propertyColumns = (GridView)PropertiesListView.View;
+            propertyColumns.Columns[0].Header = ui.Get("Column");
+            propertyColumns.Columns[1].Header = ui.Get("Value");
+            CancelButton.Content = ui.Get("Cancel");
+            MergeButton.Content = ui.Get("Merge");
+        }
+
         private void ConfigureLabels()
         {
             string shortAssemblyName = ShortenStringForLabel(AssemblyName, MAX_BUTTON_CHARACTER_WIDTH);
@@ -316,46 +343,51 @@ namespace SW2URDF.UI
             string longCSVFilename = ShortenStringForLabel(CSVFileName, MAX_LABEL_CHARACTER_WIDTH);
             string shortCSVFilename = ShortenStringForLabel(CSVFileName, MAX_BUTTON_CHARACTER_WIDTH);
 
-            MatchedListLabel.Content = BuildTextBlock("Matching Links from CSV: ", longCSVFilename);
+            ApplyTranslations();
+
+            string massText = ui.Get("Use Mass and Inertia properties loaded from: {0}");
+            string visualText = ui.Get("Use Mesh and Material properties loaded from: {0}");
+            string kinematicsText = ui.Get("Use Joint Kinematic properties loaded from: {0}");
+            string otherText = ui.Get("Use Limits, Dynamics, Calibration and Safety Controller values loaded from: {0}");
+
+            MatchedListLabel.Content = BuildTextBlock(ui.Get("Matching Links from CSV: "), longCSVFilename);
             ExistingTreeLabel.ToolTip =
-                new TextBlock { Text = "Configuration from Assembly: " + AssemblyName };
+                new TextBlock { Text = string.Format(ui.Get("Configuration from Assembly: {0}"), AssemblyName) };
 
             MassInertiaExistingButton.Content = new TextBlock { Text = shortAssemblyName };
             MassInertiaExistingButton.ToolTip =
-                new TextBlock { Text = "Use Mass and Inertia properties loaded from: " + AssemblyName };
+                new TextBlock { Text = string.Format(massText, AssemblyName) };
 
             VisualExistingButton.Content = new TextBlock { Text = shortAssemblyName };
             VisualExistingButton.ToolTip =
-                new TextBlock { Text = "Use Mesh and Material properties loaded from: " + AssemblyName };
+                new TextBlock { Text = string.Format(visualText, AssemblyName) };
 
             JointKinematicsExistingButton.Content = new TextBlock { Text = shortAssemblyName };
             JointKinematicsExistingButton.ToolTip =
-                new TextBlock { Text = "Use Joint Kinematic properties loaded from: " + AssemblyName };
+                new TextBlock { Text = string.Format(kinematicsText, AssemblyName) };
 
             OtherJointExistingButton.Content = new TextBlock { Text = shortAssemblyName };
             OtherJointExistingButton.ToolTip = new TextBlock
             {
-                Text =
-                "Use Limits, Dynamics, Calibration and Safety Controller values loaded from: " +
-                AssemblyName
+                Text = string.Format(otherText, AssemblyName)
             };
 
             MassInertiaLoadedButton.Content = new TextBlock { Text = shortCSVFilename };
             MassInertiaLoadedButton.ToolTip =
-                new TextBlock { Text = "Use Mass and Inertia properties loaded from: " + CSVFileName };
+                new TextBlock { Text = string.Format(massText, CSVFileName) };
 
             VisualLoadedButton.Content = new TextBlock { Text = shortCSVFilename };
             VisualLoadedButton.ToolTip =
-                new TextBlock { Text = "Use Mesh and Material properties loaded from: " + CSVFileName };
+                new TextBlock { Text = string.Format(visualText, CSVFileName) };
 
             JointKinematicsLoadedButton.Content = new TextBlock { Text = shortCSVFilename };
             JointKinematicsLoadedButton.ToolTip =
-                new TextBlock { Text = "Use Joint Kinematic properties loaded from: " + CSVFileName };
+                new TextBlock { Text = string.Format(kinematicsText, CSVFileName) };
 
             OtherJointLoadedButton.Content = new TextBlock { Text = shortCSVFilename };
             OtherJointLoadedButton.ToolTip = new TextBlock
             {
-                Text = "Use Limits, Dynamics, Calibration and Safety Controller values loaded from: " + CSVFileName
+                Text = string.Format(otherText, CSVFileName)
             };
         }
 

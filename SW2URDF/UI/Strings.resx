@@ -530,6 +530,96 @@ Continue with the merge?</value>
   <data xml:space="preserve" name="csv cells could not be read">
     <value>CSV cells could not be read</value>
   </data>
+  <data xml:space="preserve" name="there was a problem with the treemerge form:">
+    <value>There was a problem with the TreeMerge form:</value>
+  </data>
+  <data xml:space="preserve" name="do you wish to cancel? any changes you have made will not be saved">
+    <value>Do you wish to cancel? Any changes you have made will not be saved</value>
+  </data>
+  <data xml:space="preserve" name="cancel merge?">
+    <value>Cancel Merge?</value>
+  </data>
+  <data xml:space="preserve" name="the following links loaded from the csv {0} have not been matched with links in the assembly configuration. would you like to continue?">
+    <value>The following links loaded from the CSV {0} have not been matched with links in the assembly configuration. Would you like to continue?</value>
+  </data>
+  <data xml:space="preserve" name="merge with unmatched links?">
+    <value>Merge with unmatched links?</value>
+  </data>
+  <data xml:space="preserve" name="properties loaded from csv">
+    <value>Properties loaded from CSV</value>
+  </data>
+  <data xml:space="preserve" name="preview of merged properties">
+    <value>Preview of Merged Properties</value>
+  </data>
+  <data xml:space="preserve" name="link name cannot be empty">
+    <value>Link name cannot be empty</value>
+  </data>
+  <data xml:space="preserve" name="&quot;{0}&quot; already exists">
+    <value>"{0}" already exists</value>
+  </data>
+  <data xml:space="preserve" name="use mass and inertia properties loaded from: {0}">
+    <value>Use Mass and Inertia properties loaded from: {0}</value>
+  </data>
+  <data xml:space="preserve" name="use mesh and material properties loaded from: {0}">
+    <value>Use Mesh and Material properties loaded from: {0}</value>
+  </data>
+  <data xml:space="preserve" name="use joint kinematic properties loaded from: {0}">
+    <value>Use Joint Kinematic properties loaded from: {0}</value>
+  </data>
+  <data xml:space="preserve" name="use limits, dynamics, calibration and safety controller values loaded from: {0}">
+    <value>Use Limits, Dynamics, Calibration and Safety Controller values loaded from: {0}</value>
+  </data>
+  <data xml:space="preserve" name="matching links from csv: ">
+    <value>Matching Links from CSV: </value>
+  </data>
+  <data xml:space="preserve" name="configuration from assembly: {0}">
+    <value>Configuration from Assembly: {0}</value>
+  </data>
+  <data xml:space="preserve" name="urdf tree merge">
+    <value>URDF Tree Merge</value>
+  </data>
+  <data xml:space="preserve" name="match loaded csv links to the assembly configuration by renaming links in the &quot;unmatched links&quot; box">
+    <value>Match loaded CSV links to the Assembly configuration by renaming links in the "Unmatched Links" box</value>
+  </data>
+  <data xml:space="preserve" name="preview of updated configuration">
+    <value>Preview of Updated Configuration</value>
+  </data>
+  <data xml:space="preserve" name="unmatched links">
+    <value>Unmatched Links</value>
+  </data>
+  <data xml:space="preserve" name="mass and inertia">
+    <value>Mass and Inertia</value>
+  </data>
+  <data xml:space="preserve" name="visual properties">
+    <value>Visual Properties</value>
+  </data>
+  <data xml:space="preserve" name="joint kinematics">
+    <value>Joint Kinematics</value>
+  </data>
+  <data xml:space="preserve" name="other joint values">
+    <value>Other Joint Values</value>
+  </data>
+  <data xml:space="preserve" name="use:">
+    <value>Use:</value>
+  </data>
+  <data xml:space="preserve" name="link: ">
+    <value>Link: </value>
+  </data>
+  <data xml:space="preserve" name="change name">
+    <value>Change Name</value>
+  </data>
+  <data xml:space="preserve" name="reset">
+    <value>Reset</value>
+  </data>
+  <data xml:space="preserve" name="column">
+    <value>Column</value>
+  </data>
+  <data xml:space="preserve" name="value">
+    <value>Value</value>
+  </data>
+  <data xml:space="preserve" name="merge">
+    <value>Merge</value>
+  </data>
   <data xml:space="preserve" name="some links in the current tree are incomplete. merging may result in an incomplete urdf, would you like to continue?">
     <value>Some links in the current tree are incomplete. Merging may result in an incomplete URDF, would you like to continue?</value>
   </data>

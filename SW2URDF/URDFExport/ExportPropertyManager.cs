@@ -428,7 +428,7 @@ namespace SW2URDF.URDFExport
 
                     Link existingBaseLink = existingBaseNode.RebuildLink();
                     TreeMergeWPF wpf = new TreeMergeWPF(existingBaseLink, loadedLinks,
-                        filename, assemblyTitle);
+                        filename, assemblyTitle, ui);
                     wpf.TreeMerged += TreeMergeCompleted;
                     wpf.Show();
                 }
