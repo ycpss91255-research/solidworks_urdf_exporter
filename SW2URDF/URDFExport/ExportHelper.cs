@@ -65,6 +65,12 @@ namespace SW2URDF.URDFExport
 
         private UserProgressBar progressBar;
 
+        // File names already used for meshes and textures in the current export. Two links or textures
+        // must never end up in the same file (issue 62); the names inside the URDF are not affected.
+        private readonly HashSet<string> usedMeshFileNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> usedTextureFileNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> textureFileNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
         // Links whose mesh could not be written in the current export (issue 61).
         private readonly List<string> failedMeshLinks = new List<string>();
 
@@ -151,6 +157,9 @@ namespace SW2URDF.URDFExport
         {
             //Setting up the progress bar
             logger.Info("Beginning the export process");
+            usedMeshFileNames.Clear();
+            usedTextureFileNames.Clear();
+            textureFileNames.Clear();
             int progressBarBound = CommonSwOperations.GetCount(URDFRobot.BaseLink);
             iSwApp.GetUserProgressBar(out progressBar);
             progressBar.Start(0, progressBarBound, "Creating package directories");
@@ -159,7 +168,7 @@ namespace SW2URDF.URDFExport
             logger.Info("Creating package directories with name " + PackageName + " and save path " + SavePath);
             URDFPackage package = new URDFPackage(PackageName, SavePath, UiText.FromSolidWorks(iSwApp));
             package.CreateDirectories();
-            URDFRobot.Name = PackageName;
+            URDFRobot.Name = package.PackageName;
             string windowsURDFFileName = package.WindowsRobotsDirectory + URDFRobot.Name + ".urdf";
             string windowsCSVFileName = package.WindowsRobotsDirectory + URDFRobot.Name + ".csv";
             string windowsPackageXMLFileName = package.WindowsPackageDirectory + "package.xml";
@@ -175,16 +184,16 @@ namespace SW2URDF.URDFExport
             //Creating package.xml file
             logger.Info("Creating package.xml at " + windowsPackageXMLFileName);
             PackageXMLWriter packageXMLWriter = new PackageXMLWriter(windowsPackageXMLFileName);
-            PackageXML packageXML = new PackageXML(PackageName);
+            PackageXML packageXML = new PackageXML(package.PackageName);
             packageXML.WriteElement(packageXMLWriter);
 
             //Creating RVIZ launch file
-            Rviz rviz = new Rviz(PackageName, URDFRobot.Name + ".urdf");
+            Rviz rviz = new Rviz(package.PackageName, URDFRobot.Name + ".urdf");
             logger.Info("Creating RVIZ launch file in " + package.WindowsLaunchDirectory);
             rviz.WriteFiles(package.WindowsLaunchDirectory);
 
             //Creating Gazebo launch file
-            Gazebo gazebo = new Gazebo(URDFRobot.Name, PackageName, URDFRobot.Name + ".urdf");
+            Gazebo gazebo = new Gazebo(URDFRobot.Name, package.PackageName, URDFRobot.Name + ".urdf");
             logger.Info("Creating Gazebo launch file in " + package.WindowsLaunchDirectory);
 
             gazebo.WriteFile(package.WindowsLaunchDirectory);
@@ -304,17 +313,22 @@ namespace SW2URDF.URDFExport
             {
                 if (File.Exists(link.Visual.Material.Texture.wFilename))
                 {
-                    link.Visual.Material.Texture.Filename =
-
-                        package.TexturesDirectory + Path.GetFileName(link.Visual.Material.Texture.wFilename);
-                    string textureSavePath =
-                        package.WindowsTexturesDirectory + Path.GetFileName(link.Visual.Material.Texture.wFilename);
-                    File.Copy(link.Visual.Material.Texture.wFilename, textureSavePath, true);
+                    string textureSource = link.Visual.Material.Texture.wFilename;
+                    string textureName;
+                    // The same source file is copied once; different files with the same name get a suffix
+                    if (!textureFileNames.TryGetValue(textureSource, out textureName))
+                    {
+                        textureName = FileNames.UniqueFileNameWithExtension(Path.GetFileName(textureSource), usedTextureFileNames);
+                        textureFileNames[textureSource] = textureName;
+                        File.Copy(textureSource, package.WindowsTexturesDirectory + textureName, true);
+                    }
+                    link.Visual.Material.Texture.Filename = package.TexturesDirectory + textureName;
                 }
             }
 
-            // Create the mesh filenames. SolidWorks likes to use / but that will get messy in filenames so use _ instead
-            string linkName = link.Name.Replace('/', '_');
+            // Create the mesh filenames. Link names may hold characters that are not allowed in file names
+            // (SolidWorks likes to use /), so the file name is derived from the name; the link name itself is kept.
+            string linkName = FileNames.UniqueFileName(link.Name, usedMeshFileNames);
             string meshFilename = package.MeshesDirectory + linkName;
             string windowsMeshFileName = package.WindowsMeshesDirectory + linkName;
             switch(meshFormat)
@@ -608,14 +622,16 @@ namespace SW2URDF.URDFExport
             //Creating package directories
             URDFPackage package = new URDFPackage(PackageName, SavePath, UiText.FromSolidWorks(iSwApp));
             package.CreateDirectories();
-            string meshFileName = package.MeshesDirectory + URDFRobot.BaseLink.Name + ".STL";
-            string windowsMeshFileName = package.WindowsMeshesDirectory + URDFRobot.BaseLink.Name + ".STL";
-            string windowsURDFFileName = package.WindowsRobotsDirectory + URDFRobot.Name + ".urdf";
+            string meshBaseName = FileNames.SanitizeFileName(URDFRobot.BaseLink.Name);
+            string meshFileName = package.MeshesDirectory + meshBaseName + ".STL";
+            string windowsMeshFileName = package.WindowsMeshesDirectory + meshBaseName + ".STL";
+            string windowsURDFFileName = package.WindowsRobotsDirectory +
+                FileNames.SanitizeFileName(URDFRobot.Name, "robot") + ".urdf";
             string windowsManifestFileName = package.WindowsPackageDirectory + "manifest.xml";
 
             //Creating manifest file
             PackageXMLWriter manifestWriter = new PackageXMLWriter(windowsManifestFileName);
-            PackageXML Manifest = new PackageXML(URDFRobot.Name);
+            PackageXML Manifest = new PackageXML(package.PackageName);
             Manifest.WriteElement(manifestWriter);
 
             //Customizing STL preferences to how I want them

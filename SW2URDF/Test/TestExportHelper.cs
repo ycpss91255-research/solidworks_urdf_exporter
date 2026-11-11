@@ -424,7 +424,7 @@ namespace SW2URDF.Test
                 Assert.Equal(links.Count, exact.Count);
                 foreach (KeyValuePair<string, double> entry in exact)
                 {
-                    string name = entry.Key.Replace('/', '_');
+                    string name = FileNames.SanitizeFileName(entry.Key);
                     // Express both meshes in the link frame: the visual origin in the URDF maps mesh to link coordinates
                     List<double[]> stl = ApplyVisualOrigin(ReadStlTriangles(Path.Combine(stlMeshes, name + ".STL")), stlUrdf, entry.Key);
                     List<double[]> obj = ApplyVisualOrigin(ReadObjTriangles(Path.Combine(objMeshes, name + ".obj")), objUrdf, entry.Key);
