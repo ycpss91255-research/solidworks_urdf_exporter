@@ -144,6 +144,17 @@ namespace SW2URDF.Test
             public string SketchName = "3DSketch1";
             public const string ReferenceName = "URDF Reference";
             public ExportHelper Helper;
+            public Moq.Mock<ModelDocExtension> Extension;
+
+            // True while a call to CreateMassProperty2 sees a sketch in edit mode: SolidWorks
+            // reports mass 0 for components then.
+            public bool MassQueriedWhileEditing;
+
+            // SolidWorks has not built the geometry while a rebuild is pending, and then reports
+            // volume and mass 0 for components.
+            public bool RebuildPending;
+            public bool MassQueriedWhilePending;
+            public int Rebuilds;
 
             public FakeSketchModel()
             {
@@ -153,6 +164,14 @@ namespace SW2URDF.Test
                 var extension = new Moq.Mock<ModelDocExtension>();
                 var sketchManager = new Moq.Mock<SketchManager>();
                 var sketch = new Moq.Mock<Sketch>();
+                sketch.Setup(s => s.Is3D()).Returns(true);
+                Extension = extension;
+                extension.SetupGet(e => e.NeedsRebuild2).Returns(() => RebuildPending ? 1 : 0);
+                document.Setup(d => d.ForceRebuild3(true)).Returns(true).Callback(() =>
+                {
+                    Rebuilds++;
+                    RebuildPending = false;
+                });
                 var sketchFeature = sketch.As<IFeature>();
                 sketchFeature.SetupProperty(f => f.Name);
                 sketchFeature.Object.Name = SketchName;
@@ -236,6 +255,89 @@ namespace SW2URDF.Test
 
             Assert.Equal(1, model.SketchesCreated);
             Assert.Equal(FakeSketchModel.ReferenceName, helper.GetField("referenceSketchName"));
+        }
+
+        // Insert3DSketch(true) toggles. When a sketch is already open (left over, or the user's
+        // own) the first call used to close it and the second one reopened it, so the reference
+        // sketch stayed in edit mode after the coordinate system was built.
+        [Fact]
+        public void BuildingTheReferenceSketchNeverLeavesASketchOpen()
+        {
+            var model = new FakeSketchModel { Editing = true };
+            var helper = new PrivateObject(model.Helper);
+
+            helper.Invoke("EnsureReferenceSketch");
+
+            Assert.False(model.Editing, "a sketch is still in edit mode");
+            Assert.Equal(1, model.SketchesCreated);
+        }
+
+        [Fact]
+        public void AddingGeometryWhileTheReferenceSketchIsOpenLeavesItClosed()
+        {
+            var model = new FakeSketchModel();
+            var helper = new PrivateObject(model.Helper);
+
+            helper.Invoke("AddSketchGeometry",
+                new Type[] { typeof(Origin) }, new object[] { new Origin(true) });
+            model.Editing = true;
+            helper.Invoke("AddSketchGeometry",
+                new Type[] { typeof(Origin) }, new object[] { new Origin(true) });
+
+            Assert.False(model.Editing, "a sketch is still in edit mode");
+        }
+
+        // Mass properties of components come out as 0 while a sketch is in edit mode.
+        [Fact]
+        public void MassPropertiesAreNeverQueriedWithASketchOpen()
+        {
+            var model = new FakeSketchModel { Editing = true };
+            var app = new Moq.Mock<ISldWorks>();
+            app.Setup(a => a.RevisionNumber()).Returns("31.5.0");
+            model.Helper.iSwApp = app.Object;
+            var mass = new Moq.Mock<IMassProperty2>();
+            mass.Setup(m => m.Recalculate()).Returns(true);
+            model.Extension.Setup(e => e.CreateMassProperty2()).Returns(mass.Object)
+                .Callback(() => model.MassQueriedWhileEditing = model.Editing);
+            var helper = new PrivateObject(model.Helper);
+
+            helper.Invoke("GetComponentsMassProperty", new List<Component2>(), null);
+
+            Assert.False(model.MassQueriedWhileEditing, "CreateMassProperty2 ran with a sketch open");
+        }
+
+        [Theory]
+        [InlineData(0.0, 1, true)]
+        [InlineData(0.0, 0, false)]
+        [InlineData(0.0375, 1, false)]
+        [InlineData(0.0375, 0, false)]
+        public void ZeroMassIsRecalculatedOnlyWhileARebuildIsPending(double mass, int rebuildStatus, bool retry)
+        {
+            Assert.Equal(retry, ExportHelper.MassNeedsRetry(mass, rebuildStatus));
+        }
+
+        // Right after opening a model, and after the exporter inserted a coordinate system, the
+        // model can have a rebuild pending. The first export then wrote mass 0 for a link and the
+        // next one, once the rebuild had happened, the right value.
+        [Theory]
+        [InlineData(true, 1)]
+        [InlineData(false, 0)]
+        public void MassPropertiesAreNeverQueriedWithARebuildPending(bool pending, int expectedRebuilds)
+        {
+            var model = new FakeSketchModel { RebuildPending = pending };
+            var app = new Moq.Mock<ISldWorks>();
+            app.Setup(a => a.RevisionNumber()).Returns("31.5.0");
+            model.Helper.iSwApp = app.Object;
+            var mass = new Moq.Mock<IMassProperty2>();
+            mass.Setup(m => m.Recalculate()).Returns(true);
+            model.Extension.Setup(e => e.CreateMassProperty2()).Returns(mass.Object)
+                .Callback(() => model.MassQueriedWhilePending = model.RebuildPending);
+            var helper = new PrivateObject(model.Helper);
+
+            helper.Invoke("GetComponentsMassProperty", new List<Component2>(), null);
+
+            Assert.False(model.MassQueriedWhilePending, "CreateMassProperty2 ran with a rebuild pending");
+            Assert.Equal(expectedRebuilds, model.Rebuilds);
         }
     }
 
