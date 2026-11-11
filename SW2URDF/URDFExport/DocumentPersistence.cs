@@ -47,6 +47,15 @@ namespace SW2URDF.URDFExport
             return hasSharedData ? AttributeInit.CopyShared : AttributeInit.Blank;
         }
 
+        /// <summary>
+        /// The attributes are only shown inside the feature tree folder. Group them when new ones
+        /// were created, or when the folder is missing (for example deleted by the user).
+        /// </summary>
+        public static bool NeedsGrouping(bool attributesCreated, bool folderExists)
+        {
+            return attributesCreated || !folderExists;
+        }
+
         public static string SaveFirstText(UiText ui)
         {
             return ui.Get("The document has to be saved before the exporter can be opened.");
