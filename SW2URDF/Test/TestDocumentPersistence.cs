@@ -60,6 +60,17 @@ namespace SW2URDF.Test
         }
 
         [Fact]
+        public void TheFolderIsRebuiltWhenItIsMissingEvenIfNothingWasCreated()
+        {
+            // The user deleted the feature tree folder: the attributes survive (outside any
+            // folder, where they are not shown) and must be grouped into a new folder.
+            Assert.True(DocumentPersistence.NeedsGrouping(false, false));
+            Assert.True(DocumentPersistence.NeedsGrouping(true, true));
+            Assert.True(DocumentPersistence.NeedsGrouping(true, false));
+            Assert.False(DocumentPersistence.NeedsGrouping(false, true));
+        }
+
+        [Fact]
         public void WarningsAreLocalizedAndTellTheUserToSave()
         {
             Assert.Equal(

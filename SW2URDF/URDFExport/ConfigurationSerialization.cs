@@ -190,9 +190,12 @@ namespace SW2URDF.URDFExport
                     model.ShowConfiguration2(original);
                 }
             }
-            if (created)
+            bool folderExisted = ConfigurationFolderExists(model);
+            if (DocumentPersistence.NeedsGrouping(created, folderExisted))
             {
                 TryGroupConfigurationAttributes(model);
+                // Rebuilding a deleted folder changes the document too
+                created = created || (!folderExisted && ConfigurationFolderExists(model));
             }
             return created;
         }
@@ -555,6 +558,20 @@ namespace SW2URDF.URDFExport
             return null;
         }
 
+        private static bool ConfigurationFolderExists(ModelDoc2 model)
+        {
+            Feature feature = model.FirstFeature() as Feature;
+            while (feature != null)
+            {
+                if (feature.GetTypeName2() == "FtrFolder" && feature.Name == ConfigurationAttributeFolderName)
+                {
+                    return true;
+                }
+                feature = feature.GetNextFeature() as Feature;
+            }
+            return false;
+        }
+
         private static bool HasConfigurationAttribute(ModelDoc2 model)
         {
             string name = GetActiveConfigurationName(model);
@@ -718,7 +735,7 @@ namespace SW2URDF.URDFExport
             param = saveExporterAttribute.GetParameter("exporterVersion");
             param.SetDoubleValue2(SerializationVersion, ConfigurationOptions, "");
 
-            if (created)
+            if (DocumentPersistence.NeedsGrouping(created, ConfigurationFolderExists(model)))
             {
                 TryGroupConfigurationAttributes(model);
             }
