@@ -60,6 +60,36 @@ namespace SW2URDF.Test
             Assert.Equal("x;y.STL", link.Visual.Geometry.Mesh.Filename);
         }
 
+        // The exporter writes the color as four columns (Color Red .. Color Alpha). Loading ignored them,
+        // so every merged link came back white.
+        [Fact]
+        public void ColorColumnsAreLoaded()
+        {
+            foreach (string culture in Cultures)
+            {
+                InCulture(culture, () =>
+                {
+                    Link link = Load("Link Name,Color Red,Color Green,Color Blue,Color Alpha\r\nl,0.25,0.5,0.75,0.5\r\n")[0];
+                    Assert.Equal(new double[] { 0.25, 0.5, 0.75, 0.5 }, link.Visual.Material.Color.GetColor());
+                });
+            }
+        }
+
+        [Fact]
+        public void MissingColorColumnsKeepTheDefault()
+        {
+            Link link = Load("Link Name,Color Blue\r\nl,0.2\r\n")[0];
+            Assert.Equal(new double[] { 1, 1, 0.2, 1 }, link.Visual.Material.Color.GetColor());
+            Assert.Equal(new double[] { 1, 1, 1, 1 }, Load("Link Name\r\nl\r\n")[0].Visual.Material.Color.GetColor());
+        }
+
+        [Fact]
+        public void ColorWithBadNumberIsIgnoredNotMisread()
+        {
+            Link link = Load("Link Name,Color Red,Color Green\r\nl,abc,0.5\r\n")[0];
+            Assert.Equal(new double[] { 1, 0.5, 1, 1 }, link.Visual.Material.Color.GetColor());
+        }
+
         [Fact]
         public void NumbersUseThePointInEveryCulture()
         {
