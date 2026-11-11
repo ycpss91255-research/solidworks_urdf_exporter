@@ -17,6 +17,7 @@ namespace SW2URDF.Test
         {
             var manager = (ExportPropertyManager)System.Runtime.Serialization.FormatterServices
                 .GetUninitializedObject(typeof(ExportPropertyManager));
+            new PrivateObject(manager).SetField("ui", new SW2URDF.UI.UiText("english"));
             var node = new URDF.LinkNode { IsBaseNode = isBase };
             node.Link.Name = "reference";
             node.Link.Joint.Name = "reference_joint";
@@ -28,6 +29,17 @@ namespace SW2URDF.Test
             manager.CheckNodeComplete(node);
 
             Xunit.Assert.Equal(incomplete, node.IsIncomplete);
+        }
+
+        [Fact]
+        public void EmptyLinkErrorTextIsLocalized()
+        {
+            const string key = "Select an existing reference coordinate system for empty link {0}";
+            string english = new SW2URDF.UI.UiText("english").Get(key);
+            string chinese = new SW2URDF.UI.UiText("chinese").Get(key);
+            Xunit.Assert.Equal(key, english);
+            Xunit.Assert.NotEqual(english, chinese);
+            Xunit.Assert.Contains("{0}", chinese);
         }
 
         [Fact]
