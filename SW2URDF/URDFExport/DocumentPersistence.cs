@@ -16,6 +16,8 @@ namespace SW2URDF.URDFExport
 
     public enum AttributeInit { None, Blank, CopyShared }
 
+    public enum FolderNameCollision { None, RenameLegacyAttribute, Blocked }
+
     /// <summary>
     /// The exporter settings are stored as attributes inside the open SolidWorks document, so they
     /// are lost when the document is closed without saving. Free of SolidWorks types so the
@@ -100,6 +102,71 @@ namespace SW2URDF.URDFExport
                 case "ProfileFeature": return name == "URDF Reference";
                 default: return false;
             }
+        }
+
+        /// <summary>
+        /// What the oldest exporter attribute ("URDF Export Configuration") is renamed to. The
+        /// feature tree folder takes that name and SolidWorks feature names are unique. Keep it
+        /// listed in <see cref="ConfigurationFormat.PreviousSharedAttributeNames"/>.
+        /// </summary>
+        public const string LegacyAttributeRenamedName = "URDF Export Configuration (legacy)";
+
+        /// <summary>
+        /// Another feature already uses the name the URDF folder needs (SolidWorks keeps the
+        /// default "Folder1" then). An old exporter attribute is renamed, a user's feature never.
+        /// </summary>
+        public static FolderNameCollision DecideFolderNameCollision(string[] types, string[] names, string folderName)
+        {
+            for (int i = 0; names != null && i < names.Length; i++)
+            {
+                if (names[i] != folderName || types[i] == "FtrFolder") continue;
+                return types[i] == "Attribute" ? FolderNameCollision.RenameLegacyAttribute : FolderNameCollision.Blocked;
+            }
+            return FolderNameCollision.None;
+        }
+
+        /// <summary>The wanted name, or the wanted name followed by the first free number from 2.</summary>
+        public static string FreeName(string wanted, string[] taken)
+        {
+            System.Collections.Generic.List<string> used = new System.Collections.Generic.List<string>(taken ?? new string[0]);
+            string name = wanted;
+            for (int n = 2; used.Contains(name); n++) name = wanted + " " + n;
+            return name;
+        }
+
+        private static bool IsDefaultFolderName(string name)
+        {
+            return name != null && System.Text.RegularExpressions.Regex.IsMatch(name, @"^Folder\d+$");
+        }
+
+        /// <summary>
+        /// Folders named "FolderN" that earlier exporter versions left behind when the rename to the
+        /// URDF folder name failed: only the ones holding nothing but exporter features (and other such
+        /// folders). A user's folder, or an empty one, is never listed. Deleting a folder keeps its contents.
+        /// </summary>
+        public static string[] FindStrayFolders(string[] types, string[] names,
+            System.Func<string, string, bool> isExporterFeature)
+        {
+            System.Collections.Generic.List<string> result = new System.Collections.Generic.List<string>();
+            for (int start = 0; names != null && start < names.Length; start++)
+            {
+                if (types[start] != "FtrFolder" || !IsDefaultFolderName(names[start])) continue;
+                int end = System.Array.IndexOf(names, names[start] + "___EndTag___", start + 1);
+                if (end < 0) continue;
+                bool ours = false, foreign = false;
+                for (int i = start + 1; i < end; i++)
+                {
+                    if (types[i] == "FtrFolder")
+                    {
+                        string folder = names[i].EndsWith("___EndTag___") ? names[i].Substring(0, names[i].Length - 12) : names[i];
+                        if (!IsDefaultFolderName(folder)) foreign = true;
+                    }
+                    else if (isExporterFeature(types[i], names[i])) ours = true;
+                    else foreign = true;
+                }
+                if (ours && !foreign) result.Add(names[start]);
+            }
+            return result.ToArray();
         }
 
         public static string[] WithExtras(string[] names, string[] extras)

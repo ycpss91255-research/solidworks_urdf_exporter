@@ -338,6 +338,7 @@
     <Compile Include="Test\TestConfigurationStatus.cs" />
     <Compile Include="Test\TestTreeKeyActions.cs" />
     <Compile Include="Test\TestDocumentPersistence.cs" />
+    <Compile Include="Test\TestFolderNameCollision.cs" />
     <Compile Include="Test\TestGeneratedFeatureLog.cs" />
     <Compile Include="Test\TestExporterRouting.cs" />
     <Compile Include="Test\TestOrphanAttributes.cs" />
