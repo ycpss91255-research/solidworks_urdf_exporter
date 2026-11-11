@@ -5,7 +5,7 @@ using Xunit;
 namespace SW2URDF.Test
 {
     /// <summary>
-    /// Does not need SolidWorks. The dialogs show values with 5 significant digits (format G5). Pressing
+    /// Does not need SolidWorks. The dialogs show a value with its full precision (format R). Pressing
     /// Next or Export reads the text boxes back into the model; a value the user did not touch must keep
     /// its full precision, and a value the user typed must be taken exactly as typed.
     /// </summary>
@@ -14,7 +14,7 @@ namespace SW2URDF.Test
         private const double Roll = -1.5707963267949;
         private const double Offset = 0.00249115384615384;
         private const double Long = 1.2345678901234;
-        private const string Format = "G5";
+        private const string Format = "R";
 
         private static TextBox[] Boxes(int count)
         {
@@ -34,7 +34,9 @@ namespace SW2URDF.Test
             origin.SetRPY(new double[] { Roll, 0, Roll });
             TextBox[] b = Boxes(6);
             origin.FillBoxes(b[0], b[1], b[2], b[3], b[4], b[5], Format);
-            Assert.Equal("-1.5708", b[3].Text);
+            Assert.Equal("-1.5707963267949", b[3].Text);
+            Assert.Equal("0.00249115384615384", b[0].Text);
+            Assert.Equal(Roll, double.Parse(b[3].Text, System.Globalization.CultureInfo.InvariantCulture));
             origin.Update(b[0], b[1], b[2], b[3], b[4], b[5]);
             Assert.Equal(new double[] { Offset, Long, -Long }, origin.GetXYZ());
             Assert.Equal(new double[] { Roll, 0, Roll }, origin.GetRPY());
@@ -158,6 +160,24 @@ namespace SW2URDF.Test
             color.Update(b[0], b[1], b[2], b[3]);
             Assert.Equal(0.1234567890123, color.Red);
             Assert.Equal(0.7654321098765, color.Blue);
+        }
+
+        [Fact]
+        public void ShownTextIsTheFullPrecisionAndEditedTextIsTakenAsTyped()
+        {
+            double[] values = { 1.0 / 3.0, 0.1, 2.34558007901714E-18, -123456.789012345678, 1e-300, 0.0 };
+            foreach (double value in values)
+            {
+                Mass mass = new Mass { Value = value };
+                TextBox box = new TextBox();
+                mass.FillBoxes(box, Format);
+                Assert.Equal(value, double.Parse(box.Text, System.Globalization.CultureInfo.InvariantCulture));
+                mass.Update(box);
+                Assert.Equal(value, mass.Value);
+                box.Text = "4.5";
+                mass.Update(box);
+                Assert.Equal(4.5, mass.Value);
+            }
         }
 
         [Fact]

@@ -41,14 +41,14 @@ namespace SW2URDF.UI
             FillBlank(linkBoxes);
             if (!Link.isFixedFrame)
             {
-                //G5: Maximum decimal places to use (not counting exponential notation) is 5
+                //R: round-trip format, shows the full precision of the stored value
                 Link.Visual.Origin.FillBoxes(textBoxVisualOriginX,
                                              textBoxVisualOriginY,
                                              textBoxVisualOriginZ,
                                              textBoxVisualOriginRoll,
                                              textBoxVisualOriginPitch,
                                              textBoxVisualOriginYaw,
-                                             "G5");
+                                             "R");
 
                 Link.Inertial.Origin.FillBoxes(textBoxInertialOriginX,
                                                textBoxInertialOriginY,
@@ -56,9 +56,9 @@ namespace SW2URDF.UI
                                                textBoxInertialOriginRoll,
                                                textBoxInertialOriginPitch,
                                                textBoxInertialOriginYaw,
-                                               "G5");
+                                               "R");
 
-                Link.Inertial.Mass.FillBoxes(textBoxMass, "G5");
+                Link.Inertial.Mass.FillBoxes(textBoxMass, "R");
 
                 Link.Inertial.Inertia.FillBoxes(textBoxIxx,
                                                 textBoxIxy,
@@ -66,7 +66,7 @@ namespace SW2URDF.UI
                                                 textBoxIyy,
                                                 textBoxIyz,
                                                 textBoxIzz,
-                                                "G5");
+                                                "R");
 
                 Link.Visual.Material.FillBoxes(comboBoxMaterials);
                 textBoxTexture.Text = Link.Visual.Material.Texture.wFilename;
@@ -75,7 +75,7 @@ namespace SW2URDF.UI
                                                      domainUpDownGreen,
                                                      domainUpDownBlue,
                                                      domainUpDownAlpha,
-                                                     "G5");
+                                                     "R");
 
             }
         }
@@ -97,7 +97,7 @@ namespace SW2URDF.UI
                 joint.Parent.FillBoxes(labelParent);
                 joint.Child.FillBoxes(labelChild);
 
-                //G5: Maximum decimal places to use (not counting exponential notation) is 5
+                //R: round-trip format, shows the full precision of the stored value
 
                 joint.Origin.FillBoxes(textBoxJointX,
                                        textBoxJointY,
@@ -105,11 +105,11 @@ namespace SW2URDF.UI
                                        textBoxJointRoll,
                                        textBoxJointPitch,
                                        textBoxJointYaw,
-                                       "G5");
+                                       "R");
 
                 if (joint.Type != "fixed")
                 {
-                    joint.Axis.FillBoxes(textBoxAxisX, textBoxAxisY, textBoxAxisZ, "G5");
+                    joint.Axis.FillBoxes(textBoxAxisX, textBoxAxisY, textBoxAxisZ, "R");
                 }
 
                 if (joint.Limit != null && joint.Type != "fixed")
@@ -118,21 +118,21 @@ namespace SW2URDF.UI
                                           textBoxLimitUpper,
                                           textBoxLimitEffort,
                                           textBoxLimitVelocity,
-                                          "G5");
+                                          "R");
                 }
 
                 if (joint.Calibration != null)
                 {
                     joint.Calibration.FillBoxes(textBoxCalibrationRising,
                                                 textBoxCalibrationFalling,
-                                                "G5");
+                                                "R");
                 }
 
                 if (joint.Dynamics != null)
                 {
                     joint.Dynamics.FillBoxes(textBoxDamping,
                                              textBoxFriction,
-                                             "G5");
+                                             "R");
                 }
 
                 if (joint.Safety != null)
@@ -141,7 +141,7 @@ namespace SW2URDF.UI
                                            textBoxSoftUpper,
                                            textBoxKPosition,
                                            textBoxKVelocity,
-                                           "G5");
+                                           "R");
                 }
             }
 

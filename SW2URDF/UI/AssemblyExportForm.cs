@@ -225,6 +225,7 @@ namespace SW2URDF.UI
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
+            UiLayout.ShowFullValueTips(this);
             UiLayout.FitButtonHeightsToWindow(this);
         }
 
@@ -607,9 +608,9 @@ namespace SW2URDF.UI
                 {
                     double[] Axis = Exporter.EstimateAxis(comboBoxAxis.Text);
                     Axis = Exporter.LocalizeAxis(Axis, comboBoxOrigin.Text);
-                    textBoxAxisX.Text = Axis[0].ToString("G5");
-                    textBoxAxisY.Text = Axis[1].ToString("G5");
-                    textBoxAxisZ.Text = Axis[2].ToString("G5");
+                    textBoxAxisX.Text = Axis[0].ToString("R", SW2URDF.URDF.URDFAttribute.URDFNumberFormat);
+                    textBoxAxisY.Text = Axis[1].ToString("R", SW2URDF.URDF.URDFAttribute.URDFNumberFormat);
+                    textBoxAxisZ.Text = Axis[2].ToString("R", SW2URDF.URDF.URDFAttribute.URDFNumberFormat);
                 }
             }
         }
