@@ -37,11 +37,11 @@ namespace SW2URDF.URDFExport
             switch (source)
             {
                 case SettingsSource.Configuration:
-                    return ui.Get("These settings are stored for this configuration.");
+                    return ui.Get("Stored for this configuration");
                 case SettingsSource.Shared:
-                    return ui.Get("Using the shared (legacy) settings; they are stored for this configuration on the next save.");
+                    return ui.Get("Using shared (legacy) settings");
                 default:
-                    return ui.Get("New: nothing is stored for this configuration yet.");
+                    return ui.Get("New: nothing stored yet");
             }
         }
 
