@@ -302,10 +302,13 @@ namespace SW2URDF.URDFExport
             foreach (Link child in link.Children)
             {
                 count += 1;
-                if (!child.isFixedFrame)
-                {
-                    ExportFiles(child, package, count, exportSTL, meshFormat);
-                }
+                ExportFiles(child, package, count, exportSTL, meshFormat);
+            }
+
+            // A reference frame has no mesh, but its descendants may have geometry.
+            if (link.isFixedFrame)
+            {
+                return;
             }
 
             // Copy the texture file (if it was specified) to the textures directory
@@ -567,6 +570,23 @@ namespace SW2URDF.URDFExport
 
             logger.Info(link.Name + ": Reference geometry name " + names["component"]);
 
+            // Choose the coordinate system SOLIDWORKS exports the STL relative to. The export
+            // preference only resolves names that exist at the top level of the assembly, so a
+            // coordinate system defined inside a sub-assembly cannot be used directly and the
+            // mesh falls back to the global frame (issues #87 / #116). When the selection is
+            // nested, materialize a top-level reference coordinate system at the same global
+            // pose -- the transform the joint origin already uses, which is depth-independent --
+            // and export relative to that, so the mesh stays baked at the link origin.
+            string exportCoordsysName = names["geo"];
+            if (!string.IsNullOrEmpty(names["component"]))
+            {
+                string nestedExportCoordsys = CreateGlobalMeshCoordinateSystem(link, coordsysName);
+                if (!string.IsNullOrEmpty(nestedExportCoordsys))
+                {
+                    exportCoordsysName = nestedExportCoordsys;
+                }
+            }
+
             CommonSwOperations.ShowComponents(ActiveSWModel, link.SWComponents);
 
             bool success;
@@ -575,7 +595,7 @@ namespace SW2URDF.URDFExport
             {
                 int saveOptions = (int)swSaveAsOptions_e.swSaveAsOptions_Silent |
                     (int)swSaveAsOptions_e.swSaveAsOptions_Copy;
-                SetLinkSpecificSTLPreferences(names["geo"], ActiveDoc);
+                SetLinkSpecificSTLPreferences(exportCoordsysName, ActiveDoc);
 
                 logger.Info("Saving STL to " + windowsMeshFilename);
                 saved = ActiveDoc.Extension.SaveAs(windowsMeshFilename,

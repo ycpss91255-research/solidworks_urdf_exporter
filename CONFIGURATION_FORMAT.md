@@ -9,11 +9,29 @@ This document describes how that data is versioned.
 |---|---|---|
 | One per SolidWorks configuration | instance named after the configuration (definition `URDF Export Configuration Data`), grouped in the feature tree folder `URDF Export Configuration` | Preferred when it exists and is not empty. |
 | Shared by all configurations | `URDF Export Configuration (v1.4)` | Fallback. Written by exporters before per-configuration storage. |
-| Older shared names | `URDF Export Configuration (v1.3)`, `URDF Export Configuration` | Read-only fallback. |
+| Older shared names | `URDF Export Configuration (v1.3)`, `URDF Export Configuration`, `URDF Export Configuration (legacy)` | Read-only fallback. The plain name is renamed to `(legacy)` the first time the exporter groups the feature tree, because the feature tree folder uses that name and feature names are unique. The data is kept. |
 
 The shared attribute name contains a version for historical reasons. It is **not renamed**:
 models saved by earlier exporters keep their data under that name, and renaming would hide it.
 The feature tree folder name carries no version.
+
+## Generated coordinate systems and axes
+
+The 3D sketch `URDF Reference`, `Origin_global`, `Origin_<joint>` and `Axis_<joint>` are model features,
+not part of a configuration: there is one set per model. They are points and lines at fixed assembly
+coordinates, so they do not follow the components. The settings of a configuration store only their
+*names* (after an export, the generated name replaces `Automatically Generate`).
+
+- Every export checks a saved coordinate system or axis that the exporter generated (it hangs on the
+  `URDF Reference` sketch) against the geometry of the **active** SolidWorks configuration. When it is
+  somewhere else (another configuration, or the model was edited since) the exporter uses the generated
+  frame that is already at the right place, or makes a new numbered one (`Origin_<joint>2`), and saves that
+  name for the configuration. Old frames are left alone; switching back and forth creates nothing new.
+  Frames the user made are never replaced.
+- A configuration with "Suppress new features" ticked gets frames made in other configurations suppressed;
+  the exporter unsuppresses the `URDF Reference` sketch in the active configuration so it can add to it.
+- A saved coordinate system that no longer exists (for example the sketch was deleted, which removes its
+  frames) is generated again, for the base link as for the joints.
 
 ## Format version
 

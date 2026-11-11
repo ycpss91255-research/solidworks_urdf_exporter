@@ -285,7 +285,11 @@ namespace SW2URDF.URDFExport
         {
             // Build the link from the partdoc
             Link link = CreateLinkFromComponents(null, node);
-            if (node.Link.Joint.CoordinateSystemName == "Automatically Generate")
+            string savedFrame = node.Link.Joint.CoordinateSystemName;
+            // A saved name whose frame is gone (the reference sketch was deleted, taking its frames
+            // with it) is generated again, as it is for the other joints
+            if (savedFrame == "Automatically Generate" ||
+                (!string.IsNullOrWhiteSpace(savedFrame) && !CheckRefCoordsysExists(savedFrame)))
             {
                 CreateBaseRefOrigin(true);
                 if (!GeneratedFeatures.WasCreated(GeneratedKind.CoordinateSystem, "Origin_global"))
@@ -572,6 +576,14 @@ namespace SW2URDF.URDFExport
         //Method which builds a single link
         private Link CreateLinkFromComponents(Link parent, LinkNode node)
         {
+            node.Link.isFixedFrame = node.Link.SWComponents.Count == 0;
+            node.Link.SWMainComponent = null;
+            if (node.Link.isFixedFrame && parent != null)
+            {
+                node.Link.Joint.Type = "fixed";
+                node.Link.Joint.Parent.Name = parent.Name;
+                node.Link.Joint.Child.Name = node.Link.Name;
+            }
             if (node.Link.SWComponents.Count > 0)
             {
                 List<Component2> components = node.Link.SWComponents;
@@ -590,12 +602,12 @@ namespace SW2URDF.URDFExport
                 }
             }
 
-            if (ComputeInertialValues)
+            if (ComputeInertialValues && !node.Link.isFixedFrame)
             {
                 ComputeInertialProperties(node.Link);
             }
 
-            if (ComputeVisualCollision)
+            if (ComputeVisualCollision && !node.Link.isFixedFrame)
             {
                 ComputeVisualCollisionProperties(node.Link);
             }
@@ -640,6 +652,7 @@ namespace SW2URDF.URDFExport
         private bool CreateJoint(Link parent, Link child)
         {
             CheckRefGeometryExists(child);
+            RefreshGeneratedReferences(parent, child);
 
             string coordSysName = child.Joint.CoordinateSystemName;
             string axisName = child.Joint.AxisName;
@@ -649,6 +662,12 @@ namespace SW2URDF.URDFExport
             child.Joint.Child.Name = child.Name;
             if (child.isFixedFrame)
             {
+                if (coordSysName == "Automatically Generate")
+                {
+                    ExportErrorWhy = string.Format(
+                        UiText.FromSolidWorks(iSwApp).Get("Select an existing reference coordinate system for empty link {0}"), child.Name);
+                    return false;
+                }
                 axisName = "";
                 jointType = "fixed";
                 child.Joint.Type = jointType;
@@ -715,6 +734,92 @@ namespace SW2URDF.URDFExport
 
             LocalizeJoint(child.Joint, coordSysName);
             return true;
+        }
+
+        // The saved settings name the coordinate system and axis of a joint. When an earlier export
+        // generated them (they hang on the "URDF Reference" sketch) they are only right for the
+        // geometry they were generated in: the position of the frame does not follow the
+        // components when another SolidWorks configuration is activated or the model is edited.
+        // The position the current geometry gives is worked out on a copy of the link, and a
+        // frame (or axis) that is somewhere else is replaced by the one for the current geometry,
+        // an existing one at the right place or a new one. The earlier one is left alone, and the
+        // joint type, limits and everything else saved for the joint are kept.
+        private void RefreshGeneratedReferences(Link parent, Link child)
+        {
+            if (child.isFixedFrame || child.SWMainComponent == null ||
+                child.Joint.CoordinateSystemName == "Automatically Generate")
+            {
+                return;
+            }
+
+            string frameName = child.Joint.CoordinateSystemName;
+            string axisName = child.Joint.AxisName;
+            bool frameGenerated = IsGeneratedFeature(frameName, "COORDSYS");
+            bool axisGenerated = JointUsesAxis(child.Joint.Type) &&
+                axisName != "Automatically Generate" && IsGeneratedFeature(axisName, "AXIS");
+            if (!frameGenerated && !axisGenerated)
+            {
+                return;
+            }
+
+            Link probe = new Link { Name = child.Name };
+            probe.Joint.Name = child.Joint.Name;
+            probe.SWComponents.AddRange(child.SWComponents);
+            probe.SWMainComponent = child.SWMainComponent;
+            EstimateGlobalJointFromComponents(parent, probe);
+            Origin wanted = probe.Joint.Origin;
+            if (wanted.X == 0.0 && wanted.Y == 0.0 && wanted.Z == 0.0 &&
+                wanted.Roll == 0.0 && wanted.Pitch == 0.0 && wanted.Yaw == 0.0)
+            {
+                logger.Warn("The place of joint " + child.Joint.Name +
+                    " could not be worked out, its saved coordinate system and axis are used as they are");
+                return;
+            }
+
+            if (frameGenerated)
+            {
+                string name = GeneratedFeatureLog.RefreshName(
+                    frameName, "Origin_" + child.Joint.Name, CoordinateSystemExists,
+                    n => IsGeneratedFeature(n, "COORDSYS"), n => CoordinateSystemIsAt(n, wanted),
+                    out bool reuse, out bool changed);
+                if (changed)
+                {
+                    logger.Info("Coordinate system " + frameName + " does not fit the active configuration, using " + name);
+                    if (reuse)
+                    {
+                        GeneratedFeatures.AddReused(GeneratedKind.CoordinateSystem, name);
+                    }
+                    else
+                    {
+                        CreateRefOrigin(wanted, name);
+                    }
+                    child.Joint.CoordinateSystemName = name;
+                }
+            }
+
+            if (axisGenerated && probe.Joint.Type != "fixed")
+            {
+                double[] wantedAxis = probe.Joint.Axis.GetXYZ();
+                string name = GeneratedFeatureLog.RefreshName(
+                    axisName, "Axis_" + child.Joint.Name, AxisExists,
+                    n => IsGeneratedFeature(n, "AXIS"), n => AxisPointsAlong(n, wantedAxis),
+                    out bool reuse, out bool changed);
+                if (changed)
+                {
+                    logger.Info("Axis " + axisName + " does not fit the active configuration, using " + name);
+                    if (reuse)
+                    {
+                        GeneratedFeatures.AddReused(GeneratedKind.Axis, name);
+                    }
+                    else
+                    {
+                        probe.Joint.CoordinateSystemName = child.Joint.CoordinateSystemName;
+                        probe.Joint.AxisName = name;
+                        CreateRefAxis(probe.Joint);
+                    }
+                    child.Joint.AxisName = name;
+                }
+            }
         }
 
         // Creates a Reference Coordinate System in the SolidWorks Model to symbolize the joint location
@@ -822,6 +927,48 @@ namespace SW2URDF.URDFExport
             }
         }
 
+        // Materializes a top-level reference coordinate system at the global pose of a
+        // (possibly nested) coordinate system, and returns its name. The STL export
+        // coordinate-system preference only resolves coordinate systems at the top level of the
+        // document being saved, so a system defined inside a sub-assembly cannot be used to
+        // localize the mesh and SOLIDWORKS falls back to the global frame.
+        // The global transform is taken from GetCoordinateSystemTransform -- the same one the
+        // joint origin uses, which composes the owning component's Transform2 and is therefore
+        // correct at any nesting depth -- so the generated top-level system coincides with the
+        // selected one and the mesh is baked at the link origin, exactly as the auto-generated
+        // Origin_<joint> systems already are. Returns null if the transform cannot be resolved.
+        private string CreateGlobalMeshCoordinateSystem(Link link, string coordsysName)
+        {
+            MathTransform globalTransform = GetCoordinateSystemTransform(coordsysName);
+            if (globalTransform == null)
+            {
+                logger.Warn("Could not resolve a global transform for '" + coordsysName +
+                    "'; mesh for link " + link.Name + " will be exported in the global frame");
+                return null;
+            }
+
+            Joint meshFrame = new Joint();
+            meshFrame.Origin.SetXYZ(MathOps.GetXYZ(globalTransform));
+            meshFrame.Origin.SetRPY(MathOps.GetRPY(globalTransform));
+
+            // Like the generated joint frames: one of the same name and place (from an earlier
+            // export or preview) is used again, any other one is left alone and the next free
+            // name is taken. The name starts with Origin_ so that a cancelled preview removes it
+            // and a completed export files it in the URDF Export Configuration folder.
+            Origin wanted = meshFrame.Origin;
+            string name = GeneratedFeatureLog.ChooseName(
+                "Origin_mesh_" + link.Name.Replace('/', '_'), CoordinateSystemExists,
+                existing => CoordinateSystemIsAt(existing, wanted), out bool reuse);
+            if (reuse)
+            {
+                GeneratedFeatures.AddReused(GeneratedKind.CoordinateSystem, name);
+                return name;
+            }
+            meshFrame.CoordinateSystemName = name;
+            CreateRefOrigin(meshFrame);
+            return name;
+        }
+
         // Creates a Reference Axis to be used to calculate the joint axis
         private void CreateRefAxis(Joint Joint)
         {
@@ -910,6 +1057,10 @@ namespace SW2URDF.URDFExport
             {
                 referenceSketchName = Setup3DSketch();
             }
+            else
+            {
+                UnsuppressInActiveConfiguration(referenceSketchName, "SKETCH");
+            }
         }
 
         /// <summary>
@@ -961,6 +1112,68 @@ namespace SW2URDF.URDFExport
             }
         }
 
+        // A feature added while another configuration was active is suppressed in this one when
+        // the configuration has "Suppress new features" ticked. A suppressed sketch cannot be
+        // edited, so the points of a new frame could not be added.
+        private void UnsuppressInActiveConfiguration(string name, string selectType)
+        {
+            try
+            {
+                Feature feature = FindFeature(name, selectType);
+                if (feature != null && IsSuppressedHere(feature))
+                {
+                    logger.Info(name + " is suppressed in the active configuration, unsuppressing it there");
+                    feature.SetSuppression2(
+                        (int)swFeatureSuppressionAction_e.swUnSuppressFeature,
+                        (int)swInConfigurationOpts_e.swThisConfiguration, null);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not unsuppress " + name, e);
+            }
+        }
+
+        private static bool IsSuppressedHere(Feature feature)
+        {
+            bool[] suppressed = feature.IsSuppressed2(
+                (int)swInConfigurationOpts_e.swThisConfiguration, null) as bool[];
+            return suppressed != null && suppressed.Length > 0 && suppressed[0];
+        }
+
+        private Feature FindFeature(string name, string selectType)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return null;
+            }
+            ActiveSWModel.ClearSelection2(true);
+            Feature feature = null;
+            if (ActiveSWModel.Extension.SelectByID2(name, selectType, 0, 0, 0, false, 0, null, 0))
+            {
+                feature = ActiveSWModel.SelectionManager.GetSelectedObject6(1, -1) as Feature;
+            }
+            ActiveSWModel.ClearSelection2(true);
+            return feature;
+        }
+
+        // True for a coordinate system or axis that was made from the "URDF Reference" sketch, which
+        // is what the exporter does; one the user made is not
+        private bool IsGeneratedFeature(string name, string selectType)
+        {
+            try
+            {
+                Feature feature = FindFeature(name, selectType);
+                object[] parents = feature == null ? null : feature.GetParents() as object[];
+                return parents != null && parents.OfType<Feature>().Any(p => p.Name == "URDF Reference");
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Could not tell whether " + name + " was generated", e);
+                return false;
+            }
+        }
+
         // Inserts a sketch into the main assembly and name it
         private string Setup3DSketch()
         {
@@ -972,6 +1185,7 @@ namespace SW2URDF.URDFExport
             {
                 // From an earlier preview or made by the user: used as it is, nothing is added
                 ActiveSWModel.ClearSelection2(true);
+                UnsuppressInActiveConfiguration("URDF Reference", "SKETCH");
                 return "URDF Reference";
             }
             ActiveSWModel.SketchManager.Insert3DSketch(true);
