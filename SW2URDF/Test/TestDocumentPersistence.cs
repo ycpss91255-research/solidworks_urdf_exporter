@@ -120,6 +120,7 @@ namespace SW2URDF.Test
         [Theory]
         [InlineData("CoordSys", "Origin_global", true)]
         [InlineData("CoordSys", "Origin_joint1", true)]
+        [InlineData("CoordSys", "Origin_mesh_wheel_link", true)]
         [InlineData("CoordSys", "My coordinate system", false)]
         [InlineData("RefAxis", "Axis_joint1", true)]
         [InlineData("RefAxis", "Axis1", false)]
