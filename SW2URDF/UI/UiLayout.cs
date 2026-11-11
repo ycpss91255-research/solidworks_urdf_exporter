@@ -256,7 +256,7 @@ namespace SW2URDF.UI
         }
 
         // The edit box whose vertical range holds the middle of item and that sits beside it
-        // (no horizontal overlap), nearest middle first; null when item is not part of a row of
+        // (no horizontal overlap), a box to the right of it before one to its left, then nearest middle first; null when item is not part of a row of
         // an edit box.
         private static Control FieldBesides(Control item, List<Control> items)
         {
@@ -270,7 +270,12 @@ namespace SW2URDF.UI
                 {
                     continue;
                 }
-                if (best == null || Math.Abs(field.Top + field.Height / 2 - middle) <
+                // A caption stands left of the box it describes. One lying between two columns
+                // is also in the vertical range of the box on its left, which must not win.
+                bool right = field.Left >= item.Right;
+                bool bestRight = best != null && best.Left >= item.Right;
+                if (best == null || right && !bestRight ||
+                    right == bestRight && Math.Abs(field.Top + field.Height / 2 - middle) <
                     Math.Abs(best.Top + best.Height / 2 - middle))
                 {
                     best = field;
