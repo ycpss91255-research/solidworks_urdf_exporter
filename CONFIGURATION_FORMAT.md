@@ -23,8 +23,8 @@ coordinates, so they do not follow the components. The settings of a configurati
 *names* (after an export, the generated name replaces `Automatically Generate`).
 
 - Every export checks a saved coordinate system or axis that the exporter generated (it hangs on the
-  `URDF Reference` sketch) against the geometry of the **active** SolidWorks configuration. When it is
-  somewhere else (another configuration, or the model was edited since) the exporter uses the generated
+  `URDF Reference` sketch) against the geometry of the **active** SolidWorks configuration. Only its position is compared (orientation conventions differ between exporter versions and describe the same robot). When it is
+  at another position (another configuration, or the model was edited since) the exporter uses the generated
   frame that is already at the right place, or makes a new numbered one (`Origin_<joint>2`), and saves that
   name for the configuration. Old frames are left alone; switching back and forth creates nothing new.
   Frames the user made are never replaced.
