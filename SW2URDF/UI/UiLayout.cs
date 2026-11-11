@@ -51,13 +51,21 @@ namespace SW2URDF.UI
             FitButtonHeights(root, WindowDpi(root));
         }
 
-        // The designer gives push buttons a fixed height, but the visual theme draws the
-        // button face with a margin that grows with the DPI (and CJK fonts are taller), so at
-        // 125%/150% the top and bottom of the caption were cut off. Grow every button that is
+        // Vertical room, at 96 DPI, that the visual theme takes from a push button's height before
+        // the caption gets its clip rectangle (button border plus content margin, top and bottom
+        // together). Measured by drawing buttons of growing height next to an unclipped label:
+        // a 15px PMingLiU line needs a 24px button to show all glyph rows. The theme scales this
+        // with the DPI it draws at.
+        internal const float ButtonThemeVerticalMargin96 = 9f;
+
+        // The designer gives push buttons a fixed height, but the visual theme clips the caption to
+        // a rectangle smaller than the button, by a margin that grows with the DPI (and CJK fonts
+        // are taller). A button that is too short shows its caption with the top of the glyphs
+        // cut off, even when the button frame itself looks fine. Grow every button that is
         // too short for its text by the missing height, around its centre line.
         internal static void FitButtonHeights(Control root, float dpi)
         {
-            int margin = (int)Math.Ceiling(3 * dpi / 96f);
+            int margin = (int)Math.Ceiling(ButtonThemeVerticalMargin96 * dpi / 96f);
             foreach (Control child in root.Controls)
             {
                 Button button = child as Button;
@@ -66,7 +74,7 @@ namespace SW2URDF.UI
                     int text = Math.Max(button.Font.Height, TextRenderer.MeasureText(
                         button.Text, button.Font, new Size(Math.Max(1, button.Width - 8), 0),
                         TextFormatFlags.WordBreak | TextFormatFlags.NoPadding).Height);
-                    int needed = text + 2 * margin;
+                    int needed = text + margin;
                     if (button.Height < needed)
                     {
                         button.SetBounds(button.Left, button.Top - (needed - button.Height) / 2,
