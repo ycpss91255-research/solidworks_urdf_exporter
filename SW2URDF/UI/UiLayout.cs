@@ -299,5 +299,27 @@ namespace SW2URDF.UI
             }
             return gained;
         }
+
+        // Status banner (active configuration and where its settings come from): sized to its text.
+        // Sets the banner text and makes its height fit the wrapped text at the current font and
+        // DPI. A banner docked at the top of a form pushes the content down, so the form grows by
+        // the height it gained to keep the content area the size it had.
+        internal static void SetStatusBannerText(Label banner, string text)
+        {
+            int oldHeight = banner.Height;
+            banner.Text = text;
+            Size room = new Size(Math.Max(1, banner.ClientSize.Width - banner.Padding.Horizontal), 0);
+            Size need = TextRenderer.MeasureText(text ?? "", banner.Font, room,
+                TextFormatFlags.WordBreak | TextFormatFlags.NoPadding);
+            int height = need.Height + banner.Padding.Vertical + (banner.Height - banner.ClientSize.Height) + 2;
+            banner.Height = height;
+            Form form = banner.FindForm();
+            if (banner.Dock == DockStyle.Top && form != null && form.WindowState == FormWindowState.Normal
+                && height != oldHeight)
+            {
+                Rectangle area = Screen.FromControl(form).WorkingArea;
+                form.Height = Math.Min(form.Height + (height - oldHeight), area.Height);
+            }
+        }
     }
 }

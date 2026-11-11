@@ -66,6 +66,7 @@ namespace SW2URDF.URDFExport
 
         private readonly PropertyManagerPage2 PMPage;
         private PropertyManagerPageGroup PMGroup;
+        private PropertyManagerPageGroup PMConfigGroup;
         private PropertyManagerPageSelectionbox PMSelection;
         private PropertyManagerPageButton PMButtonExport;
         private PropertyManagerPageButton PMButtonLoad;
@@ -119,6 +120,7 @@ namespace SW2URDF.URDFExport
         private const int ComputeJointLimitsID = 30;
         private const int LoadedCSVFilenameID = 31;
         private const int LabelConfigurationStatusID = 32;
+        private const int ConfigurationGroupID = 33;
 
         #endregion class variables
 
@@ -687,21 +689,26 @@ namespace SW2URDF.URDFExport
         private void SetupPropertyManagerPage(ref string caption, ref string tip,
             ref long options, ref int controlType, ref int alignment)
         {
+            //Active SolidWorks configuration and where its settings come from, in a group of its
+            //own at the top: the group caption (set by RefreshConfigurationStatus once the model is
+            //known) is the most noticeable text a PropertyManager page offers.
+            caption = ConfigurationStatus.Headline(ui, null);
+            options = (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Visible +
+                (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded;
+            PMConfigGroup = (PropertyManagerPageGroup)PMPage.AddGroupBox(ConfigurationGroupID, caption, (int)options);
+            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
+            alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
+            options = (int)swAddControlOptions_e.swControlOptions_Visible +
+                (int)swAddControlOptions_e.swControlOptions_Enabled;
+            PMLabelConfigurationStatus = (PropertyManagerPageLabel)PMConfigGroup.AddControl2(
+                LabelConfigurationStatusID, (short)controlType, "", (short)alignment, (int)options, "");
+
             //Begin adding the controls to the page
             //Create the group box
             caption = ui.Get("Configure and Organize Links");
             options = (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Visible +
                 (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded;
             PMGroup = (PropertyManagerPageGroup)PMPage.AddGroupBox(GroupID, caption, (int)options);
-
-            //Active SolidWorks configuration and where its settings come from (filled in by
-            //RefreshConfigurationStatus once the model is known)
-            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
-            alignment = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            options = (int)swAddControlOptions_e.swControlOptions_Visible +
-                (int)swAddControlOptions_e.swControlOptions_Enabled;
-            PMLabelConfigurationStatus = (PropertyManagerPageLabel)PMGroup.AddControl2(
-                LabelConfigurationStatusID, (short)controlType, "", (short)alignment, (int)options, "");
 
             //Create the parent link label (static)
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Label;
