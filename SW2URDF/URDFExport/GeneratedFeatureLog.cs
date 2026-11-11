@@ -152,6 +152,22 @@ namespace SW2URDF.URDFExport
             return name;
         }
 
+        /// <summary>
+        /// True when a frame (a row-major 4x4 transform) is at the wanted position. Its orientation is
+        /// not compared: the exporter's estimate and older exporter versions orient the axes of a
+        /// frame differently for the same joint (a half turn describes the same robot), and
+        /// replacing such a frame would change the URDF of a model whose geometry did not change.
+        /// </summary>
+        public static bool SamePlace(double[] rowMajorTransform, double[] wantedXyz, double tolerance)
+        {
+            if (rowMajorTransform == null || rowMajorTransform.Length != 16 || wantedXyz == null || wantedXyz.Length != 3)
+            {
+                return false;
+            }
+            return SameValues(
+                new[] { rowMajorTransform[3], rowMajorTransform[7], rowMajorTransform[11] }, wantedXyz, tolerance);
+        }
+
         /// <summary>True when two vectors run along the same line, in either direction.</summary>
         public static bool SameDirection(double[] first, double[] second, double tolerance)
         {
