@@ -9,7 +9,7 @@ This document describes how that data is versioned.
 |---|---|---|
 | One per SolidWorks configuration | instance named after the configuration (definition `URDF Export Configuration Data`), grouped in the feature tree folder `URDF Export Configuration` | Preferred when it exists and is not empty. |
 | Shared by all configurations | `URDF Export Configuration (v1.4)` | Fallback. Written by exporters before per-configuration storage. |
-| Older shared names | `URDF Export Configuration (v1.3)`, `URDF Export Configuration` | Read-only fallback. |
+| Older shared names | `URDF Export Configuration (v1.3)`, `URDF Export Configuration`, `URDF Export Configuration (legacy)` | Read-only fallback. The plain name is renamed to `(legacy)` the first time the exporter groups the feature tree, because the feature tree folder uses that name and feature names are unique. The data is kept. |
 
 The shared attribute name contains a version for historical reasons. It is **not renamed**:
 models saved by earlier exporters keep their data under that name, and renaming would hide it.
