@@ -293,6 +293,10 @@ namespace SW2URDF.SW
         public void SetupAssemblyExporter()
         {
             ModelDoc2 modeldoc = SwApp.ActiveDoc;
+            if (RouteToOtherExporter(modeldoc, ExporterKind.Assembly))
+            {
+                return;
+            }
             logger.Info("Assembly export called for file " + modeldoc.GetTitle());
             bool saveAndRebuild = false;
             if (modeldoc.GetSaveFlag())
@@ -318,6 +322,34 @@ namespace SW2URDF.SW
                 logger.Info("Opening property manager");
                 SetupPropertyManager();
             }
+        }
+
+        /// <summary>
+        /// True when the active document does not belong to the exporter that was asked for: the
+        /// right exporter is opened for it instead (a part form on an assembly cannot work), or the
+        /// user is told that there is no exporter for this kind of document.
+        /// </summary>
+        private bool RouteToOtherExporter(ModelDoc2 modeldoc, ExporterKind requested)
+        {
+            ExporterKind kind = modeldoc == null ? ExporterKind.None : ExporterRouting.Decide(modeldoc.GetType());
+            if (kind == requested)
+            {
+                return false;
+            }
+            logger.Info("The active document needs the " + kind + " exporter, not the " + requested + " exporter");
+            if (kind == ExporterKind.Assembly)
+            {
+                SetupAssemblyExporter();
+            }
+            else if (kind == ExporterKind.Part)
+            {
+                SetupPartExporter();
+            }
+            else
+            {
+                MessageBox.Show(ui.Get("Open a part or an assembly to use the URDF exporter."));
+            }
+            return true;
         }
 
         public void AssemblyURDFExporter()
@@ -350,6 +382,10 @@ namespace SW2URDF.SW
         {
             logger.Info("Part export called");
             ModelDoc2 modeldoc = SwApp.ActiveDoc;
+            if (RouteToOtherExporter(modeldoc, ExporterKind.Part))
+            {
+                return;
+            }
             if ((modeldoc.Extension.NeedsRebuild2 == 0) ||
                 MessageBox.Show(ui.Get("Save and rebuild document?"),
                 ui.Get("The SW to URDF exporter requires saving before continuing"),
