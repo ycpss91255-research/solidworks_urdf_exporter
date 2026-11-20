@@ -169,7 +169,10 @@ namespace SW2URDF.URDFExport
             URDFPackage package = new URDFPackage(PackageName, SavePath, UiText.FromSolidWorks(iSwApp));
             package.CreateDirectories();
             URDFRobot.Name = package.PackageName;
-            string windowsURDFFileName = package.WindowsRobotsDirectory + URDFRobot.Name + ".urdf";
+            bool writeXacro = URDFRobot.BaseLink.WriteXacro;
+            URDFRobot.WriteXacro = writeXacro;
+            string windowsURDFFileName = package.WindowsRobotsDirectory +
+                XacroOutput.RobotFileName(URDFRobot.Name, writeXacro);
             string windowsCSVFileName = package.WindowsRobotsDirectory + URDFRobot.Name + ".csv";
             string windowsPackageXMLFileName = package.WindowsPackageXML;
 
@@ -188,12 +191,13 @@ namespace SW2URDF.URDFExport
             packageXML.WriteElement(packageXMLWriter);
 
             //Creating RVIZ launch file
-            Rviz rviz = new Rviz(package.PackageName, URDFRobot.Name + ".urdf");
+            Rviz rviz = new Rviz(package.PackageName, XacroOutput.RobotFileName(URDFRobot.Name, writeXacro), writeXacro);
             logger.Info("Creating RVIZ launch file in " + package.WindowsLaunchDirectory);
             rviz.WriteFiles(package.WindowsLaunchDirectory);
 
             //Creating Gazebo launch file
-            Gazebo gazebo = new Gazebo(URDFRobot.Name, package.PackageName, URDFRobot.Name + ".urdf");
+            Gazebo gazebo = new Gazebo(URDFRobot.Name, package.PackageName,
+                XacroOutput.RobotFileName(URDFRobot.Name, writeXacro), writeXacro);
             logger.Info("Creating Gazebo launch file in " + package.WindowsLaunchDirectory);
 
             gazebo.WriteFile(package.WindowsLaunchDirectory);
@@ -659,7 +663,7 @@ namespace SW2URDF.URDFExport
             string meshFileName = package.MeshesDirectory + meshBaseName + ".STL";
             string windowsMeshFileName = package.WindowsMeshesDirectory + meshBaseName + ".STL";
             string windowsURDFFileName = package.WindowsRobotsDirectory +
-                FileNames.SanitizeFileName(URDFRobot.Name, "robot") + ".urdf";
+                XacroOutput.RobotFileName(FileNames.SanitizeFileName(URDFRobot.Name, "robot"), URDFRobot.BaseLink.WriteXacro);
 
             //Creating package.xml, the same file the assembly export writes
             PackageXMLWriter packageXMLWriter = new PackageXMLWriter(package.WindowsPackageXML);
@@ -723,6 +727,7 @@ namespace SW2URDF.URDFExport
 
             //Writing URDF to file
             URDFWriter uWriter = new URDFWriter(windowsURDFFileName);
+            URDFRobot.WriteXacro = URDFRobot.BaseLink.WriteXacro;
             //mRobot.addLink(mLink);
             URDFRobot.WriteURDF(uWriter.writer);
         }

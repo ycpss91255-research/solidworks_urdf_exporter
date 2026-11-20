@@ -75,6 +75,7 @@ namespace SW2URDF.UI
             InitializeComponent();
             ui = UiText.FromSolidWorks(iSwApp);
             ui.Apply(this);
+            new ToolTip().SetToolTip(checkBoxXacro, ui.Get("Write the robot as a .urdf.xacro file instead of a .urdf file. The launch files then expand it with xacro."));
             AlignFieldLabels();
             UiLayout.FitForm(this, UiLayout.ScreenDpi());
             Exporter = new ExportHelper(iSwApp);
@@ -178,6 +179,8 @@ namespace SW2URDF.UI
                                                              textBox_collision_origin_pitch,
                                                              textBox_collision_origin_yaw);
 
+            Exporter.URDFRobot.BaseLink.WriteXacro = checkBoxXacro.Checked;
+
             // Remember these settings for the active SolidWorks configuration before the link is
             // localized for the export
             Exporter.SavePartSettings();
@@ -259,6 +262,7 @@ namespace SW2URDF.UI
                 logger.Warn("Could not load the saved part settings", ex);
             }
             textBox_save_as.Text = Exporter.SavePath + "\\" + Exporter.PackageName;
+            checkBoxXacro.Checked = Exporter.URDFRobot.BaseLink.WriteXacro;
 
             Exporter.URDFRobot.BaseLink.Visual.Origin.FillBoxes(textBox_collision_origin_x,
                                                              textBox_collision_origin_y,
@@ -303,4 +307,4 @@ namespace SW2URDF.UI
 
         #endregion Form event handlers
     }
-}
+}

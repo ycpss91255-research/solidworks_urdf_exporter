@@ -28,6 +28,21 @@ namespace SW2URDF.URDF
             Attributes.Add(NameAttribute);
         }
 
+        /// <summary>
+        /// Declares the xacro namespace on the robot element, for a file that is written as .urdf.xacro.
+        /// Nothing else changes in the file.
+        /// </summary>
+        public bool WriteXacro;
+
+        protected override void WriteExtraAttributes(XmlWriter writer)
+        {
+            if (WriteXacro)
+            {
+                writer.WriteAttributeString("xmlns", SW2URDF.URDFExport.XacroOutput.NamespacePrefix, null,
+                    SW2URDF.URDFExport.XacroOutput.NamespaceUri);
+            }
+        }
+
         public override void WriteURDF(XmlWriter writer)
         {
             writer.WriteStartDocument();

@@ -601,4 +601,10 @@
   <data xml:space="preserve" name="select an existing reference coordinate system for empty link {0}">
     <value>Select an existing reference coordinate system for empty link {0}</value>
   </data>
+  <data xml:space="preserve" name="write xacro (.urdf.xacro)">
+    <value>Write xacro (.urdf.xacro)</value>
+  </data>
+  <data xml:space="preserve" name="write the robot as a .urdf.xacro file instead of a .urdf file. the launch files then expand it with xacro.">
+    <value>Write the robot as a .urdf.xacro file instead of a .urdf file. The launch files then expand it with xacro.</value>
+  </data>
 </root>

@@ -120,6 +120,7 @@ namespace SW2URDF.UI
             meshFormatTips.SetToolTip(radioButtonStl, ui.Get("Geometry only, no colour."));
             meshFormatTips.SetToolTip(radioButton3dxml, ui.Get("Geometry with colour."));
             meshFormatTips.SetToolTip(radioButtonObj, ui.Get("Geometry with colour and materials, as .obj and .mtl files."));
+            meshFormatTips.SetToolTip(checkBoxXacro, ui.Get("Write the robot as a .urdf.xacro file instead of a .urdf file. The launch files then expand it with xacro."));
             // Items show the localized caption; the stored/compared value is mapped back by ui.ComboValue.
             comboBoxJointType.Items.Clear();
             foreach (string type in SW2URDF.URDF.Joint.AvailableTypes)
@@ -139,6 +140,7 @@ namespace SW2URDF.UI
             UiLayout.FitForm(this, UiLayout.ScreenDpi());
             swApp = SwApp;
             BaseNode = node;
+            checkBoxXacro.Checked = BaseNode.Link.WriteXacro;
             ActiveSWModel = swApp.ActiveDoc;
             RefreshConfigurationStatus();
             Exporter = exporter;
@@ -253,6 +255,15 @@ namespace SW2URDF.UI
         {
             Exporter.UpdateReferenceGeometries();
             FillJointTree();
+        }
+
+        // The choice is kept on the base link, which is saved with the settings of the active configuration.
+        private void CheckBoxXacroCheckedChanged(object sender, EventArgs e)
+        {
+            if (BaseNode != null)
+            {
+                BaseNode.Link.WriteXacro = checkBoxXacro.Checked;
+            }
         }
 
         private void RadioButtonObjCheckedChanged(object sender, EventArgs e)
@@ -462,6 +473,7 @@ namespace SW2URDF.UI
                 {
                     meshFormat = MeshExportFormat.STL;
                 }
+                Exporter.URDFRobot.BaseLink.WriteXacro = checkBoxXacro.Checked;
                 Exporter.ExportRobot(exportSTL, meshFormat);
                 ConfigurationSerialization.GroupUrdfFeatures(ActiveSWModel, ui);
 
@@ -636,4 +648,4 @@ namespace SW2URDF.UI
             textBoxMimicOffset.Text = "0.0";
         }
     }
-}
+}

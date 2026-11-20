@@ -78,6 +78,7 @@
             this.panelObjColorNote = new System.Windows.Forms.Panel();
             this.panelLinkContent = new System.Windows.Forms.Panel();
             this.panelLinkButtons = new System.Windows.Forms.TableLayoutPanel();
+            this.checkBoxXacro = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanelLinkButtons = new System.Windows.Forms.FlowLayoutPanel();
             this.panelJointPage = new System.Windows.Forms.Panel();
             this.panelJointContent = new System.Windows.Forms.Panel();
@@ -242,16 +243,32 @@
             this.panelLinkButtons.ColumnCount = 2;
             this.panelLinkButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.panelLinkButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panelLinkButtons.Controls.Add(this.buttonLinksCancel, 0, 0);
-            this.panelLinkButtons.Controls.Add(this.flowLayoutPanelLinkButtons, 1, 0);
+            this.panelLinkButtons.Controls.Add(this.checkBoxXacro, 0, 0);
+            this.panelLinkButtons.SetColumnSpan(this.checkBoxXacro, 2);
+            this.panelLinkButtons.Controls.Add(this.buttonLinksCancel, 0, 1);
+            this.panelLinkButtons.Controls.Add(this.flowLayoutPanelLinkButtons, 1, 1);
             this.panelLinkButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelLinkButtons.Location = new System.Drawing.Point(0, 610);
+            this.panelLinkButtons.Location = new System.Drawing.Point(0, 587);
             this.panelLinkButtons.Name = "panelLinkButtons";
             this.panelLinkButtons.Padding = new System.Windows.Forms.Padding(12, 4, 12, 6);
-            this.panelLinkButtons.RowCount = 1;
+            this.panelLinkButtons.RowCount = 2;
             this.panelLinkButtons.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.panelLinkButtons.Size = new System.Drawing.Size(1073, 34);
+            this.panelLinkButtons.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.panelLinkButtons.Size = new System.Drawing.Size(1073, 57);
             this.panelLinkButtons.TabIndex = 1;
+            //
+            // checkBoxXacro
+            //
+            // Applies to the whole robot file, so it sits with the export buttons, not with one link.
+            this.checkBoxXacro.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.checkBoxXacro.AutoSize = true;
+            this.checkBoxXacro.Margin = new System.Windows.Forms.Padding(3, 0, 3, 4);
+            this.checkBoxXacro.Name = "checkBoxXacro";
+            this.checkBoxXacro.Size = new System.Drawing.Size(150, 17);
+            this.checkBoxXacro.TabIndex = 2;
+            this.checkBoxXacro.Text = "Write xacro (.urdf.xacro)";
+            this.checkBoxXacro.UseVisualStyleBackColor = true;
+            this.checkBoxXacro.CheckedChanged += new System.EventHandler(this.CheckBoxXacroCheckedChanged);
             //
             // flowLayoutPanelLinkButtons
             //
@@ -2020,10 +2037,11 @@
         private System.Windows.Forms.Panel panelObjColorNote;
         private System.Windows.Forms.Panel panelLinkContent;
         private System.Windows.Forms.TableLayoutPanel panelLinkButtons;
+        private System.Windows.Forms.CheckBox checkBoxXacro;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelLinkButtons;
         private System.Windows.Forms.Panel panelJointPage;
         private System.Windows.Forms.Panel panelJointContent;
         private System.Windows.Forms.TableLayoutPanel panelJointButtons;
         private System.Windows.Forms.RadioButton radioButtonStl;
     }
-}
+}

@@ -74,12 +74,14 @@ namespace SW2URDF.ROS
         private readonly string paramName;
         private readonly string paramValue;
         private readonly string paramTextFile;
+        private readonly string paramCommand;
 
-        public LaunchParam(string name, string value = "", string textfile = "")
+        public LaunchParam(string name, string value = "", string textfile = "", string command = "")
         {
             paramName = name;
             paramValue = value;
             paramTextFile = textfile;
+            paramCommand = command;
         }
 
         public override void WriteFile(XmlWriter writer)
@@ -95,6 +97,11 @@ namespace SW2URDF.ROS
             if (paramTextFile.Length > 0)
             {
                 writer.WriteAttributeString("textfile", paramTextFile);
+            }
+
+            if (paramCommand.Length > 0)
+            {
+                writer.WriteAttributeString("command", paramCommand);
             }
             writer.WriteEndElement();
         }
@@ -170,7 +177,9 @@ namespace SW2URDF.ROS
         private readonly string model;
         private readonly List<LaunchElement> elements;
 
-        public Gazebo(string modelName, string packageName, string URDFName)
+        // A plain URDF is spawned from its file. A xacro file has to be expanded first: the launch file
+        // loads it into robot_description with the xacro command and spawns the model from that parameter.
+        public Gazebo(string modelName, string packageName, string URDFName, bool xacro = false)
         {
             elements = new List<LaunchElement>();
             model = modelName;
@@ -180,12 +189,28 @@ namespace SW2URDF.ROS
             elements.Add(new LaunchInclude("$(find gazebo_ros)/launch/empty_world.launch"));
             elements.Add(new LaunchNode(
                 "tf_footprint_base", "tf", "static_transform_publisher", "0 0 0 0 0 0 base_link base_footprint 40"));
-            elements.Add(new LaunchNode(
-                "spawn_model", "gazebo_ros", "spawn_model", "-file $(find " + package +
-                ")/urdf/" + robotURDF + " -urdf -model " + model, "screen"));
+            if (xacro)
+            {
+                elements.Add(new LaunchParam("robot_description", command: XacroCommand(package, robotURDF)));
+                elements.Add(new LaunchNode(
+                    "spawn_model", "gazebo_ros", "spawn_model",
+                    "-param robot_description -urdf -model " + model, "screen"));
+            }
+            else
+            {
+                elements.Add(new LaunchNode(
+                    "spawn_model", "gazebo_ros", "spawn_model", "-file $(find " + package +
+                    ")/urdf/" + robotURDF + " -urdf -model " + model, "screen"));
+            }
             elements.Add(new LaunchNode(
                 "fake_joint_calibration", "rostopic", "rostopic",
                 "pub /calibrated std_msgs/Bool true"));
+        }
+
+        /// <summary>ROS 1 launch command that expands a xacro file of the package into a URDF.</summary>
+        public static string XacroCommand(string packageName, string xacroFileName)
+        {
+            return "$(find xacro)/xacro $(find " + packageName + ")/urdf/" + xacroFileName;
         }
 
         public void WriteFile(string dir)
@@ -222,15 +247,19 @@ namespace SW2URDF.ROS
         private readonly string robotURDF;
         private readonly List<LaunchElement> elements;
 
-        public Rviz(string packageName, string URDFName)
+        public Rviz(string packageName, string URDFName, bool xacro = false)
         {
             package = packageName;
             robotURDF = URDFName;
 
+            LaunchParam robotDescription = xacro
+                ? new LaunchParam("robot_description", command: Gazebo.XacroCommand(package, robotURDF))
+                : new LaunchParam("robot_description", "", "$(find " + package + ")/urdf/" + robotURDF);
+
             elements = new List<LaunchElement>
             {
                 new LaunchArg("model"),
-                new LaunchParam("robot_description", "", "$(find " + package + ")/urdf/" + robotURDF),
+                robotDescription,
                 new LaunchNode("joint_state_publisher_gui", "joint_state_publisher_gui", "joint_state_publisher_gui"),
                 new LaunchNode("robot_state_publisher", "robot_state_publisher", "robot_state_publisher"),
                 new LaunchNode("rviz", "rviz", "rviz", "-d $(find " + package + ")/urdf.rviz")

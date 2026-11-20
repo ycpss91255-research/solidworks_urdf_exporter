@@ -112,6 +112,7 @@
             this.saveFileDialog_save_as = new System.Windows.Forms.SaveFileDialog();
             this.checkBox_rotate = new System.Windows.Forms.CheckBox();
             this.objExport = new System.Windows.Forms.CheckBox();
+            this.checkBoxXacro = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanelOptions = new System.Windows.Forms.FlowLayoutPanel();
             this.labelObjColorNote = new System.Windows.Forms.Label();
             this.panelObjColorNote = new System.Windows.Forms.Panel();
@@ -760,7 +761,7 @@
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.textBox_mass);
             this.groupBox1.Font = new System.Drawing.Font(this.Font.FontFamily, this.Font.SizeInPoints * 1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(1)));
-            this.groupBox1.Location = new System.Drawing.Point(12, 96);
+            this.groupBox1.Location = new System.Drawing.Point(12, 148);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(543, 185);
             this.groupBox1.TabIndex = 34;
@@ -807,7 +808,7 @@
             this.groupBox2.Controls.Add(this.label23);
             this.groupBox2.Controls.Add(this.textBox_visual_origin_y);
             this.groupBox2.Controls.Add(this.label30);
-            this.groupBox2.Location = new System.Drawing.Point(12, 286);
+            this.groupBox2.Location = new System.Drawing.Point(12, 338);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(543, 236);
             this.groupBox2.TabIndex = 62;
@@ -839,7 +840,7 @@
             this.groupBox3.Controls.Add(this.textBox_collision_origin_x);
             this.groupBox3.Controls.Add(this.textBox_collision_origin_z);
             this.groupBox3.Controls.Add(this.textBox_collision_origin_y);
-            this.groupBox3.Location = new System.Drawing.Point(12, 528);
+            this.groupBox3.Location = new System.Drawing.Point(12, 580);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(543, 141);
             this.groupBox3.TabIndex = 67;
@@ -907,14 +908,27 @@
             this.objExport.UseVisualStyleBackColor = true;
             this.objExport.CheckedChanged += new System.EventHandler(this.ObjExportCheckedChanged);
             //
+            // checkBoxXacro
+            //
+            this.checkBoxXacro.AutoSize = true;
+            this.checkBoxXacro.Location = new System.Drawing.Point(3, 49);
+            this.checkBoxXacro.Name = "checkBoxXacro";
+            this.checkBoxXacro.Size = new System.Drawing.Size(150, 17);
+            this.checkBoxXacro.TabIndex = 2;
+            this.checkBoxXacro.Text = "Write xacro (.urdf.xacro)";
+            this.checkBoxXacro.UseVisualStyleBackColor = true;
+            //
             // flowLayoutPanelOptions
             //
             this.flowLayoutPanelOptions.AutoSize = true;
             this.flowLayoutPanelOptions.Controls.Add(this.checkBox_rotate);
             this.flowLayoutPanelOptions.Controls.Add(this.objExport);
+            this.flowLayoutPanelOptions.Controls.Add(this.checkBoxXacro);
+            this.flowLayoutPanelOptions.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowLayoutPanelOptions.WrapContents = false;
             this.flowLayoutPanelOptions.Location = new System.Drawing.Point(9, 70);
             this.flowLayoutPanelOptions.Name = "flowLayoutPanelOptions";
-            this.flowLayoutPanelOptions.Size = new System.Drawing.Size(396, 23);
+            this.flowLayoutPanelOptions.Size = new System.Drawing.Size(396, 69);
             this.flowLayoutPanelOptions.TabIndex = 75;
             //
             // panelObjColorNote
@@ -1081,6 +1095,7 @@
         private System.Windows.Forms.Button button_savename_browse;
         private System.Windows.Forms.SaveFileDialog saveFileDialog_save_as;
         private System.Windows.Forms.CheckBox objExport;
+        private System.Windows.Forms.CheckBox checkBoxXacro;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelOptions;
         private System.Windows.Forms.Label labelObjColorNote;
         private System.Windows.Forms.Panel panelObjColorNote;
@@ -1088,4 +1103,4 @@
         private System.Windows.Forms.Panel panelButtons;
         private System.Windows.Forms.CheckBox checkBox_rotate;
     }
-}
+}

@@ -55,6 +55,11 @@ namespace SW2URDF.URDF
             this.required = required;
         }
 
+        /// <summary>Attributes written after the URDF attributes, such as a namespace declaration.</summary>
+        protected virtual void WriteExtraAttributes(XmlWriter writer)
+        {
+        }
+
         public virtual void WriteURDF(XmlWriter writer)
         {
             if (!AreRequiredFieldsSatisfied())
@@ -75,6 +80,8 @@ namespace SW2URDF.URDF
                     attribute.WriteURDF(writer);
                 }
             }
+
+            WriteExtraAttributes(writer);
 
             foreach (URDFElement child in ChildElements)
             {

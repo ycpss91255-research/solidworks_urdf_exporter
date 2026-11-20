@@ -62,6 +62,21 @@ It does not manage joints and links themselves, nor the reference coordinate sys
   them, are found by name for reuse, refresh and the cleanup of a cancelled preview, and hang on the
   `URDF Reference` sketch, so they are not regrouped.
 
+## Optional members
+
+Optional members are added without raising the format version (see below). Each one is read as its default
+when an older file does not have it, and an older exporter ignores it.
+
+| Member | Where | Meaning | Default |
+|---|---|---|---|
+| `WriteXacro` | the base link of the configuration entry | The export writes the robot as `<robot_name>.urdf.xacro` instead of `<robot_name>.urdf` (the "Write xacro" checkbox of the export forms). | `false`. It is not written when false, so the data of a configuration without xacro is byte-for-byte what it was before the member existed. |
+
+With `WriteXacro` set, only the `.urdf.xacro` file is written (no extra plain `.urdf`). The `<robot>` element
+declares `xmlns:xacro="http://www.ros.org/wiki/xacro"` and the rest of the file is the plain URDF, including the
+`package://` mesh paths. The ROS 1 `display.launch` and `gazebo.launch` expand it with
+`$(find xacro)/xacro`; without the member they are unchanged. The CSV next to the robot file keeps the name
+`<robot_name>.csv`. Macros and parameters are not generated.
+
 ## Format version
 
 - The version is the `exporterVersion` parameter stored **inside** each attribute. It

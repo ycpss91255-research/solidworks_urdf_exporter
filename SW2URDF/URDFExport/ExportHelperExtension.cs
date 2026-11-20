@@ -145,6 +145,7 @@ namespace SW2URDF.URDFExport
             target.Inertial.SetElement(saved.Inertial);
             target.Visual.SetElement(saved.Visual);
             target.Collision.SetElement(saved.Collision);
+            target.WriteXacro = saved.WriteXacro;
         }
 
         // This method now only works for the part exporter
